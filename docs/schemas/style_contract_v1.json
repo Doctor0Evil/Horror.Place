@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HorrorPlaceStyleContract",
+  "type": "object",
+  "required": ["id", "version", "safety_tier", "invariants", "metrics", "visual", "semantic", "implication_rules"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]+$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+$"
+    },
+    "safety_tier": {
+      "type": "string",
+      "enum": ["standard", "mature", "research"]
+    },
+    "allowed_builds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["standard", "mature", "research"]
+      },
+      "minItems": 1
+    },
+    "invariants": {
+      "type": "object",
+      "required": ["min", "recommended"],
+      "properties": {
+        "min": {
+          "type": "object",
+          "properties": {
+            "CIC": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "MDI": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "AOS": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "RRM": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "FCF": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "SPR": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "RWF": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "DET": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "LSG": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "SHCI": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "additionalProperties": false
+        },
+        "recommended": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "UEC": { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } }, "required": ["min", "max"] },
+        "EMD": { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } }, "required": ["min", "max"] },
+        "STCI": { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } }, "required": ["min", "max"] },
+        "CDL": { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } }, "required": ["min", "max"] },
+        "ARR": { "type": "object", "properties": { "min": { "type": "number" }, "max": { "type": "number" } }, "required": ["min", "max"] }
+      },
+      "additionalProperties": false
+    },
+    "visual": {
+      "type": "object",
+      "properties": {
+        "palette": {
+          "type": "object",
+          "properties": {
+            "monochrome_only": { "type": "boolean" },
+            "max_saturation": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          }
+        },
+        "composition_tags_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lighting_tags_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "semantic": {
+      "type": "object",
+      "properties": {
+        "mood_tags_required": { "type": "array", "items": { "type": "string" } },
+        "subject_tags_required": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "bci_haptics": {
+      "type": "object",
+      "properties": {
+        "requires_bci": { "type": "boolean" },
+        "channels": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "implication_rules": {
+      "type": "object",
+      "required": ["explicit_violence_forbidden", "evidence_types_allowed"],
+      "properties": {
+        "explicit_violence_forbidden": { "type": "boolean" },
+        "evidence_types_allowed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "bloodstained_object",
+              "disturbed_earth",
+              "contradictory_record",
+              "missing_person_reference",
+              "spectral_testimony_fragment",
+              "empty_space_implication"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
