@@ -1,0 +1,499 @@
+(* =============================================================================
+   Horror$Place Invariant Query Language (HIQL)
+   Version: 1.0.0
+   Doctrine: Rivers of Blood Charter v3.11A
+   Compliance: Adult Content Gating (18+) Required
+   
+   This BNF specification defines a formal query language for accessing,
+   filtering, and correlating horror invariants across the geo-historical
+   database. All queries must pass validation before execution.
+   ============================================================================= *)
+
+(* -----------------------------------------------------------------------------
+   SECTION 1: CORE SYNTAX ELEMENTS
+   ----------------------------------------------------------------------------- *)
+
+<query> ::= <select_query>
+          | <aggregate_query>
+          | <correlation_query>
+          | <validation_query>
+          | <telemetry_query>
+
+<select_query> ::= SELECT <select_list>
+                   FROM <source>
+                   [WHERE <condition>]
+                   [ORDER BY <sort_spec>]
+                   [LIMIT <integer>]
+
+<aggregate_query> ::= AGGREGATE <aggregate_function>
+                      ON <invariant_ref>
+                      GROUP BY <group_spec>
+                      [HAVING <condition>]
+
+<correlation_query> ::= CORRELATE <invariant_ref>
+                        WITH <invariant_ref>
+                        [USING <correlation_method>]
+                        [THRESHOLD <float>]
+
+<validation_query> ::= VALIDATE <region_ref>
+                       AGAINST <contract_ref>
+                       [RETURN <validation_detail>]
+
+<telemetry_query> ::= TELEMETRY <metric_list>
+                      FOR <session_ref>
+                      [TIME_RANGE <time_spec>]
+
+(* -----------------------------------------------------------------------------
+   SECTION 2: INVARIANT REFERENCES (16 Core Metrics)
+   ----------------------------------------------------------------------------- *)
+
+<invariant_ref> ::= <history_invariant>
+                  | <spectral_invariant>
+                  | <entertainment_invariant>
+
+(* Layer 1: History-Aware Horror World Model *)
+<history_invariant> ::= CIC    (* Catastrophic Imprint Coefficient *)
+                      | MDI    (* Mythic Density Index *)
+                      | AOS    (* Archival Opacity Score *)
+                      | RRM    (* Ritual Residue Map *)
+                      | FCF    (* Folkloric Convergence Factor *)
+                      | SPR    (* Spectral Plausibility Rating *)
+                      | RWF    (* Reliability Weighting Factor *)
+                      | DET    (* Dread Exposure Threshold *)
+                      | HVF    (* Haunt Vector Field *)
+                      | LSG    (* Liminal Stress Gradient *)
+
+(* Layer 2: Spectral Presence *)
+<spectral_invariant> ::= SHCI  (* Spectral-History Coupling Index *)
+
+(* Layer 3: Entertainment Factors *)
+<entertainment_invariant> ::= UEC   (* Uncertainty Engagement Coefficient *)
+                            | EMD   (* Evidential Mystery Density *)
+                            | STCI  (* Safe-Threat Contrast Index *)
+                            | CDL   (* Cognitive Dissonance Load *)
+                            | ARR   (* Ambiguous Resolution Ratio *)
+
+(* -----------------------------------------------------------------------------
+   SECTION 3: DATA SOURCES AND REGIONS
+   ----------------------------------------------------------------------------- *)
+
+<source> ::= <region_table>
+           | <history_database>
+           | <telemetry_store>
+           | <combined_source>
+
+<region_table> ::= REGIONS
+                 | REGION(<region_id>)
+                 | REGION_TAG(<tag_string>)
+
+<history_database> ::= HISTORY
+                     | HISTORY(<region_ref>)
+                     | ARCHIVE(<document_class>)
+
+<telemetry_store> ::= TELEMETRY
+                    | SESSIONS
+                    | PLAYER_METRICS
+
+<combined_source> ::= <source> JOIN <source> ON <join_condition>
+
+<region_ref> ::= <region_id>
+               | REGION_ID(<string>)
+               | COORDINATES(<float>, <float>)
+               | BIOME(<biome_type>)
+
+<region_id> ::= <string>
+
+<biome_type> ::= DENSE_FOREST
+               | DRY_MEADOW
+               | SWAMP
+               | SCORCHED_DESERT
+               | MARSHLAND
+               | INDUSTRIAL_WASTELAND
+               | ABANDONED_SETTLEMENT
+               | WATER_BODY
+               | UNDERGROUND
+               | LIMINAL_ZONE
+
+(* -----------------------------------------------------------------------------
+   SECTION 4: SELECTION AND FILTERING
+   ----------------------------------------------------------------------------- *)
+
+<select_list> ::= <select_item> [, <select_item>]*
+
+<select_item> ::= <invariant_ref>
+                | <invariant_ref> AS <alias>
+                | CALCULATED(<expression>) AS <alias>
+                | *
+
+<condition> ::= <comparison>
+              | <logical_op>
+              | <invariant_check>
+              | <exists_clause>
+
+<comparison> ::= <operand> <operator> <operand>
+
+<operand> ::= <invariant_ref>
+            | <literal>
+            | <function_call>
+            | <subquery>
+
+<operator> ::= =
+             | !=
+             | <
+             | >
+             | <=
+             | >=
+             | ~=        (* approximate equality *)
+             | BETWEEN
+             | IN
+
+<logical_op> ::= <condition> AND <condition>
+               | <condition> OR <condition>
+               | NOT <condition>
+               | (<condition>)
+
+<invariant_check> ::= INVARIANT(<invariant_ref>) IS <valid_state>
+                    | INVARIANT(<invariant_ref>) HAS_RANGE <float>, <float>
+
+<valid_state> ::= VALID
+                | WARNING
+                | INVALID
+                | PENDING
+
+<exists_clause> ::= EXISTS(<subquery>)
+                  | NOT EXISTS(<subquery>)
+
+(* -----------------------------------------------------------------------------
+   SECTION 5: AGGREGATION AND GROUPING
+   ----------------------------------------------------------------------------- *)
+
+<aggregate_function> ::= AVG
+                       | SUM
+                       | MIN
+                       | MAX
+                       | STDDEV
+                       | VARIANCE
+                       | CORRELATION
+                       | HISTOGRAM
+
+<group_spec> ::= <group_item> [, <group_item>]*
+
+<group_item> ::= <invariant_ref>
+               | <region_ref>
+               | TIME_BUCKET(<time_unit>)
+               | BIOME_CLASS
+
+<time_unit> ::= HOUR
+              | DAY
+              | WEEK
+              | SESSION
+              | CHAPTER
+
+(* -----------------------------------------------------------------------------
+   SECTION 6: CORRELATION ANALYSIS
+   ----------------------------------------------------------------------------- *)
+
+<correlation_method> ::= PEARSON
+                       | SPEARMAN
+                       | KENDALL
+                       | MUTUAL_INFORMATION
+                       | GRANGER_CAUSALITY
+
+<correlation_threshold> ::= THRESHOLD <float>
+
+(* Predefined correlation pairs for horror analysis *)
+<standard_correlation> ::= CORRELATE CIC WITH DET
+                         | CORRELATE SHCI WITH UEC
+                         | CORRELATE AOS WITH EMD
+                         | CORRELATE SPR WITH CDL
+                         | CORRELATE STCI WITH ARR
+
+(* -----------------------------------------------------------------------------
+   SECTION 7: VALIDATION CONTRACTS
+   ----------------------------------------------------------------------------- *)
+
+<contract_ref> ::= <contract_id>
+                 | CONTRACT(<contract_name>)
+                 | DOCTRINE(<doctrine_version>)
+
+<contract_id> ::= VGC_001      (* Visual Generation Contract *)
+                | NGC_001      (* Narrative Generation Contract *)
+                | AGC_001      (* Audio Generation Contract *)
+                | SGC_001      (* Spectral Generation Contract *)
+
+<doctrine_version> ::= STRING
+
+<validation_detail> ::= FULL
+                      | SUMMARY
+                      | FAILURES_ONLY
+                      | WITH_SUGGESTIONS
+
+(* -----------------------------------------------------------------------------
+   SECTION 8: TELEMETRY INTEGRATION
+   ----------------------------------------------------------------------------- *)
+
+<metric_list> ::= <metric_ref> [, <metric_ref>]*
+
+<metric_ref> ::= <telemetry_metric>
+               | <invariant_ref>
+               | DERIVED(<expression>)
+
+<telemetry_metric> ::= TIME_IN_REGION
+                     | HEART_RATE_VARIANCE
+                     | PAUSE_FREQUENCY
+                     | BACKTRACK_DISTANCE
+                     | INVENTORY_CHECK_RATE
+                     | SAVE_FREQUENCY
+                     | AUDIO_VOLUME_ADJUSTMENTS
+                     | GAZE_DWELL_TIME
+                     | MOVEMENT_HESSITATION
+                     | SANITY_DEPLETION_RATE
+
+<session_ref> ::= SESSION(<session_id>)
+                | PLAYER(<player_id>)
+                | ALL_ACTIVE
+                | COHORT(<cohort_name>)
+
+<time_spec> ::= <timestamp> TO <timestamp>
+              | LAST <integer> <time_unit>
+              | SINCE <event_ref>
+
+<event_ref> ::= REGION_ENTRY(<region_id>)
+              | SPECTRAL_MANIFESTATION
+              | SANITY_EVENT
+              | SAVE_POINT
+
+(* -----------------------------------------------------------------------------
+   SECTION 9: EXPRESSIONS AND FUNCTIONS
+   ----------------------------------------------------------------------------- *)
+
+<expression> ::= <math_expression>
+               | <string_expression>
+               | <invariant_expression>
+
+<math_expression> ::= <operand> <math_op> <operand>
+                    | FUNC(<function_name>, <arg_list>)
+
+<math_op> ::= +
+            | -
+            | *
+            | /
+            | ^
+            | %
+
+<function_name> ::= SPR_CALC           (* Calculate SPR from CIC, MDI, AOS *)
+                  | DET_SCALE          (* Scale DET by CIC *)
+                  | HVF_MAGNITUDE      (* Calculate HVF magnitude *)
+                  | MANIFEST_TYPE      (* Determine manifestation type from SHCI *)
+                  | ENTERTAINMENT_SCORE (* Composite entertainment metric *)
+
+<arg_list> ::= <arg> [, <arg>]*
+
+<arg> ::= <literal>
+        | <invariant_ref>
+        | <expression>
+
+<string_expression> ::= <string> <string_op> <string>
+                      | CONCAT(<arg_list>)
+                      | MATCH(<string>, <pattern>)
+
+<string_op> ::= ||
+              | CONTAINS
+              | STARTS_WITH
+              | ENDS_WITH
+
+<invariant_expression> ::= DERIVE(<invariant_ref>, <formula>)
+                         | NORMALIZE(<invariant_ref>)
+                         | THRESHOLD_CHECK(<invariant_ref>, <float>)
+
+(* -----------------------------------------------------------------------------
+   SECTION 10: LITERALS AND DATA TYPES
+   ----------------------------------------------------------------------------- *)
+
+<literal> ::= <string>
+            | <integer>
+            | <float>
+            | <boolean>
+            | <null>
+
+<string> ::= " <characters> "
+           | ' <characters> '
+
+<integer> ::= <digit>+
+
+<float> ::= <digit>+ . <digit>+
+          | <digit>+ . <digit>+ E <sign> <digit>+
+
+<boolean> ::= TRUE
+            | FALSE
+
+<null> ::= NULL
+
+<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+<sign> ::= + | -
+
+(* -----------------------------------------------------------------------------
+   SECTION 11: SORTING AND LIMITING
+   ----------------------------------------------------------------------------- *)
+
+<sort_spec> ::= <sort_item> [, <sort_item>]*
+
+<sort_item> ::= <invariant_ref> [ASC | DESC]
+              | <expression> [ASC | DESC]
+
+<limit_clause> ::= LIMIT <integer>
+                 | OFFSET <integer>
+                 | LIMIT <integer> OFFSET <integer>
+
+(* -----------------------------------------------------------------------------
+   SECTION 12: AI-CHAT COMPATIBLE EXTENSIONS
+   ----------------------------------------------------------------------------- *)
+
+(* Natural language query wrapper for AI-chat integration *)
+<nl_query> ::= NL(" <natural_language> ")
+
+<natural_language> ::= <characters>  (* Free-form text parsed by NLP *)
+
+(* AI-suggested query with confidence score *)
+<ai_suggested_query> ::= AI_SUGGEST(<query>, <confidence_float>)
+
+<confidence_float> ::= <float>  (* Range: 0.0 to 1.0 *)
+
+(* Query explanation for transparency *)
+<query_with_explanation> ::= EXPLAIN(<query>)
+
+(* -----------------------------------------------------------------------------
+   SECTION 13: ADULT GATING AND COMPLIANCE CHECKS
+   ----------------------------------------------------------------------------- *)
+
+<gating_check> ::= AGE_GATE_VERIFIED(<player_id>)
+                 | CONTENT_LEVEL(<rating>)
+                 | WELLNESS_CHECK(<session_id>)
+
+<rating> ::= TEEN
+           | MATURE
+           | ADULT
+           | ADULT_PLUS
+
+<wellness_check> ::= BREAK_RECOMMENDED(<session_id>)
+                   | INTENSITY_CAP_ACTIVE
+                   | SAFE_ZONE_AVAILABLE
+
+(* -----------------------------------------------------------------------------
+   SECTION 14: EXAMPLE QUERIES (Reference)
+   ----------------------------------------------------------------------------- *)
+
+(* Example 1: Find all high-CIC regions with low DET *)
+EXAMPLE_1 ::= SELECT REGION_ID, CIC, DET
+              FROM REGIONS
+              WHERE CIC >= 0.75 AND DET <= 0.50
+              ORDER BY CIC DESC
+              LIMIT 10
+
+(* Example 2: Correlate spectral coupling with player uncertainty *)
+EXAMPLE_2 ::= CORRELATE SHCI WITH UEC
+              USING PEARSON
+              THRESHOLD 0.65
+
+(* Example 3: Validate region against visual contract *)
+EXAMPLE_3 ::= VALIDATE REGION("eidoville_valley")
+              AGAINST VGC_001
+              RETURN WITH_SUGGESTIONS
+
+(* Example 4: Aggregate entertainment metrics by biome *)
+EXAMPLE_4 ::= AGGREGATE AVG(UEC)
+              ON ENTERTAINMENT_INVARIANT
+              GROUP BY BIOME_CLASS
+              HAVING AVG(UEC) >= 0.55
+
+(* Example 5: Telemetry correlation with invariant values *)
+EXAMPLE_5 ::= TELEMETRY HEART_RATE_VARIANCE, PAUSE_FREQUENCY
+              FOR SESSION("session_12345")
+              TIME_RANGE LAST 1 HOUR
+
+(* Example 6: AI-chat natural language query *)
+EXAMPLE_6 ::= NL("Show me regions where players feel most uncertain")
+
+(* Example 7: Complex multi-invariant filter for Rivers of Blood compliance *)
+EXAMPLE_7 ::= SELECT REGION_ID, CIC, AOS, SHCI, SPR
+              FROM REGIONS
+              WHERE CIC >= 0.85
+                AND AOS >= 0.70
+                AND SHCI >= 0.90
+                AND SPR >= 0.75
+                AND INVARIANT(CIC) IS VALID
+              ORDER BY (CIC * SHCI) DESC
+
+(* Example 8: Derived SPR calculation with validation *)
+EXAMPLE_8 ::= SELECT REGION_ID,
+                     CIC,
+                     MDI,
+                     AOS,
+                     DERIVE(SPR, SPR_CALC(CIC, MDI, AOS)) AS CALCULATED_SPR
+              FROM REGIONS
+              WHERE THRESHOLD_CHECK(CIC, 0.60) = TRUE
+
+(* -----------------------------------------------------------------------------
+   SECTION 15: EXTENSION POINTS (Future Versions)
+   ----------------------------------------------------------------------------- *)
+
+(* Reserved for BCI/fMRI integration - see context-narrative specsheet *)
+<neuro_query> ::= NEURO(<neuro_metric>)
+                | FMRI_REGION(<coordinate_3d>)
+                | BCI_SIGNAL(<signal_type>)
+
+<neuro_metric> ::= CORTICAL_AROUSAL
+                 | AMYGDALA_ACTIVITY
+                 | PREFRONTAL_ENGAGEMENT
+                 | HEART_BRAIN_COHERENCE
+
+<signal_type> ::= EEG_ALPHA
+                | EEG_BETA
+                | EEG_GAMMA
+                | GSR
+                | HRV
+
+(* Reserved for multi-region temporal analysis *)
+<temporal_query> ::= TEMPORAL(<time_series_inv>)
+                   | PREDICT(<invariant_ref>, <time_horizon>)
+
+<time_series_inv> ::= CIC_OVER_TIME
+                    | UEC_TRAJECTORY
+                    | MANIFESTATION_FREQUENCY
+
+(* -----------------------------------------------------------------------------
+   SECTION 16: ERROR HANDLING AND VALIDATION
+   ----------------------------------------------------------------------------- *)
+
+<error_response> ::= ERROR(<error_code>, <error_message>)
+
+<error_code> ::= E001  (* Invalid invariant reference *)
+               | E002  (* Region not found *)
+               | E003  (* Contract validation failed *)
+               | E004  (* Age gate not verified *)
+               | E005  (* Query timeout *)
+               | E006  (* Insufficient permissions *)
+               | E007  (* Invalid correlation method *)
+               | E008  (* Telemetry data unavailable *)
+
+<error_message> ::= <string>
+
+(* Validation response structure *)
+<validation_response> ::= VALIDATION_RESULT(<status>, <details>)
+
+<status> ::= PASS
+           | WARN
+           | FAIL
+
+<details> ::= <detail_item> [, <detail_item>]*
+
+<detail_item> ::= RULE(<rule_id>): <result>
+
+<result> ::= PASSED
+           | FAILED(<reason>)
+           | SKIPPED
+
+(* =============================================================================
+   END OF BNF SPECIFICATION
+   ============================================================================= *)
