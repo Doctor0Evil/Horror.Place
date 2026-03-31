@@ -1,0 +1,456 @@
+# =============================================================================
+# Horror$Place Visual-Narrative Contract Schema
+# Version: 1.0.0
+# Doctrine: Rivers of Blood Charter
+# Compliance: Adult Content Gating (18+) Required
+# 
+# This schema defines enforceable contracts between visual generation,
+# narrative systems, and the horror invariant engine. All content must
+# pass validation before deployment to production environments.
+# =============================================================================
+
+[meta]
+schema_id = "VNC_001_HAND_PAINTED_FOLK"
+schema_version = "1.0.0"
+created_date = "2026-03-31"
+doctrine_reference = "Rivers of Blood Charter v3.11A"
+age_gate_required = true
+minimum_age = 18
+content_classification = "MATURE_HORROR"
+
+# =============================================================================
+# SECTION 1: VISUAL AESTHETIC PROFILE
+# =============================================================================
+
+[visual_profile]
+profile_id = "FOLK_PAINTED_DARKNESS"
+rendering_method = "hand_painted_digital"
+color_strategy = "restricted_palette_dark"
+texture_approach = "organic_brushwork"
+
+# Color palette restrictions (hex values for engine enforcement)
+[visual_profile.palette]
+primary_dark = "#1a1410"      # Deep charcoal-brown
+secondary_dark = "#2d241f"    # Warm black
+accent_blood = "#4a1f1f"      # Dried blood red
+accent_rust = "#5c4033"       # Oxidized metal
+highlight_bone = "#c9b896"    # Aged ivory
+highlight_moon = "#e8e4d9"    # Cold moonlight
+forbidden_colors = ["#ff0000", "#00ff00", "#0000ff"]  # No pure RGB
+
+# Brushwork characteristics
+[visual_profile.brushwork]
+stroke_visibility = "high"
+edge_softness = "variable"
+layer_count_min = 4
+layer_count_max = 12
+blend_mode = "traditional_overlay"
+noise_texture = "canvas_grain"
+
+# Atmospheric effects
+[visual_profile.atmosphere]
+fog_density = "dynamic_by_DET"
+particle_systems = ["ash", "dust", "dried_petals"]
+volumetric_lighting = true
+light_scattering = "turbid_medium"
+
+# =============================================================================
+# SECTION 2: NARRATIVE TONE ENFORCEMENT
+# =============================================================================
+
+[narrative_profile]
+tone_id = "SLAVIC_FOLK_DREAD"
+perspective = "limited_third_person"
+temporal_structure = "non_linear_fragmented"
+reliability_mode = "unreliable_narrator"
+
+# Story pacing constraints
+[narrative_profile.pacing]
+exposition_ratio = 0.15       # Max 15% direct exposition
+implication_ratio = 0.65      # Min 65% implied information
+ambiguity_ratio = 0.20        # Min 20% permanently unresolved
+dialogue_sparsity = "high"    # Minimal direct speech
+
+# Thematic boundaries
+[narrative_profile.themes]
+allowed = [
+    "collective_memory",
+    "landscape_trauma",
+    "ritual_consequence",
+    "disappearance_mystery",
+    "environmental_retribution"
+]
+forbidden = [
+    "jump_scare_reliance",
+    "gore_for_shock",
+    "supernatural_explanation",
+    "heroic_resolution"
+]
+
+# Character archetypes (folklore-based, original)
+[narrative_profile.archetypes]
+witness = { role = "observer_survivor", agency = "limited" }
+keeper = { role = "knowledge_guardian", trustworthiness = "ambiguous" }
+absent_one = { role = "vanished_person", presence = "environmental_only" }
+echo = { role = "memory_manifestation", corporeality = "partial" }
+
+# =============================================================================
+# SECTION 3: INVARIANT BINDING REQUIREMENTS
+# =============================================================================
+
+[invariant_bindings]
+# These invariants MUST be queried before content generation
+
+[invariant_bindings.history_layer]
+CIC_min = 0.60
+CIC_max = 1.00
+MDI_min = 0.50
+MDI_max = 1.00
+AOS_min = 0.40
+AOS_max = 1.00
+RRM_min = 0.30
+RRM_max = 1.00
+FCF_min = 0.40
+FCF_max = 1.00
+SPR_min = 0.50
+SPR_max = 1.00
+RWF_min = 0.30
+RWF_max = 1.00
+DET_min = 0.20
+DET_max = 0.80
+HVF_required = true
+LSG_min = 0.40
+LSG_max = 1.00
+
+[invariant_bindings.entertainment_layer]
+UEC_target = { min = 0.55, max = 0.85 }
+EMD_target = { min = 0.60, max = 0.90 }
+STCI_target = { min = 0.45, max = 0.75 }
+CDL_target = { min = 0.60, max = 0.85 }
+ARR_minimum = 0.70
+
+[invariant_bindings.spectral_layer]
+SHCI_min = 0.50
+SHCI_max = 1.00
+manifestation_probability = "scaled_by_SPR"
+
+# =============================================================================
+# SECTION 4: ADULT CONTENT GATING SYSTEM
+# =============================================================================
+
+[content_gating]
+age_verification_required = true
+minimum_age = 18
+verification_method = "account_based"
+consent_logging = true
+
+# Content intensity scales (0.0 - 1.0)
+[content_gating.intensity_limits]
+psychological_pressure_max = 0.85
+visual_disturbance_max = 0.75
+thematic_darkness_max = 0.90
+implied_violence_max = 0.70
+explicit_content_allowed = false
+
+# Wellness safeguards
+[content_gating.wellness]
+mandatory_break_reminders = true
+break_interval_minutes = 45
+intensity_ramping = "gradual"
+safe_zone_required = true
+safe_zone_frequency = "per_chapter"
+opt_out_mechanism = true
+
+# Content warnings (dynamic by region)
+[content_gating.warnings]
+dynamic_by = ["CIC", "DET", "SPR"]
+warning_categories = [
+    "psychological_horror",
+    "existential_dread",
+    "historical_trauma",
+    "body_horror_implied",
+    "isolation_themes"
+]
+display_timing = "pre_region_entry"
+
+# =============================================================================
+# SECTION 5: GENERATION CONTRACT RULES
+# =============================================================================
+
+[generation_contracts]
+
+# Visual generation must satisfy these conditions
+[generation_contracts.visual]
+contract_id = "VGC_001"
+validation_required = true
+
+[[generation_contracts.visual.rules]]
+rule_id = "VGC_001_R1"
+description = "No pure color values in final render"
+check_type = "palette_analysis"
+failure_action = "reject_and_regenerate"
+
+[[generation_contracts.visual.rules]]
+rule_id = "VGC_001_R2"
+description = "Brush stroke visibility must exceed threshold"
+check_type = "texture_analysis"
+threshold = 0.60
+failure_action = "apply_post_process"
+
+[[generation_contracts.visual.rules]]
+rule_id = "VGC_001_R3"
+description = "Atmospheric density must match DET value"
+check_type = "invariant_correlation"
+correlation_invariant = "DET"
+tolerance = 0.15
+failure_action = "adjust_and_log"
+
+[[generation_contracts.visual.rules]]
+rule_id = "VGC_001_R4"
+description = "Light source must be motivated by HVF direction"
+check_type = "lighting_analysis"
+correlation_invariant = "HVF"
+failure_action = "recalculate"
+
+# Narrative generation must satisfy these conditions
+[generation_contracts.narrative]
+contract_id = "NGC_001"
+validation_required = true
+
+[[generation_contracts.narrative.rules]]
+rule_id = "NGC_001_R1"
+description = "Exposition ratio must not exceed 15%"
+check_type = "text_analysis"
+threshold = 0.15
+failure_action = "rewrite_implication"
+
+[[generation_contracts.narrative.rules]]
+rule_id = "NGC_001_R2"
+description = "At least 70% of mysteries must remain unresolved"
+check_type = "resolution_tracking"
+threshold = 0.70
+correlation_invariant = "ARR"
+failure_action = "add_ambiguity"
+
+[[generation_contracts.narrative.rules]]
+rule_id = "NGC_001_R3"
+description = "All supernatural elements must have CIC anchor"
+check_type = "lore_validation"
+correlation_invariant = "CIC"
+failure_action = "add_historical_context"
+
+[[generation_contracts.narrative.rules]]
+rule_id = "NGC_001_R4"
+description = "No direct supernatural confirmation allowed"
+check_type = "certainty_analysis"
+max_certainty = 0.40
+failure_action = "introduce_doubt"
+
+# =============================================================================
+# SECTION 6: MACHINE-CHECKABLE LABELS
+# =============================================================================
+
+[label_taxonomy]
+# All generated content must be tagged with these labels for telemetry
+
+[label_taxonomy.visual_labels]
+required_count_min = 5
+allowed_labels = [
+    "brush_visible",
+    "palette_restricted",
+    "light_motivated",
+    "atmosphere_dynamic",
+    "composition_asymmetric",
+    "texture_organic",
+    "contrast_high",
+    "detail_selective",
+    "edge_variable",
+    "depth_layered"
+]
+
+[label_taxonomy.narrative_labels]
+required_count_min = 4
+allowed_labels = [
+    "perspective_limited",
+    "reliability_questionable",
+    "temporal_fragmented",
+    "exposition_minimal",
+    "ambiguity_preserved",
+    "theme_trauma",
+    "theme_memory",
+    "theme_landscape",
+    "resolution_partial",
+    "explanation_denied"
+]
+
+[label_taxonomy.invariant_labels]
+required_count_min = 3
+format = "INV_{name}_{value_range}"
+examples = [
+    "INV_CIC_high",
+    "INV_AOS_medium",
+    "INV_DET_low",
+    "INV_SPR_high",
+    "INV_SHCI_coupled"
+]
+
+# =============================================================================
+# SECTION 7: TELEMETRY AND VALIDATION
+# =============================================================================
+
+[telemetry]
+logging_required = true
+session_tracking = true
+player_response_capture = true
+
+[telemetry.metrics]
+# Track these metrics for each content instance
+tracked = [
+    "time_in_region",
+    "heart_rate_variance",
+    "pause_frequency",
+    "backtrack_distance",
+    "inventory_check_rate",
+    "save_frequency",
+    "audio_volume_adjustments"
+]
+
+# Correlation analysis for invariant tuning
+[telemetry.correlations]
+analyze = [
+    { metric = "pause_frequency", invariant = "UEC" },
+    { metric = "backtrack_distance", invariant = "STCI" },
+    { metric = "save_frequency", invariant = "DET" },
+    { metric = "heart_rate_variance", invariant = "CIC" },
+    { metric = "time_in_region", invariant = "ARR" }
+]
+
+# Validation checkpoints
+[telemetry.validation]
+checkpoints = [
+    "pre_generation",
+    "post_generation",
+    "pre_delivery",
+    "post_experience"
+]
+failure_threshold = 0.10
+auto_remediation = true
+
+# =============================================================================
+# SECTION 8: WORKFLOW SPRINT INTEGRATION
+# =============================================================================
+
+[workflow_sprints]
+sprint_duration_weeks = 3
+review_gates = 3
+
+[workflow_sprints.phase_1]
+name = "Historical_Anchoring"
+duration_days = 7
+deliverables = [
+    "region_invariant_profile",
+    "historical_event_graph",
+    "folklore_convergence_map"
+]
+validation_gate = "invariant_consistency"
+
+[workflow_sprints.phase_2]
+name = "Visual_Narrative_Prototype"
+duration_days = 7
+deliverables = [
+    "concept_art_set",
+    "narrative_fragment_draft",
+    "audio_mood_board"
+]
+validation_gate = "contract_compliance"
+
+[workflow_sprints.phase_3]
+name = "Integration_Testing"
+duration_days = 7
+deliverables = [
+    "playtest_build",
+    "telemetry_dashboard",
+    "wellness_report"
+]
+validation_gate = "player_response_analysis"
+
+# =============================================================================
+# SECTION 9: AI-CHAT INTEGRATION SPECIFICATIONS
+# =============================================================================
+
+[ai_chat_integration]
+enabled = true
+context_awareness_required = true
+invariant_query_mandatory = true
+
+[ai_chat_integration.prompt_constraints]
+# AI must include these in all generation requests
+required_context = [
+    "region_invariants",
+    "entertainment_targets",
+    "content_gating_status",
+    "previous_content_history"
+]
+
+forbidden_requests = [
+    "full_explanation",
+    "supernatural_confirmation",
+    "horror_bypass",
+    "intensity_override"
+]
+
+[ai_chat_integration.response_validation]
+check_invariants = true
+check_gating = true
+check_contracts = true
+log_all_interactions = true
+
+# =============================================================================
+# SECTION 10: EXTENSION POINTS
+# =============================================================================
+
+[extension_points]
+# Reserved for future schema versions without breaking compatibility
+
+[extension_points.visual_profiles]
+reserved_ids = ["VNC_002", "VNC_003", "VNC_004"]
+max_profiles = 8
+
+[extension_points.narrative_profiles]
+reserved_ids = ["NNC_001", "NNC_002", "NNC_003"]
+max_profiles = 6
+
+[extension_points.gating_levels]
+reserved_levels = ["TEEN", "MATURE", "ADULT_PLUS"]
+custom_levels_allowed = true
+
+# =============================================================================
+# SECTION 11: COMPLIANCE CERTIFICATION
+# =============================================================================
+
+[compliance]
+certification_required = true
+certification_authority = "Horror$Place Review Board"
+review_frequency = "per_major_release"
+
+[compliance.checklist]
+items = [
+    "age_gate_functional",
+    "invariant_bindings_validated",
+    "content_contracts_enforced",
+    "telemetry_operational",
+    "wellness_safeguards_active",
+    "ai_chat_constraints_applied",
+    "label_taxonomy_complete",
+    "extension_points_documented"
+]
+minimum_pass_rate = 1.0  # All items must pass
+
+[compliance.audit_log]
+retention_days = 730
+export_format = "JSON"
+encryption_required = true
+
+# =============================================================================
+# END OF SCHEMA
+# =============================================================================
