@@ -1,0 +1,14 @@
+{
+  "aral_sea_dissolution_01": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Atrocity-Seeds.git#events/aral_dissolution_v1.json",
+    "invariant_preconditions": ["AOS-782", "CIC-1956", "HVF-0.92"],
+    "hash": "sha256:example_hash_for_aral_dissolution_event_contract",
+    "tier": "mature"
+  },
+  "surprise_archivist_water_whisper_v1": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Codebase-of-Death.git#contracts/events/surprise_archivist_water_whisper_v1.json",
+    "invariant_preconditions": ["MDI-0.6", "SPR-0.7"],
+    "hash": "sha256:example_hash_for_water_whisper_event_contract",
+    "tier": "mature"
+  }
+}
