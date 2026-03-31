@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Horror$Place Invariant Bundle Schema v1",
+  "description": "Schema for defining region-specific horror invariants that govern content generation and safety constraints.",
+  "type": "object",
+  "properties": {
+    "region_id": {
+      "type": "string",
+      "description": "Unique identifier for the region or location.",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "CIC": {
+      "type": "number",
+      "description": "Catastrophic Imprint Coefficient: Quantifies the historical impact of major disasters.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "MDI": {
+      "type": "number",
+      "description": "Mythic Density Index: Measures the concentration of myths and urban legends.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "AOS": {
+      "type": "number",
+      "description": "Archival Opacity Score: Captures the completeness and reliability of historical records.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "RRM": {
+      "type": "number",
+      "description": "Ritual Residue Map: Indicates the presence of repeated, structured human behavior.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "FCF": {
+      "type": "number",
+      "description": "Folkloric Convergence Factor: Measures how many independent storylines point to the same area.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "SPR": {
+      "type": "number",
+      "description": "Spectral Plausibility Rating: Likelihood that a haunting could be true within world rules.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "RWF": {
+      "type": "number",
+      "description": "Reliability Weighting Factor: Rates the credibility of sources contributing to the region's story.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "DET": {
+      "type": "number",
+      "description": "Dread Exposure Threshold: Time a character can remain in the area before psychological effects.",
+      "minimum": 0.0,
+      "maximum": 10.0
+    },
+    "HVF": {
+      "type": "number",
+      "description": "Historical Veracity Factor: Measure of how closely the region's portrayal aligns with documented history.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "LSG": {
+      "type": "number",
+      "description": "Liminal Stress Gradient: Sharpness of transition between different states or biomes.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "SHCI": {
+      "type": "number",
+      "description": "Spectral-Historical Coherence Index: Measures the consistency between spectral activity and historical events.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "preconditions": {
+      "type": "array",
+      "description": "List of invariant IDs that must be satisfied before this region can be activated or accessed.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "region_id",
+    "CIC",
+    "MDI",
+    "AOS",
+    "RRM",
+    "FCF",
+    "SPR",
+    "RWF",
+    "DET",
+    "HVF",
+    "LSG",
+    "SHCI"
+  ],
+  "additionalProperties": false
+}
