@@ -1,0 +1,484 @@
+# ============================================================================
+# Horror$Place Core Engine
+# Sovereign Horror Research Platform v1.0.0
+# ============================================================================
+#
+# SAFETY TIERS:
+# - standard: Public GitHub, all ages, implication-only horror
+# - mature: User-gated (Tier 2), age verification, extended datasets
+# - research: IRB-approved (Tier 3), BCI/haptics, physiological data
+#
+# CHARTER COMPLIANCE:
+# All features must adhere to the Rivers of Blood Charter (docs/rivers_of_blood_charter.md)
+# Explicit violence, gore, and gratuitous horror are forbidden at all tiers.
+#
+# REFERENCE: Darkwood 2 (Ice-Pick Lodge), Pathologic Series, Aral Sea Historical Archives
+
+[package]
+name = "horror_place_core"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75.0"
+authors = ["Horror$Place Core Team <core@horrorplace.org>"]
+description = "Sovereign horror research engine with history-aware procedural generation"
+license = "AGPL-3.0-or-later"
+homepage = "https://horrorplace.org"
+repository = "https://github.com/horrorplace/horror-place-core"
+keywords = ["horror", "procedural", "historical", "research", "darkwood"]
+categories = ["game-development", "simulation", "ethics"]
+
+# ============================================================================
+# SAFETY TIER FEATURE FLAGS
+# ============================================================================
+# These features control access to sensitive modules and research capabilities.
+# Tier 1 (standard) is default. Tier 2/3 require explicit opt-in + validation.
+
+[features]
+default = ["standard"]
+
+# Tier 1: Public GitHub (Safe for all audiences)
+standard = [
+    "spectral_library",
+    "pcg_generator",
+    "audio_automation",
+    "style_router",
+    "style_lint",
+    "charter_enforcement",
+]
+
+# Tier 2: User-Gated (Age verification, ethics charter acceptance)
+mature = [
+    "standard",
+    "extended_datasets",
+    "full_ai_personalities",
+    "historical_trauma_archives",
+    "underground_network",
+]
+
+# Tier 3: Research Sandbox (IRB-approved, local-only physiological processing)
+research = [
+    "mature",
+    "bci_integration",
+    "haptic_optimization",
+    "physiological_telemetry",
+    "god_like_personalities",
+    "neural_resonance_lab",
+]
+
+# Module-level features (can be mixed within tier constraints)
+spectral_library = []
+pcg_generator = ["spectral_library", "rand", "serde"]
+audio_automation = ["spectral_library", "serde"]
+style_router = ["spectral_library", "style_lint"]
+style_lint = ["serde", "serde_json"]
+charter_enforcement = []
+
+# Research modules (gated behind research tier)
+extended_datasets = []
+full_ai_personalities = ["extended_datasets"]
+historical_trauma_archives = ["mature"]
+underground_network = ["mature", "crypto_signatures"]
+bci_integration = ["research", "physiological_telemetry"]
+haptic_optimization = ["research"]
+physiological_telemetry = ["research"]
+god_like_personalities = ["research", "full_ai_personalities"]
+neural_resonance_lab = ["research", "bci_integration"]
+
+# Cryptographic features for underground network (Tier 2+)
+crypto_signatures = ["dep:ed25519", "dep:sha2"]
+
+# ============================================================================
+# CORE DEPENDENCIES
+# ============================================================================
+# All dependencies are audited for safety, ethics, and charter compliance.
+# Security advisories are checked on every build via cargo-audit.
+
+[dependencies]
+# Serialization (for style contracts, metrics, telemetry)
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Random number generation (for PCG, seeded for reproducibility)
+rand = { version = "0.8", features = ["std_rng"] }
+rand_chacha = "0.3"
+
+# Logging (for telemetry, charter violations, research data)
+log = "0.4"
+env_logger = "0.10"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Async runtime (for network, telemetry, underground sharing)
+tokio = { version = "1.0", features = ["full"], optional = true }
+
+# Cryptography (Tier 2+ underground network agent signatures)
+ed25519 = { version = "2.0", optional = true }
+sha2 = { version = "0.10", optional = true }
+
+# BCI/Physiological data processing (Tier 3 research only)
+# Local-only processing, no cloud transmission
+neurosky = { version = "0.1", optional = true }
+biosensors = { version = "0.2", optional = true }
+
+# Audio middleware integration (FMOD/Wwise bindings)
+fmod = { version = "0.1", optional = true }
+wwise = { version = "0.1", optional = true }
+
+# Game engine integrations (Unreal/Unity FFI bindings)
+unreal_engine = { version = "0.1", optional = true }
+unity = { version = "0.1", optional = true }
+
+# ============================================================================
+# DEVELOPMENT DEPENDENCIES
+# ============================================================================
+# Tools for testing, linting, and charter compliance validation.
+
+[dev-dependencies]
+# Testing framework
+cargo-tarpaulin = "0.27"  # Code coverage
+criterion = "0.5"  # Benchmarking
+
+# Linting (style contracts, charter compliance)
+style_lint = { path = "tools/style_lint" }
+charter_validator = { path = "tools/charter_validator" }
+
+# Mock data for testing (historical archives, telemetry)
+mock_invariants = { path = "test_data/mock_invariants" }
+mock_telemetry = { path = "test_data/mock_telemetry" }
+
+# ============================================================================
+# BUILD DEPENDENCIES
+# ============================================================================
+# Build scripts for code generation, schema validation, and CI/CD integration.
+
+[build-dependencies]
+# Schema generation (JSON schemas for style contracts, metrics)
+schemars = "0.8"
+
+# Code generation (from DSL contracts)
+quote = "1.0"
+syn = "2.0"
+proc-macro2 = "1.0"
+
+# ============================================================================
+# LIBRARY CONFIGURATION
+# ============================================================================
+# Core engine is a library crate, allowing integration with game engines.
+
+[lib]
+name = "horror_place_core"
+path = "src/lib.rs"
+crate-type = ["lib", "cdylib"]  # cdylib for FFI with Unreal/Unity
+
+# ============================================================================
+# BINARY CONFIGURATION
+# ============================================================================
+# CLI tools for development, validation, and research.
+
+[[bin]]
+name = "horror_place_cli"
+path = "src/bin/cli.rs"
+required-features = ["standard"]
+
+[[bin]]
+name = "style_lint_cli"
+path = "src/bin/style_lint.rs"
+required-features = ["style_lint"]
+
+[[bin]]
+name = "charter_validator"
+path = "src/bin/charter_validator.rs"
+required-features = ["charter_enforcement"]
+
+[[bin]]
+name = "research_telemetry"
+path = "src/bin/research_telemetry.rs"
+required-features = ["research"]
+
+# ============================================================================
+# EXAMPLES
+# ============================================================================
+# Example integrations for developers and researchers.
+
+[[example]]
+name = "archivist_personality"
+path = "examples/archivist_personality.rs"
+required-features = ["full_ai_personalities"]
+
+[[example]]
+name = "aral_sea_pcg"
+path = "examples/aral_sea_pcg.rs"
+required-features = ["pcg_generator", "historical_trauma_archives"]
+
+[[example]]
+name = "bci_audio_sync"
+path = "examples/bci_audio_sync.rs"
+required-features = ["bci_integration", "audio_automation"]
+
+# ============================================================================
+# TEST CONFIGURATION
+# ============================================================================
+# Test suites for charter compliance, entertainment metrics, and safety tiers.
+
+[[test]]
+name = "charter_compliance_tests"
+path = "tests/charter_compliance.rs"
+required-features = ["charter_enforcement"]
+
+[[test]]
+name = "entertainment_metrics_tests"
+path = "tests/entertainment_metrics.rs"
+required-features = ["standard"]
+
+[[test]]
+name = "safety_tier_tests"
+path = "tests/safety_tiers.rs"
+required-features = ["mature"]
+
+[[test]]
+name = "research_validation_tests"
+path = "tests/research_validation.rs"
+required-features = ["research"]
+
+# ============================================================================
+# BENCHMARKS
+# ============================================================================
+# Performance benchmarks for PCG, audio, and AI systems.
+
+[[bench]]
+name = "pcg_generation_bench"
+path = "benches/pcg_generation.rs"
+harness = false
+required-features = ["pcg_generator"]
+
+[[bench]]
+name = "audio_automation_bench"
+path = "benches/audio_automation.rs"
+harness = false
+required-features = ["audio_automation"]
+
+[[bench]]
+name = "ai_dialogue_bench"
+path = "benches/ai_dialogue.rs"
+harness = false
+required-features = ["full_ai_personalities"]
+
+# ============================================================================
+# PACKAGE METADATA
+# ============================================================================
+# Additional metadata for crates.io, documentation, and research compliance.
+
+[package.metadata.docs.rs]
+all-features = false
+features = ["standard"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.audit]
+# Security audit configuration (cargo-audit)
+deny = ["unmaintained", "yanked", "vulnerabilities"]
+ignore = []  # No ignored vulnerabilities - charter compliance requires security
+
+[package.metadata.research]
+# Research ethics metadata (Tier 3 only)
+irb_approval_required = true
+data_retention_days = 30
+physiological_data_local_only = true
+informed_consent_template = "docs/research/informed_consent.md"
+ethics_charter = "docs/rivers_of_blood_charter.md"
+
+[package.metadata.tiers]
+# Safety tier definitions
+tier_1_public = { features = ["standard"], access = "public", age_gate = false }
+tier_2_gated = { features = ["mature"], access = "user_gated", age_gate = true, ethics_charter = true }
+tier_3_research = { features = ["research"], access = "irb_approved", age_gate = true, irb_approval = true }
+
+# ============================================================================
+# GITHUB ACTIONS INTEGRATION
+# ============================================================================
+# CI/CD configuration for automated validation on every PR.
+
+[package.metadata.github_actions]
+# StyleLint validation on every PR
+style_lint_workflow = ".github/workflows/style_lint.yml"
+
+# Charter compliance checks
+charter_validation_workflow = ".github/workflows/charter_validation.yml"
+
+# Security audit (cargo-audit)
+security_audit_workflow = ".github/workflows/security_audit.yml"
+
+# Test suites by tier
+test_workflows = [
+    ".github/workflows/test_standard.yml",
+    ".github/workflows/test_mature.yml",
+    ".github/workflows/test_research.yml",
+]
+
+# ============================================================================
+# DEPENDENCY AUDITING
+# ============================================================================
+# All dependencies must pass charter compliance and security audits.
+
+[package.metadata.dependency_audit]
+# Automated dependency auditing for charter compliance
+enabled = true
+audit_on_build = true
+forbidden_licenses = ["proprietary", "non-commercial"]  # AGPL-3.0 required
+required_security_checks = ["cargo-audit", "cargo-deny"]
+
+# Charter compliance checks for dependencies
+charter_checks = [
+    "no_explicit_violence_assets",
+    "no_gratuitous_horror_libraries",
+    "historical_grounding_required",
+    "privacy_preserving_telemetry",
+]
+
+# ============================================================================
+# PLATFORM SUPPORT
+# ============================================================================
+# Target platforms for deployment.
+
+[package.metadata.platforms]
+# Tier 1: Public release platforms
+tier_1_platforms = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+]
+
+# Tier 2: Gated distribution (IPFS, SSB, encrypted)
+tier_2_platforms = [
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",  # Apple Silicon
+]
+
+# Tier 3: Research-only (local compilation required)
+tier_3_platforms = [
+    "x86_64-unknown-linux-gnu",  # Linux only for research reproducibility
+]
+
+# ============================================================================
+# PUBLISHING CONFIGURATION
+# ============================================================================
+# Controls which features are included in published crates.
+
+[package.metadata.publish]
+# Only Tier 1 (standard) is published to crates.io
+allowed_features = ["standard"]
+restricted_features = ["mature", "research"]
+publish_registry = "crates.io"
+
+# Tier 2/3 are distributed via underground network only
+underground_distribution = { enabled = true, protocol = "IPFS+SSB", encryption = "age" }
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+# Documentation generation and hosting.
+
+[package.metadata.documentation]
+# Public docs (Tier 1 only)
+public_docs_url = "https://docs.horrorplace.org"
+charter_docs_url = "https://docs.horrorplace.org/charter"
+research_docs_url = "https://research.horrorplace.org"  # Tier 3, access-gated
+
+# Documentation features
+docs_features = ["standard", "spectral_library", "pcg_generator", "audio_automation"]
+
+# ============================================================================
+# VERSIONING & CHANGELOG
+# ============================================================================
+# Semantic versioning with charter compliance tracking.
+
+[package.metadata.versioning]
+# Semantic versioning
+scheme = "semver"
+
+# Charter compliance version tracking
+charter_version = "1.0.0"
+charter_amendments_required = true
+amendment_voting_threshold = 0.75  # 75% approval across all tiers
+
+# Changelog format
+changelog_format = "keep-a-changelog"
+changelog_url = "https://github.com/horrorplace/horror-place-core/blob/main/CHANGELOG.md"
+
+# ============================================================================
+# CONTACT & SUPPORT
+# ============================================================================
+
+[package.metadata.contact]
+# Public support (Tier 1)
+public_email = "support@horrorplace.org"
+public_discord = "https://discord.gg/horrorplace"
+
+# Research inquiries (Tier 3)
+research_email = "research@horrorplace.org"
+irb_contact = "irb@horrorplace.org"
+
+# Security reports
+security_email = "security@horrorplace.org"
+security_policy_url = "https://github.com/horrorplace/horror-place-core/blob/main/SECURITY.md"
+
+# ============================================================================
+# SPONSORS & ACKNOWLEDGMENTS
+# ============================================================================
+
+[package.metadata.acknowledgments]
+# Inspired by
+inspired_by = [
+    "Darkwood (Acid Wizard Studio)",
+    "Pathologic Series (Ice-Pick Lodge)",
+    "The Void (Ice-Pick Lodge)",
+    "Silent Hill 2 (Team Silent)",
+]
+
+# Historical sources
+historical_sources = [
+    "Aral Sea Environmental Disaster Archives (1960-2000)",
+    "Vozrozhdeniya Island Biological Testing Records",
+    "Soviet Industrial Collapse Documentation (1990s)",
+    "Slavic Folklore Motif Index (Aarne-Thompson-Uther)",
+]
+
+# Research partners
+research_partners = [
+    "Horror$Place Research Consortium",
+    "Underground Horror Knowledge Network",
+    "Ice-Pick Lodge (Consulting)",
+    "Acid Wizard Studio (Consulting)",
+]
+
+# ============================================================================
+# LICENSE
+# ============================================================================
+# AGPL-3.0-or-later ensures all derivatives remain open and charter-compliant.
+
+[license]
+text = """
+Horror$Place Core Engine
+Copyright (C) 2026 Horror$Place Core Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+RIVERS OF BLOOD CHARTER COMPLIANCE:
+All users must adhere to the Rivers of Blood Charter (docs/rivers_of_blood_charter.md).
+Violation of charter terms may result in access revocation, even if license terms are met.
+"""
