@@ -1,407 +1,189 @@
-***
+# Art Style Specification: Spectral Engraving (Dark Sublime)
+### Horror$Place Visual Contract v1.0
 
-# Spectral Engraving Dark Sublime  
-*Artstyle Logic & Label Specification for Horror$Place*  
-`docs/artstyle_spectral_engraving_dark_sublime.md`
-
-***
-
-## 1. Purpose
-
-This document defines a **codified artstyle dimension** for Horror$Place: the **Spectral Engraving Dark Sublime** mode. It translates a specific visual tradition—monochrome, high-contrast, engraved cosmic horror with human‑mass divinities and lone observers—into **labels, parameters, and logic contracts** that AI tools must follow when generating visual prompts, narrative descriptions, or engine-side presentation. [facebook](https://www.facebook.com/groups/259412529766772/posts/973696791671672/)
-
-The goal is to allow the repository to:
-
-- Reference this artstyle as a **stable, machine-usable profile**.  
-- Enforce formal constraints so generated horror is **consistent, coherent, and historically grounded**.  
-- Give AI authors a vocabulary and schema to extend this style across entities, scenes, and documents.
+> *"The eye sees only what the mind is prepared to comprehend."*
 
 ***
 
-## 2. Conceptual Definition
+## 1. Style Overview
 
-### 2.1 High-Level Style Identity
+**Spectral Engraving** is the foundational visual language of Horror$Place. It is a **monochrome cosmic horror** aesthetic designed to maximize **Uncertainty Engagement (UEC)** and **Evidential Mystery Density (EMD)** by obscuring detail rather than revealing it.
 
-**Artstyle ID:** `SPECTRAL_ENGRAVING_DARK_SUBLIME`
+Inspired by the top-down atmospheric dread of *Darkwood* and the surreal bleakness of *Pathologic*, this style treats visibility as a resource and darkness as a canvas. It is not merely "dark"; it is **historically weighted**. Every shadow, texture, and lighting effect must correlate to the **Geo-Historical Invariant Layer** (CIC, AOS, MDI, etc.).
 
-**Core identity:**  
-A monochrome, engraving-like horror mode where **divine-scale entities constructed from human forms** confront a **lone, insignificantly small witness** under **violent shafts of celestial light** in an otherwise engulfing darkness. Awe and terror are indistinguishable; the scene feels like a sacrament performed in a void.
-
-### 2.2 Thematic Axes
-
-This artstyle lives at the intersection of:
-
-- **Cosmic insignificance:** tiny figure vs. monumental entity.  
-- **Human-mass divinity:** gods literally built from people (aggregated bodies, heads, limbs).  
-- **Dark sublime:** beauty and horror fused; devotional lighting on abominable forms.  
-- **Engraved eternity:** the scene feels etched into stone or metal, timeless and archival. [facebook](https://www.facebook.com/bondanisty/posts/ww3nanobananadark-monochrome-illustration-style-detailed-engraving-line-art-vint/10163425818664404/)
+### Core Philosophy
+1.  **Obscurity over Clarity:** Players should never see the monster clearly; they see its shadow, its effect on the environment, or its trace.
+2.  **Monochrome Sublime:** Color is reserved for danger or supernatural anomalies. The world is grey, rust, and black.
+3.  **Invariant-Driven Rendering:** Visual parameters (noise, contrast, fog) are dynamically adjusted based on historical trauma data (CIC, AOS).
 
 ***
 
-## 3. Label Taxonomy
+## 2. Visual Invariant Mapping
 
-All AI tools and generation scripts must use this **controlled vocabulary** when referring to the style. These labels should be surfaced in prompt metadata, asset tags, and content configuration files.
+This style contract defines how the **10 History-Horror Attribution Terms** (from `src/spectral_library.rs`) directly influence visual rendering. The engine queries these invariants to adjust the "Spectral Engraving" parameters in real-time.
 
-### 3.1 Global Artstyle Labels
+| Invariant | Visual Parameter | Behavior Rule |
+|-----------|------------------|---------------|
+| **CIC** (Catastrophic Imprint) | **Decay Density** | High CIC (>0.8) increases rust textures, structural collapse, and debris particle count. |
+| **AOS** (Archival Opacity) | **Visual Noise** | High AOS (>0.7) introduces film grain, chromatic aberration, and "missing texture" glitches to simulate unreliable reality. |
+| **MDI** (Mythic Density) | **Ambient Particles** | High MDI triggers floating dust motes, ash, or "spectral snow" even indoors. |
+| **LSG** (Liminal Stress) | **Lighting Contrast** | High LSG zones enforce hard shadows at thresholds (doorways, tree lines) with 90% light reduction. |
+| **SPR** (Spectral Plausibility) | **Entity Opacity** | Low SPR entities are semi-transparent or distorted; High SPR entities appear solid but obscured by fog. |
+| **RRM** (Ritual Residue) | **Symbolic Markings** | High RRM areas procedurally generate faint sigils on walls/floors (visible only under specific light angles). |
+| **FCF** (Folkloric Convergence) | **Architectural Anomaly** | High FCF zones feature impossible geometry (stairs to nowhere, doors opening into walls). |
+| **RWF** (Reliability Weight) | **Texture Fidelity** | Low RWF areas use lower-resolution textures or blurred assets to simulate "fading memory." |
+| **DET** (Dread Exposure) | **Vignette Intensity** | As player time in zone increases, screen vignette darkens and peripheral vision narrows. |
+| **HVF** (Haunt Vector) | **Fog Direction** | Volumetric fog flows along the HVF vector, subtly pushing player movement against the "pressure." |
+
+***
+
+## 3. Color Palette & Lighting
+
+### 3.1 The Dark Sublime Palette
+
+Color is strictly controlled to maintain the "Implication Layer" (Charter Pillar 2).
+
+| Color Role | Hex Code | Usage |
+|------------|----------|-------|
+| **Void Black** | `#0A0A0A` | Deep shadows, unexplored areas. |
+| **Bone Grey** | `#C8C8C8` | Primary surfaces (walls, ground, skin). |
+| **Rust Red** | `#5C2A2A` | **ONLY** for bloodstains (dried), rust, or danger indicators. |
+| **Sickly Green** | `#2F4F2F` | **ONLY** for toxic zones, biological experiments (Aral Sea influence). |
+| **Static White** | `#F0F0F0` | **ONLY** for supernatural flashes, camera flashes, or spectral entities. |
+
+**Rule:** No saturated colors allowed. All colors must be desaturated by at least 40% unless triggered by a high-CIC event.
+
+### 3.2 Lighting Mechanics
+
+Inspired by *Darkwood's* day/night cycle and flashlight mechanics:
+
+1.  **Restricted Field of View (FOV):** Player vision is limited to a cone (default 90 degrees). Everything outside is rendered as pure black or vague silhouettes.
+2.  **Dynamic Shadow Casting:** All light sources (flashlight, fires) cast hard, dynamic shadows. Entities hiding in shadows are rendered as **shadow-only** (no texture).
+3.  **Occlusion Fog:** Distance fog is not uniform; it clusters around high-CIC coordinates to block line-of-sight to atrocities.
+4.  **Night Event Protocol:** During "Night" phases (high DET), all ambient light is reduced by 50%. Only player-held light sources function.
+
+***
+
+## 4. Composition & Camera Rules
+
+### 4.1 Perspective
+
+-   **Top-Down Isometric:** Fixed camera angle (45 degrees) to restrict spatial awareness.
+-   **No Rotation:** Player cannot rotate the camera; they must rotate their character to see behind them (increases vulnerability/UEC).
+-   **Depth Layers:** Foreground objects (trees, walls) obscure the player character when moving "below" them, creating moments of total blindness.
+
+### 4.2 Framing the Horror
+
+-   **The Threshold Rule:** Every doorway, gate, or biome transition must be framed with high-contrast lighting (LSG invariant).
+-   **The Empty Center:** Central areas of rooms should often be empty; horror elements are placed in corners or edges (peripheral dread).
+-   **Environmental Traces:** Instead of bodies, show **disturbed earth**, **abandoned tools**, or **drag marks**. (Charter Compliance: Pillar 2).
+
+***
+
+## 5. Asset Validation & Forbidden Elements
+
+All assets must pass `StyleLint` validation against this contract before merging.
+
+### 5.1 Allowed Evidence Types
+
+| Asset Type | Description | Invariant Link |
+|------------|-------------|----------------|
+| **Trace Decals** | Blood splatters (dried), mud footprints, scorch marks. | CIC, RRM |
+| **Archival Props** | Redacted documents, torn photos, broken cameras. | AOS, RWF |
+| **Structural Anomalies** | Doors leading to walls, windows showing wrong outdoors. | FCF, AOS |
+| **Audio-Visual Sync** | Lights flickering in rhythm with distant chanting. | RRM, MDI |
+
+### 5.2 Forbidden Depictions (Charter Violation)
+
+| Forbidden Asset | Reason | Alternative |
+|-----------------|--------|-------------|
+| **Explicit Corpses** | Violates Pillar 2 (Implication). | Show body bags, outlines on ground, or personal effects. |
+| **Gore Textures** | Violates Pillar 2 (Implication). | Use dark rust/red stains only. |
+| **Clear Monster Models** | Reduces UEC (Uncertainty). | Use silhouettes, shadows, or partial renders (legs only). |
+| **Bright Colors** | Breaks Dark Sublime palette. | Desaturate to grey/brown. |
+| **UI Quest Markers** | Breaks "No Hand-Holding" (Darkwood principle). | Use environmental landmarks or HVF fog flow. |
+
+***
+
+## 6. Machine-Readable Style Contract
+
+This JSON structure defines the enforceable rules for the `StyleLint` tool (File 7).
 
 ```json
 {
-  "artstyle_id": "SPECTRAL_ENGRAVING_DARK_SUBLIME",
-  "visual_mode": [
-    "monochrome_grayscale",
-    "high_contrast_chiaroscuro",
-    "engraving_like_linework",
-    "halo_backlighting",
-    "dark_romantic_composition"
+  "style_id": "spectral_engraving_dark_sublime",
+  "version": "1.0.0",
+  "palette_constraints": {
+    "max_saturation": 0.6,
+    "allowed_accent_colors": ["#5C2A2A", "#2F4F2F", "#F0F0F0"],
+    "base_palette": "monochrome_grey"
+  },
+  "camera_constraints": {
+    "perspective": "top_down_isometric",
+    "rotation_allowed": false,
+    "fov_degrees": 90,
+    "occlusion_enabled": true
+  },
+  "invariant_bindings": {
+    "CIC": { "target": "decay_density", "min_threshold": 0.5, "max_effect": 1.0 },
+    "AOS": { "target": "visual_noise", "min_threshold": 0.7, "max_effect": 0.8 },
+    "LSG": { "target": "shadow_contrast", "min_threshold": 0.6, "max_effect": 0.9 }
+  },
+  "forbidden_tags": [
+    "explicit_gore",
+    "bright_color",
+    "full_entity_reveal",
+    "ui_quest_marker"
   ],
-  "thematic_mode": [
-    "cosmic_insignificance",
-    "human_mass_divinity",
-    "sacramental_terror",
-    "dark_sublime",
-    "body_as_architecture"
-  ]
+  "entertainment_targets": {
+    "UEC": { "min": 0.55, "max": 0.85 },
+    "EMD": { "min": 0.60, "max": 0.90 }
+  }
 }
 ```
 
-### 3.2 Sub-Labels by Dimension
+***
 
-- **Composition:**
-  - `composition_radial_divine_core`
-  - `composition_vertical_axis_beam`
-  - `composition_lone_figure_scale_anchor`
-  - `composition_mandala_of_suffering`
+## 7. Workflow Integration
 
-- **Lighting:**
-  - `lighting_backlit_celestial_shaft`
-  - `lighting_halo_corona_edges`
-  - `lighting_volumetric_atmosphere`
-  - `lighting_sacramental_spot_on_observer`
-  - `lighting_deep_cavernous_shadows`
+### 7.1 Asset Generation Sprints
 
-- **Palette / Tonal:**
-  - `palette_monochrome_only`
-  - `contrast_extreme_light_dark`
-  - `tones_silver_highlights`
-  - `tones_charcoal_shadows`
-  - `texture_stone_ivory_flesh`
+-   **Photogrammetry:** Scan real-world Soviet-era objects (gas masks, rusted machinery) but desaturate textures to match Dark Sublime palette.
+-   **Modular Kits:** Create "decay kits" (walls, floors) that can be procedurally swapped based on CIC levels (low CIC = clean, high CIC = cracked/rusted).
+-   **Spectral Anchors:** Place invisible "Spectral Anchor" objects in levels. When triggered, they activate local style overrides (e.g., increase AOS noise, shift fog color).
 
-- **Subject / Iconography:**
-  - `subject_human_body_cluster_entity`
-  - `subject_radial_flower_of_bodies`
-  - `subject_aggregated_heads_core`
-  - `subject_lone_cloaked_observer`
-  - `subject_barren_rock_threshold`
+### 7.2 Runtime Validation
 
-- **Mood / Tone:**
-  - `mood_cosmic_dread`
-  - `mood_devotional_horror`
-  - `mood_rapture_torment_ambiguity`
-  - `mood_apotheosis_through_absorption`
-
-Any content tagged with `artstyle_id = SPECTRAL_ENGRAVING_DARK_SUBLIME` must also select at least:
-
-- 1 composition label  
-- 1 lighting label  
-- 1 palette label  
-- 1 subject label  
-- 1 mood label  
-
-This enforces **minimum style coherence**.
+-   **Style Runtime Validator:** Monitors active camera and lighting settings. If a light source exceeds saturation limits or camera rotates illegally, it triggers a warning log.
+-   **Invariant Sync:** Every frame, the renderer queries `SpectralLibrary` for the player's current tile invariants and adjusts post-processing volumes (fog, noise, vignette) accordingly.
 
 ***
 
-## 4. Invariant Binding
+## 8. Reference Cases (Darkwood & Pathologic)
 
-This artstyle is not just a look; it is a **visual expression of invariants** in the Horror$Place history layer.
-
-### 4.1 Required Invariant Conditions
-
-This mode should be **eligible** only when:
-
-- \( CIC \geq 0.75 \): high catastrophic imprint.  
-- \( MDI \geq 0.7 \): strong mythic density.  
-- \( AOS \geq 0.6 \): partially opaque archives, gaps in records.  
-- \( SPR \geq 0.7 \): manifestations feel plausible in-world.  
-- \( SHCI \geq 0.8 \): strong coupling between events and entities.  
-
-Recommended:
-
-- \( LSG \geq 0.7 \): strong stress at thresholds, caverns, or borders.  
-- \( RRM \geq 0.5 \): presence of ritual residue, especially sacrificial or devotional.
-
-### 4.2 Metric Mapping (Player Experience)
-
-When this style is active:
-
-- **UEC (Uncertainty Engagement):** target 0.6–0.8  
-  - The scene should **raise questions**, not fully answer them.  
-- **EMD (Evidential Mystery Density):** target 0.7–0.9  
-  - Scenes reveal **partial evidence** (human forms, ritual posture, scale) but conceal origin.  
-- **STCI (Safe-Threat Contrast):** mid 0.5–0.7  
-  - There is space to observe before danger; the threat feels imminent but not immediate.  
-- **CDL (Cognitive Dissonance Load):** high 0.7–0.9  
-  - It should be hard to decide whether the entity is offering salvation or annihilation.  
-- **ARR (Ambiguous Resolution Ratio):** ≥ 0.75  
-  - Encounters rarely resolve with a clear “it was X”; they lean into unresolved symbolism.
+| Feature | Darkwood Implementation | Horror$Place Adaptation |
+|---------|-------------------------|-------------------------|
+| **Vision** | Flashlight cone in darkness. | Dynamic cone based on DET (Dread Exposure). |
+| **Night** | Hide or die loop. | High-CIC night events spawn spectral echoes, not just enemies. |
+| **Map** | No minimap, rely on landmarks. | Use HVF (Haunt Vector) fog flow to guide intuition. |
+| **Horror** | Body horror mutants. | Environmental mutations (walls breathing, floors softening). |
+| **Sound** | Directional audio cues. | Audio-visual sync (lights flicker to sound节奏). |
 
 ***
 
-## 5. Engine-Facing Artstyle Profile
+## 9. Compliance Checklist
 
-### 5.1 Lua Artstyle Profile (Pseudocode)
+Before any visual asset is merged into the repository:
 
-```lua
--- File: artstyles/spectral_engraving_dark_sublime.lua
-
-local SpectralStyle = {}
-
-SpectralStyle.id = "SPECTRAL_ENGRAVING_DARK_SUBLIME"
-
-SpectralStyle.invariant_requirements = function(inv)
-    return inv.cic  >= 0.75 and
-           inv.mdi  >= 0.70 and
-           inv.aos  >= 0.60 and
-           inv.spr  >= 0.70 and
-           inv.shci >= 0.80
-end
-
-SpectralStyle.metric_targets = {
-    UEC  = { min = 0.60, max = 0.80 },
-    EMD  = { min = 0.70, max = 0.90 },
-    STCI = { min = 0.50, max = 0.70 },
-    CDL  = { min = 0.70, max = 0.90 },
-    ARR  = { min = 0.75, max = 1.00 }
-}
-
-SpectralStyle.visual_flags = {
-    monochrome_only         = true,
-    allow_color_temperature = false,
-    high_contrast_required  = true,
-    volumetric_light        = true,
-    halo_backlighting       = true
-}
-
-SpectralStyle.semantic_tags = {
-    "cosmic_insignificance",
-    "human_mass_divinity",
-    "sacramental_terror",
-    "dark_sublime",
-    "body_as_architecture"
-}
-
-return SpectralStyle
-```
-
-Any generation pipeline that requests this artstyle must load this module and validate `invariant_requirements` before proceeding.
+- [ ] **Palette Check:** Is saturation < 60%?
+- [ ] **Implication Check:** Does this asset show evidence rather than explicit violence?
+- [ ] **Invariant Check:** Is there a defined CIC/AOS binding for this asset?
+- [ ] **Camera Check:** Does this asset work with top-down occlusion?
+- [ ] **UI Check:** Does this asset avoid relying on UI markers for context?
 
 ***
 
-## 6. Composition & Camera Logic
-
-### 6.1 Radial Divine Core + Vertical Axis
-
-The core compositional rule is:
-
-- The main entity is arranged in a **radial pattern** (flower, wheel, mandala), composed of **aggregated human forms**.  
-- The camera framing emphasizes a **vertical axis**: light descends from above, passing through the entity and terminating on the observer below.
-
-Key composition constraints:
-
-- **Entity coverage:** 40–70% of frame height.  
-- **Observer height:** 3–10% of frame height at bottom center or slightly off-center.  
-- **Negative space:** at least 15% of frame reserved for unoccupied darkness or cloud.
-
-### 6.2 Lone Observer as Scale Anchor
-
-- Exactly **one primary human-scale figure** in the foreground.  
-- Pose: standing, slightly bowed or craned upward; cloaked or shrouded for anonymity.  
-- Rule: no secondary crowd; if additional humans exist, they must be **part of the entity**, not separate witnesses.
-
-### 6.3 Engine Parameters for Camera
-
-```lua
-function SpectralStyle.apply_camera(scene, inv, metrics)
-    local cam = scene.camera
-
-    cam.mode = "god_beam_witness"
-
-    cam.entity_frame_ratio = 0.55   -- entity occupies majority of height
-    cam.observer_height_ratio = 0.06
-    cam.vertical_bias = 0.15        -- push framing upward to emphasize heavens
-    cam.fov = 45                     -- narrower, more monumental feel
-
-    cam.enforce_monumentality = true
-end
-```
-
-***
-
-## 7. Lighting & Tonal Logic
-
-### 7.1 Light Origin and Behavior
-
-- Primary light source: **above/behind entity**.  
-- Shape: **shaft or cone** of light with volumetric scattering.  
-- Behavior: creates a **halo** around entity edges; central mass remains partly obscured.
-
-### 7.2 Monochrome Enforcement
-
-- **Color disabled**: all hues map to grayscale; only value and texture vary.  
-- Highlights: near-white with subtle “silver” impression.  
-- Mid-tones: sculpted, smooth, statue-like flesh or stone.  
-- Shadows: deep, near-black where information disappears.
-
-### 7.3 Engine Lighting Parameters (Pseudo)
-
-```lua
-function SpectralStyle.apply_lighting(scene, inv, metrics)
-    local L = scene.lighting
-
-    L.palette_mode = "monochrome"
-    L.enable_color = false
-
-    L.key_light.source = "above_entity"
-    L.key_light.type = "shaft"
-    L.key_light.intensity = 1.0
-    L.key_light.angle = 15  -- narrow cone
-
-    L.halo.enabled = true
-    L.halo.width = 0.1
-    L.halo.intensity = 0.9
-
-    L.shadows.depth = 0.95  -- very deep
-    L.shadows.softness = 0.3
-
-    L.volumetrics.enabled = true
-    L.volumetrics.density = 0.7
-end
-```
-
-***
-
-## 8. Subject Logic: Entities and Environment
-
-### 8.1 Aggregated Human Entity Schema
-
-The central entity is **constructed**, not merely large. Its structure:
-
-```lua
-AggregatedEntity = {
-    type = "human_mass_divinity",
-    composition = {
-        core_cluster = {
-            component = "heads_torsos",
-            packing_density = 0.85,
-            visibility = "partial_faces",
-            expression_range = {"rapture", "torment", "neutral_abyss"}
-        },
-        radial_limbs = {
-            component = "full_bodies",
-            arrangement = "sunflower_petals",
-            count = "dozens",
-            posture = "outstretched",
-            motion_hint = "centrifugal_bloom"
-        }
-    },
-    scale = "colossal",
-    silhouette = "floral_mandala",
-    hover_state = "suspended_in_void",
-    awareness = "implied_by_light_contact"
-}
-```
-
-Rules:
-
-- **No non-human appendages** in this profile; horror comes from human forms reconfigured into divinity.  
-- Faces should show **mixed affect**: ecstasy, agony, blankness.
-
-### 8.2 Environment Schema
-
-- Terrain: barren, rocky, jagged; minimal vegetation.  
-- Setting: cavern, chasm, or void-like plain.  
-- Sky: turbulent or cloud-sheathed, mostly consumed by darkness and the light shaft.
-
-***
-
-## 9. Prompt & Tooling Contracts
-
-### 9.1 Prompt Metadata Contract
-
-Any AI visual or narrative generator targeting this style must emit metadata similar to:
-
-```json
-{
-  "target_artstyle": "SPECTRAL_ENGRAVING_DARK_SUBLIME",
-  "composition_tags": [
-    "composition_radial_divine_core",
-    "composition_lone_figure_scale_anchor"
-  ],
-  "lighting_tags": [
-    "lighting_backlit_celestial_shaft",
-    "lighting_halo_corona_edges"
-  ],
-  "palette_tags": [
-    "palette_monochrome_only",
-    "contrast_extreme_light_dark"
-  ],
-  "subject_tags": [
-    "subject_human_body_cluster_entity",
-    "subject_lone_cloaked_observer"
-  ],
-  "mood_tags": [
-    "mood_cosmic_dread",
-    "mood_devotional_horror"
-  ]
-}
-```
-
-### 9.2 Text/Narrative Generators
-
-Narrative outputs using this artstyle must:
-
-- Emphasize **scale contrast** (tiny observer vs. vast entity).  
-- Describe **light as almost religious** but focused on something abominable.  
-- Avoid color terms; rely on **value and texture language** (silver, charcoal, pale, shadowed).  
-- Reinforce the **fusion of worship and terror**.
-
-***
-
-## 10. Validation Rules
-
-To keep Horror$Place exceptionally structured, any scripted or generated asset claiming this style must pass these checks:
-
-1. **Invariant Gate:**  
-   - Validate `invariant_requirements(inv)` before rendering or labeling.
-
-2. **Composition Check:**  
-   - Ensure a radial or centralized entity and a lone witness anchor exist.  
-   - Reject layouts with multiple independent observers or scattered focal points.
-
-3. **Palette Check:**  
-   - Reject use of explicit color channels or color names in metadata or text.
-
-4. **Lighting Check:**  
-   - Require backlit/hard-light configuration and halo/volumetric parameters.
-
-5. **Semantic Check:**  
-   - Demand presence of at least one of:
-     - `human_mass_divinity`
-     - `cosmic_insignificance`
-     - `sacramental_terror`
-
-***
-
-## 11. Mermaid Diagram Filename
-
-The **Spectral Library architecture diagram** from the prior response should be saved as:
-
-- `docs/diagrams/spectral_library_architecture.mmd`
-
-This current artstyle spec does not need a new diagram, but future expansions could add:
-
-- `docs/diagrams/artstyle_spectral_engraving_dark_sublime_flow.mmd`  
-
-to visualize how style selection flows from invariants and metrics through rendering and narrative layers.
-
-***
+**Document Status:** Active  
+**Last Updated:** 2026-01-01  
+**Maintainer:** Horror$Place Art Direction Team  
+**Related Files:** `src/spectral_library.rs`, `schemas/entertainment_metrics_v1.json`, `docs/rivers_of_blood_charter.md`
