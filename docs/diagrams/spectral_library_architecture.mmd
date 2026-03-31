@@ -1,0 +1,36 @@
+graph TD
+    subgraph "Horror$Place Engine Core"
+        A["H. API (Lua)"]
+        B["spectral_library.rs (Rust)"]
+    end
+
+    subgraph "Data Sources"
+        C["registry/regions.json"]
+        D["HorrorPlace-Black-Archivum (Private Repo)"]
+    end
+
+    subgraph "Consumers"
+        E["pcg_generator.rs"]
+        F["audio_automation.rs"]
+        G["surprisedirector.lua"]
+        H["Archivist Persona"]
+    end
+
+    A <--> B
+    C --> B
+    D -.-> B
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    H --> I["A. API (Archivist State)"]
+
+    style A fill:#f9d5bb,stroke:#333,stroke-width:2px
+    style B fill:#d5e8d4,stroke:#333,stroke-width:2px
+    style C fill:#dae8fc,stroke:#333,stroke-width:2px
+    style D fill:#e1d5:#333,stroke-width:2px
+    style E fill:#fff2cc,stroke:#333,stroke-width:2px
+    style F fill:#fff2cc,stroke:#333,stroke-width:2px
+    style G fill:#fff2cc,stroke:#333,stroke-width:2px
+    style H fill:#fff2cc,stroke:#333,stroke-width:2px
+    style I fill:#fff2cc,stroke:#333,stroke-width:2px
