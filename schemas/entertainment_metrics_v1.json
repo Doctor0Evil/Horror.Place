@@ -24,15 +24,41 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "description": "Uncertainty Engagement Coefficient. Measures player engagement driven by ambiguity rather than confusion.",
-          "telemetry_hooks": [
-            "cautious_movement_duration",
-            "camera_scan_frequency",
-            "hover_time_at_thresholds"
-          ],
+          "telemetry_hooks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "cautious_movement_duration",
+              "camera_scan_frequency",
+              "hover_time_at_thresholds"
+            ]
+          },
           "target_range": {
-            "min": 0.55,
-            "max": 0.85,
-            "reason": "Below 0.55 indicates boredom; above 0.85 indicates frustration."
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "default": {
+              "min": 0.55,
+              "max": 0.85,
+              "reason": "Below 0.55 indicates boredom; above 0.85 indicates frustration."
+            }
           }
         },
         "EMD": {
@@ -40,15 +66,41 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "description": "Evidential Mystery Density. Count of unresolved clues/anomalies per unit time.",
-          "telemetry_hooks": [
-            "note_interactions",
-            "environmental_trace_inspections",
-            "partial_explanation_triggers"
-          ],
+          "telemetry_hooks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "note_interactions",
+              "environmental_trace_inspections",
+              "partial_explanation_triggers"
+            ]
+          },
           "target_range": {
-            "min": 0.60,
-            "max": 0.90,
-            "reason": "Ensures players feel like detectives without solving the mystery."
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "default": {
+              "min": 0.60,
+              "max": 0.90,
+              "reason": "Ensures players feel like detectives without solving the mystery."
+            }
           }
         },
         "STCI": {
@@ -56,15 +108,41 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "description": "Safe-Threat Contrast Index. Measures alternation between perceived safety and danger.",
-          "telemetry_hooks": [
-            "ambient_audio_intensity_delta",
-            "enemy_spawn_interval_variance",
-            "lighting_state_changes"
-          ],
+          "telemetry_hooks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "ambient_audio_intensity_delta",
+              "enemy_spawn_interval_variance",
+              "lighting_state_changes"
+            ]
+          },
           "target_range": {
-            "min": 0.40,
-            "max": 0.70,
-            "reason": "Prevents fatigue from constant tension or safety."
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "default": {
+              "min": 0.40,
+              "max": 0.70,
+              "reason": "Prevents fatigue from constant tension or safety."
+            }
           }
         },
         "CDL": {
@@ -72,15 +150,41 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "description": "Cognitive Dissonance Load. Tracks mutually plausible explanations held by the player.",
-          "telemetry_hooks": [
-            "conflicting_lore_access",
-            "npc_testimony_contradictions",
-            "visual_motif_variations"
-          ],
+          "telemetry_hooks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "conflicting_lore_access",
+              "npc_testimony_contradictions",
+              "visual_motif_variations"
+            ]
+          },
           "target_range": {
-            "min": 0.70,
-            "max": 0.95,
-            "reason": "High CDL sustains the 'I don't know, but it could be real' edge."
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "default": {
+              "min": 0.70,
+              "max": 0.95,
+              "reason": "High CDL sustains the 'I don't know, but it could be real' edge."
+            }
           }
         },
         "ARR": {
@@ -88,15 +192,41 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "description": "Ambiguous Resolution Ratio. Ratio of partial/suggestive resolutions vs. full explanations.",
-          "telemetry_hooks": [
-            "quest_completion_states",
-            "narrative_closure_events",
-            "unresolved_encounter_count"
-          ],
+          "telemetry_hooks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "quest_completion_states",
+              "narrative_closure_events",
+              "unresolved_encounter_count"
+            ]
+          },
           "target_range": {
-            "min": 0.70,
-            "max": 1.0,
-            "reason": "Critical for maintaining mystery; never fully resolve the horror."
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "default": {
+              "min": 0.70,
+              "max": 1.0,
+              "reason": "Critical for maintaining mystery; never fully resolve the horror."
+            }
           }
         }
       },
@@ -106,33 +236,32 @@
         "STCI",
         "CDL",
         "ARR"
-      ]
+      ],
+      "additionalProperties": false
     },
     "validation_rules": {
       "type": "object",
-      "description": "Logical conditions that define an 'Effective Mystery' state.",
+      "description": "Logical conditions that define an 'Effective Mystery' state. These are descriptive fields for downstream evaluators, not executable logic.",
       "properties": {
         "effective_mystery": {
           "type": "boolean",
-          "description": "True if session meets core entertainment thresholds.",
-          "logic": "UEC > 0.55 AND ARR > 0.70"
+          "description": "True if session meets core entertainment thresholds."
         },
         "overwhelm_warning": {
           "type": "boolean",
-          "description": "True if tension exceeds sustainable limits.",
-          "logic": "STCI > 0.85 OR UEC < 0.30"
+          "description": "True if tension exceeds sustainable limits."
         },
         "boredom_warning": {
           "type": "boolean",
-          "description": "True if engagement drops due to lack of uncertainty.",
-          "logic": "UEC < 0.40 AND EMD < 0.50"
+          "description": "True if engagement drops due to lack of uncertainty."
         }
       },
       "required": [
         "effective_mystery",
         "overwhelm_warning",
         "boredom_warning"
-      ]
+      ],
+      "additionalProperties": false
     },
     "compliance": {
       "type": "object",
@@ -150,7 +279,8 @@
       "required": [
         "evidence_based",
         "implication_only"
-      ]
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
@@ -160,6 +290,7 @@
     "validation_rules",
     "compliance"
   ],
+  "additionalProperties": false,
   "examples": [
     {
       "version": "1.0.0",
