@@ -1,0 +1,16 @@
+{
+  "aral_sea_basin": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Atrocity-Seeds.git#regions/basin_of_silence_v1.json",
+    "invariant_bundle": "git@github.com:Doctor0Evil/HorrorPlace-Black-Archivum.git#contracts/invariant_bundles/invariant_bundle_aral_sea_v1.json",
+    "story_spine_seeds": ["aral_sea_dissolution_01"],
+    "hash": "sha256:example_hash_for_basin_of_silence_region_contract",
+    "tier": "mature"
+  },
+  "soviet_factory_block_17": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Atrocity-Seeds.git#regions/factory_block_example_v1.json", -- Hypothetical path
+    "invariant_bundle": "git@github.com:Doctor0Evil/HorrorPlace-Black-Archivum.git#contracts/invariant_bundles/invariant_bundle_soviet_industrial_v1.json", -- Hypothetical path
+    "story_spine_seeds": ["surprise_archivist_water_whisper_v1"], -- Hypothetical event
+    "hash": "sha256:example_hash_for_factory_block_region_contract",
+    "tier": "mature"
+  }
+}
