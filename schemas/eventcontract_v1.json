@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Horror$Place Event Contract Schema v1",
+  "description": "Schema for defining Surprise.Events! and Vanish.Dissipation! sequences, including triggers, required evidence, and metric impacts.",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Unique identifier for the event contract.",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the event."
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the event's nature and occurrence."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["Surprise.Event!", "Vanish.Dissipation!", "Other"],
+      "description": "Type of event, categorizing its core mechanic."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["standard", "mature", "research"],
+      "description": "Safety tier as defined by the Rivers of Blood Charter."
+    },
+    "trigger_conditions": {
+      "type": "array",
+      "description": "List of conditions that must be met for the event to activate (e.g., invariant IDs, player state).",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "description": "List of evidence types that must be present in the region or player's inventory for the event to be valid.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metrics_impact": {
+      "type": "object",
+      "description": "Defines the immediate impact this event has on entertainment metrics.",
+      "properties": {
+        "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+      },
+      "additionalProperties": false
+    },
+    "duration_estimate_ms": {
+      "type": "integer",
+      "description": "Estimated duration of the event in milliseconds, for pacing calculations.",
+      "minimum": 0
+    },
+    "stage_sequence": {
+      "type": "array",
+      "description": "Ordered list of stages defining the event's progression.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage_name": { "type": "string" },
+          "stage_description": { "type": "string" },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "metrics_modifiers": {
+            "type": "object",
+            "properties": {
+              "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+              "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+              "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+              "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+              "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["stage_name", "stage_description", "duration_ms"]
+      }
+    }
+  },
+  "required": [
+    "event_id",
+    "name",
+    "description",
+    "event_type",
+    "tier",
+    "trigger_conditions",
+    "required_evidence",
+    "metrics_impact",
+    "stage_sequence"
+  ],
+  "additionalProperties": false
+}
