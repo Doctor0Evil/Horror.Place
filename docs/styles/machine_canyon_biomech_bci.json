@@ -1,0 +1,69 @@
+{
+  "id": "MACHINE_CANYON_BIOMECH_BCI",
+  "version": "v1.0",
+  "safety_tier": "mature",
+  "allowed_builds": ["mature", "research"],
+  "invariants": {
+    "min": {
+      "CIC": 0.60,
+      "MDI": 0.50,
+      "AOS": 0.70,
+      "FCF": 0.60,
+      "SPR": 0.65,
+      "SHCI": 0.70
+    },
+    "recommended": {
+      "RRM": 0.50,
+      "LSG": 0.60
+    }
+  },
+  "metrics": {
+    "UEC":  { "min": 0.50, "max": 0.75 },
+    "EMD":  { "min": 0.60, "max": 0.85 },
+    "STCI": { "min": 0.40, "max": 0.70 },
+    "CDL":  { "min": 0.70, "max": 0.90 },
+    "ARR":  { "min": 0.70, "max": 1.00 }
+  },
+  "visual": {
+    "palette": {
+      "monochrome_only": false,
+      "max_saturation": 0.20
+    },
+    "composition_tags_required": [
+      "composition_canyon_corridor",
+      "composition_lone_figure_bottom_center"
+    ],
+    "lighting_tags_required": [
+      "lighting_internal_furnace_glow",
+      "lighting_env_foggy_smoke"
+    ]
+  },
+  "semantic": {
+    "mood_tags_required": [
+      "mood_existential_mechanical_dread",
+      "mood_lost_in_megastructure"
+    ],
+    "subject_tags_required": [
+      "subject_machine_walls",
+      "subject_cable_web"
+    ]
+  },
+  "bci_haptics": {
+    "requires_bci": true,
+    "channels": [
+      "haptic_floor_vibration",
+      "haptic_cable_tension",
+      "haptic_breath_chest"
+    ]
+  },
+  "implication_rules": {
+    "explicit_violence_forbidden": true,
+    "evidence_types_allowed": [
+      "disturbed_earth",
+      "contradictory_record",
+      "missing_person_reference",
+      "spectral_testimony_fragment",
+      "empty_space_implication"
+    ]
+  }
+}
