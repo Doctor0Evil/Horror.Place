@@ -1,0 +1,20 @@
+{
+  "spectral_engraving_dark_sublime": {
+    "path": "docs/artstyle_spectral_engraving_dark_sublime.md",
+    "tier": "mature",
+    "platforms": ["web", "vr"],
+    "hash": "sha256:example_hash_for_spectral_engraving_doc"
+  },
+  "machine_canyon_biomech_bci": {
+    "path": "docs/artstyle_machine_canyon_biomech_bci.md",
+    "tier": "research",
+    "platforms": ["bci", "vr"],
+    "hash": "sha256:example_hash_for_machine_canyon_doc"
+  },
+  "rivers_of_blood_spectral_fluid_chrome": {
+    "path": "docs/artstyle_rivers_of_blood_spectral_fluid_chrome.md",
+    "tier": "mature",
+    "platforms": ["web", "vr"],
+    "hash": "sha256:example_hash_for_fluid_chrome_doc"
+  }
+}
