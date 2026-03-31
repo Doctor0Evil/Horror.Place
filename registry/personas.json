@@ -1,0 +1,26 @@
+{
+  "archivist_witness_01": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Codebase-of-Death.git#contracts/personas/archivist_witness_v1.json",
+    "tier": "mature",
+    "SHCI_range": [0.7, 0.9],
+    "hash": "sha256:example_hash_for_archivist_witness_persona_contract"
+  },
+  "witness_fragments_01": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Spectral-Foundry.git#contracts/personas/witness_fragments_v1.json",
+    "tier": "mature",
+    "SHCI_range": [0.6, 0.85],
+    "hash": "sha256:example_hash_for_witness_fragments_persona_contract"
+  },
+  "echo_ritual_01": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Spectral-Foundry.git#contracts/personas/echo_ritual_v1.json",
+    "tier": "mature",
+    "SHCI_range": [0.8, 0.95],
+    "hash": "sha256:example_hash_for_echo_ritual_persona_contract"
+  },
+  "process_god_seed_01": {
+    "path": "git@github.com:Doctor0Evil/HorrorPlace-Process-Gods-Research.git#contracts/personas/process_god_seed_v1.json",
+    "tier": "research",
+    "SHCI_range": [0.95, 1.0],
+    "hash": "sha256:example_hash_for_process_god_seed_persona_contract"
+  }
+}
