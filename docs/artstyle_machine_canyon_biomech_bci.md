@@ -1,433 +1,213 @@
-***
+# Art Style Specification: Machine Canyon (Biomech BCI)
+### Horror$Place Industrial Horror Contract v1.0
 
-# Artstyle: Machine Canyon Biomech + BCI Haptic Horror  
-``
-
-***
-
-## 1. Purpose
-
-This document defines a **machine-enforceable artstyle profile** for Horror$Place based on an industrial, canyon-like megastructure filled with obsessive linework, organic-metal surfaces, and a lone human within an indifferent mechanism. It also codifies how this style integrates with **BCI + haptic feedback** to produce synchronized, data-driven scares.
-
-The profile is intended to:
-
-- Serve as a **strict contract** for AI code and content generation.  
-- Bind visual and narrative motifs to **history invariants** and **player metrics**.  
-- Define how BCI signals and haptic systems are wired into horror delivery.
+> *"The machine does not hate you. It simply requires fuel."*
 
 ***
 
-## 2. Style Identity
+## 1. Style Overview
 
-### 2.1 Artstyle ID and Scope
+**Machine Canyon** is the secondary visual language of Horror$Place, triggered in regions of high **Ritual Residue (RRM)** and **Folkloric Convergence (FCF)**. It represents the industrialization of horror: where machinery consumes biology not out of malice, but out of function.
 
-**Artstyle ID:** `MACHINE_CANYON_BIOMECH_BCI`
+Inspired by the abandoned industrial sites of the Aral Sea (Darkwood 2), the surreal biology of *Pathologic*, and the claustrophobic machinery of *Event[0]*, this style treats the environment as a living, breathing engine. The player is not a hero; they are potential fuel.
 
-**Scope:**
-
-- Visual: industrial canyon, infinite machinery, fine-line drafting + muted washes.  
-- Narrative: existential processing of life by mechanism.  
-- Haptics/BCI: low-frequency dread, mechanical tension, sensation of being inside a system that does not care.
-
-### 2.2 Conceptual Axes
-
-This style expresses:
-
-- **Industrial Infinity:** the world is a machine corridor with no discernible end.  
-- **Biomechanical Warmth:** metal surfaces feel **fleshed, stained, and lived-in**, not sterile.  
-- **Human Negligibility:** a single figure inside a machine that neither notices nor needs them.  
-- **Subtractive Divinity:** no explicit deity, only process; worship is replaced by throughput.  
+### Core Philosophy
+1.  **Functional Horror:** Machines operate logically but consume illogically (e.g., pistons pumping blood instead of oil).
+2.  **Claustrophobic Navigation:** Paths are narrow, confusing, and shift subtly (non-Euclidean hints) to induce disorientation.
+3.  **BCI Resonance:** Experimental integration where machine rhythms sync with player physiological stress (Tier 3 Research).
+4.  **Implied Consumption:** Biology is never shown being destroyed; it is shown as *input* (hair in gears, respiratory sounds in vents).
 
 ***
 
-## 3. Label Taxonomy
+## 2. Visual Invariant Mapping
 
-All AI generation and engine modules must use the following **controlled labels**.
+This style contract defines how the **Geo-Historical Invariants** drive the biomech aesthetic. The engine queries these invariants to adjust the "Machine Canyon" parameters in real-time.
 
-### 3.1 Global Artstyle Labels
+| Invariant | Visual Parameter | Behavior Rule |
+|-----------|------------------|---------------|
+| **RRM** (Ritual Residue) | **Machine Activity** | High RRM (>0.8) activates idle machinery (pistons, conveyor belts) without power sources. |
+| **FCF** (Folkloric Convergence) | **Geometry Shift** | High FCF (>0.7) causes corridors to lengthen or doors to relocate when unobserved. |
+| **CIC** (Catastrophic Imprint) | **Decay Type** | High CIC (>0.9) shifts decay from rust to "organic corrosion" (fleshy rust, weeping metal). |
+| **DET** (Dread Exposure) | **Lighting Failure** | As DET increases, lights flicker in rhythm with player heartbeat (if BCI active). |
+| **AOS** (Archival Opacity) | **Label Legibility** | High AOS blurs machine warning labels, making them unreadable or contradictory. |
+| **HVF** (Haunt Vector) | **Airflow Direction** | Vent airflow particles move against HVF, suggesting suction toward "consumption zones." |
+
+***
+
+## 3. Color Palette & Lighting
+
+### 3.1 The Industrial Void Palette
+
+Color is used to signify function and danger. The world is dark, metallic, and occasionally visceral.
+
+| Color Role | Hex Code | Usage |
+|------------|----------|-------|
+| **Oil Black** | `#050505` | Deep shadows, machine interiors, unlit corridors. |
+| **Oxidized Copper** | `#3B4D4D` | Primary metal surfaces (pipes, walls, machinery). |
+| **Bioluminescent Amber** | `#FFBF00` | **ONLY** for machine status lights, warning beacons. |
+| **Dried Blood Rust** | `#4A2C2A` | **ONLY** for stains on machinery, filters, intake vents. |
+| **Sterile White** | `#E0E0E0` | **ONLY** for laboratory zones, surgical tools (cold, unfeeling). |
+
+**Rule:** No natural light sources (sun, moon). All light is artificial (bulbs, LEDs, sparks). Shadows are hard and mechanical.
+
+### 3.2 Lighting Mechanics
+
+1.  **Strobe Effect:** Lights flicker at irregular intervals (2–5 seconds) to disrupt player vision timing.
+2.  **Shadow Occlusion:** Machinery casts dense shadows that obscure pathways. Players must move through shadows to progress.
+3.  **Emergency Lighting:** In high-CIC zones, only red emergency lights function, reducing visibility radius by 40%.
+4.  **BCI Sync (Tier 3):** If BCI hardware is detected, light flicker frequency matches player HRV (Heart Rate Variability) to create subconscious resonance.
+
+***
+
+## 4. Geometry & Navigation
+
+### 4.1 The Canyon Structure
+
+-   **Narrow Corridors:** Pathways are barely wide enough for the player character (shoulder-grazing).
+-   **Verticality:** Multi-level catwalks, ladders, and pits. Falling is instant death or severe injury.
+-   **Looping Paths:** Corridors may loop back on themselves (FCF > 0.8) to induce disorientation.
+-   **Dead Ends:** Many paths terminate in machinery intakes or sealed bulkheads.
+
+### 4.2 The Living Machine
+
+-   **Breathing Walls:** Metal surfaces expand/contract slightly (scale 1.0 → 1.02) to simulate respiration.
+-   **Fluid Leaks:** Pipes leak viscous fluids (oil/blood ambiguity) that pool on floors.
+-   **Intake Vents:** Large grates emit suction sounds and pull debris (papers, cloth) inward. **Never show what lies beyond.**
+
+***
+
+## 5. Asset Validation & Forbidden Elements
+
+All assets must pass `StyleLint` validation against this contract before merging.
+
+### 5.1 Allowed Evidence Types
+
+| Asset Type | Description | Invariant Link |
+|------------|-------------|----------------|
+| **Biomech Decals** | Hair caught in gears, blood smears on levers, fingerprints on glass. | CIC, RRM |
+| **Machine Logs** | Printouts showing "Fuel Efficiency" spikes correlated with missing persons. | AOS, FCF |
+| **Respiratory Audio** | Hissing vents that sound like wheezing breathing. | DET, HVF |
+| **Structural Shifts** | Doors that lock/unlock based on player stress (BCI). | FCF, DET |
+
+### 5.2 Forbidden Depictions (Charter Violation)
+
+| Forbidden Asset | Reason | Alternative |
+|-----------------|--------|-------------|
+| **Visible Bodies in Machinery** | Violates Pillar 2 (Implication). | Show personal effects (wallets, IDs) near intakes. |
+| **Explicit Gore/Disembowelment** | Violates Pillar 2 (Implication). | Use blood rust stains and fluid leaks only. |
+| **Sentient Robots** | Breaks "Functional Horror" rule. | Machines are dumb engines; the horror is their purpose. |
+| **Open Sky** | Breaks Claustrophobia rule. | Ceilings are always pipes, concrete, or metal plating. |
+| **Natural Sounds** | Breaks Industrial Atmosphere. | Replace birds/wind with hums, clicks, hydraulics. |
+
+***
+
+## 6. BCI & Haptic Integration (Tier 3 Research)
+
+This section defines experimental features gated behind `research` feature flags in `Cargo.toml`.
+
+### 6.1 Physiological Mapping
+
+| Physiological Signal | Machine Response | Purpose |
+|----------------------|------------------|---------|
+| **Heart Rate (HR)** | Pumping speed of hydraulic pistons. | Syncs environment to player anxiety. |
+| **Electrodermal (EDA)** | Static charge on metal surfaces (spark frequency). | Visualizes player stress as electrical danger. |
+| **Respiration** | Vent airflow intensity (whistling/hissing). | Makes the building feel like it's breathing with the player. |
+
+### 6.2 Haptic Feedback
+
+-   **Rumble Patterns:** Low-frequency rumble (20–40Hz) when near active machinery.
+-   **Adaptive Triggers:** Controller triggers stiffen when interacting with jammed levers or heavy doors.
+-   **Heartbeat Sync:** Haptic pulse matches player HR (if BCI active) to blur line between self and machine.
+
+***
+
+## 7. Machine-Readable Style Contract
+
+This JSON structure defines the enforceable rules for the `StyleLint` tool (File 7).
 
 ```json
 {
-  "artstyle_id": "MACHINE_CANYON_BIOMECH_BCI",
-  "visual_mode": [
-    "industrial_megastructure",
-    "fine_line_hatching",
-    "muted_biomech_wash"
+  "style_id": "machine_canyon_biomech_bci",
+  "version": "1.0.0",
+  "palette_constraints": {
+    "max_saturation": 0.5,
+    "allowed_accent_colors": ["#FFBF00", "#4A2C2A", "#E0E0E0"],
+    "base_palette": "industrial_void"
+  },
+  "geometry_constraints": {
+    "min_corridor_width_meters": 1.2,
+    "max_visibility_range_meters": 15.0,
+    "ceiling_type": "enclosed",
+    "natural_light_allowed": false
+  },
+  "invariant_bindings": {
+    "RRM": { "target": "machine_activity", "min_threshold": 0.6, "max_effect": 1.0 },
+    "FCF": { "target": "geometry_shift", "min_threshold": 0.7, "max_effect": 0.8 },
+    "CIC": { "target": "organic_corrosion", "min_threshold": 0.8, "max_effect": 0.9 }
+  },
+  "bci_features": {
+    "enabled": false,
+    "feature_flag": "research",
+    "hr_sync_pumps": true,
+    "eda_static_sparks": true,
+    "respire_vents": true
+  },
+  "forbidden_tags": [
+    "visible_corpse",
+    "explicit_gore",
+    "sentient_ai",
+    "open_sky",
+    "natural_sounds"
   ],
-  "thematic_mode": [
-    "mechanism_over_organism",
-    "human_as_process_input",
-    "infinite_corridor",
-    "indifferent_system"
-  ]
+  "entertainment_targets": {
+    "STCI": { "min": 0.60, "max": 0.80 },
+    "CDL": { "min": 0.75, "max": 0.95 }
+  }
 }
 ```
 
-### 3.2 Detailed Dimension Labels
+***
 
-- **Composition:**
-  - `composition_canyon_corridor`
-  - `composition_machine_walls_left_right`
-  - `composition_lone_figure_bottom_center`
-  - `composition_converging_depth_glow`
-  - `composition_cable_web_crossing_void`
+## 8. Workflow Integration
 
-- **Lighting & Palette:**
-  - `lighting_internal_furnace_glow`
-  - `lighting_diffuse_sickly_core`
-  - `lighting_env_foggy_smoke`
-  - `palette_desaturated_bone_iron`
-  - `palette_sickly_warm_highlights`
-  - `palette_rust_blood_stains`
-  - `palette_no_vibrant_color`
+### 8.1 Asset Generation Sprints
 
-- **Surface & Detail:**
-  - `detail_dense_hatching`
-  - `detail_crosshatched_shadow`
-  - `detail_cable_bundles`
-  - `detail_riveted_panels`
-  - `detail_chain_suspension`
-  - `detail_vertebra_pipes`
+-   **Photogrammetry:** Scan real-world Soviet industrial sites (pumps, valves, control panels) but texture them with "organic corrosion" shaders.
+-   **Modular Kits:** Create "Canyon Kits" (walls, floors, pipes) that snap together to form narrow, looping corridors.
+-   **Audio-Visual Sync:** Link machine animation cycles to audio stems (piston slam = hydraulic hiss) for cohesive feedback.
 
-- **Mood & Theme:**
-  - `mood_existential_mechanical_dread`
-  - `mood_processed_flesh`
-  - `mood_unseen_heart_of_machine`
-  - `mood_lost_in_megastructure`
+### 8.2 Runtime Validation
 
-- **BCI/Haptic:**
-  - `bci_channel_heartbeat_resonance`
-  - `bci_channel_breath_constraint`
-  - `haptic_channel_floor_vibration`
-  - `haptic_channel_cable_tension`
-  - `haptic_pattern_conveyor_pulse`
-
-Any use of this style must select:
-
-- ≥ 1 composition label  
-- ≥ 1 lighting label  
-- ≥ 1 palette/surface label  
-- ≥ 1 mood label  
-- ≥ 1 BCI/haptic label  
+-   **Style Runtime Validator:** Monitors lighting and geometry. If natural light enters the scene or corridors widen beyond 2.0 meters, it triggers a warning.
+-   **Invariant Sync:** Every frame, the renderer queries `SpectralLibrary` for RRM/FCF levels and adjusts machine activity (idle → active) accordingly.
 
 ***
 
-## 4. Invariant and Metric Binding
+## 9. Reference Cases (Pathologic & Darkwood 2)
 
-### 4.1 Required Invariants
-
-This style activates only when local history supports **industrialized, process-based horror**.
-
-Minimum conditions:
-
-- \( CIC \geq 0.6 \): history of large-scale systemic harm (e.g., exploitation, accidents).  
-- \( MDI \geq 0.5 \): myths of “the machine” or anonymous forces.  
-- \( AOS \geq 0.7 \): opaque records, missing workers, unexplained disappearances.  
-- \( FCF \geq 0.6 \): folklore converging around industrial corridors, furnaces, or mines.  
-- \( SPR \geq 0.65 \): machine-linked manifestations feel believable in-world.  
-- \( SHCI \geq 0.7 \): spectral activity tightly constrained to industrial events.
-
-Recommended:
-
-- \( RRM \geq 0.5 \): rituals of productivity, sacrifice to systems, or process worship.  
-- \( LSG \geq 0.6 \): liminal stress in walkways, catwalks, loading docks.
-
-### 4.2 Player-Experience Targets
-
-When active, style aims for:
-
-- **UEC:** 0.5–0.75 → player feels uncertain about the machine’s awareness.  
-- **EMD:** 0.6–0.85 → scattered clues: graffiti, tags, bone fragments, abandoned tools. [horror](https://horror.org/horror-world-building-tips-by-joanna-nelius/)
-- **STCI:** 0.4–0.7 → alternating stretches of dead stillness and sudden mechanical activity.  
-- **CDL:** 0.7–0.9 → mind struggles to decide if the machine is alive.  
-- **ARR:** ≥ 0.7 → no simple “it’s evil/good”; mostly unresolved.
+| Feature | Pathologic Implementation | Horror$Place Adaptation |
+|---------|---------------------------|-------------------------|
+| **Architecture** | Surreal, impossible structures. | Industrial impossible geometry (loops, shifts). |
+| **Horror** | Plague as invisible enemy. | Machine consumption as invisible function. |
+| **Setting** | Town as living organism. | Factory as living organism. |
+| **Survival** | Time management, immunity. | Navigation management, stealth. |
+| **Atmosphere** | Oppressive, philosophical. | Claustrophobic, functional dread. |
 
 ***
 
-## 5. Style Profile Module
+## 10. Compliance Checklist
 
-Filename:  
-`artstyles/machine_canyon_biomech_bci.lua`
+Before any visual asset is merged into the repository:
 
-```lua
--- File: artstyles/machine_canyon_biomech_bci.lua
-
-local Style = {}
-
-Style.id = "MACHINE_CANYON_BIOMECH_BCI"
-
-Style.invariant_requirements = function(inv)
-    return inv.cic  >= 0.60 and
-           inv.mdi  >= 0.50 and
-           inv.aos  >= 0.70 and
-           inv.fcf  >= 0.60 and
-           inv.spr  >= 0.65 and
-           inv.shci >= 0.70
-end
-
-Style.metric_targets = {
-    UEC  = { min = 0.50, max = 0.75 },
-    EMD  = { min = 0.60, max = 0.85 },
-    STCI = { min = 0.40, max = 0.70 },
-    CDL  = { min = 0.70, max = 0.90 },
-    ARR  = { min = 0.70, max = 1.00 }
-}
-
-Style.visual_flags = {
-    allow_color              = true,
-    palette_desaturation     = 0.85, -- high desaturation
-    max_saturation           = 0.2,
-    use_muted_biomech_wash   = true,
-    dense_hatching_required  = true,
-    forbid_clean_metal       = true
-}
-
-Style.semantic_tags = {
-    "mechanism_over_organism",
-    "human_as_process_input",
-    "industrial_megastructure",
-    "existential_mechanical_dread"
-}
-
-Style.region_bias = 0.0
-
-return Style
-```
-
-This style module is registered through `style_registry.lua` and consumed by the `StyleRouter`.
+- [ ] **Palette Check:** Is saturation < 50%? Are natural colors excluded?
+- [ ] **Implication Check:** Does this asset show evidence of consumption rather than explicit bodies?
+- [ ] **Invariant Check:** Is there a defined RRM/FCF binding for this asset?
+- [ ] **Geometry Check:** Does this asset fit within narrow corridor constraints (width < 2.0m)?
+- [ ] **BCI Check:** Are experimental features gated behind `research` flags?
 
 ***
 
-## 6. Composition, Camera, and Environment Logic
-
-### 6.1 Corridor Composition
-
-Rules:
-
-- Left and right frame edges are **machine walls** forming a canyon.  
-- One side emphasizes **cylindrical conduits, cables, vertical repetition**.  
-- The other emphasizes **angled armor plates, chains, panel seams**.  
-- Center depth converges on a **furnace glow**; full machine body is never seen.
-
-### 6.2 Lone Figure Constraint
-
-- Single human-scale figure at bottom-center or lower-third center, facing into the corridor.  
-- No eye contact or explicit acknowledgment from the environment.  
-- Pose must suggest **observation, not influence**.
-
-### 6.3 Camera Parameters (Pseudo)
-
-```lua
--- Called after StyleRouter selects this style
-function Style.apply_camera(scene, inv, metrics)
-    local cam = scene.camera
-
-    cam.mode = "machine_canyon"
-    cam.fov = 60
-    cam.vertical_bias = 0.0       -- emphasize corridor depth more than sky
-    cam.depth_vanish_point = { x = 0.5, y = 0.4 } -- slightly above center
-
-    cam.observer_height_ratio = 0.05
-    cam.enforce_canyon_framing = true
-end
-```
-
-***
-
-## 7. Lighting and Palette Rules
-
-### 7.1 Furnace Glow Logic
-
-- Central light is **sickly, internal, and partially occluded**.  
-- Color: desaturated yellow-white or pale ochre, always low saturation.  
-- Behavior: constant, low flicker; feels like a **deep, slow-burning core**.
-
-### 7.2 Environmental Lighting
-
-- Peripheral areas: dim, diffuse, with heavy shadow under cables and in recesses.  
-- No clean spotlight on the figure; the human is lit by **ambient reflection** from the machine.  
-- Fog and particulate emphasis: smoke, dust, or vapor.
-
-### 7.3 Engine Parameters (Pseudo)
-
-```lua
-function Style.apply_lighting(scene, inv, metrics)
-    local L = scene.lighting
-
-    L.palette_mode = "muted_industrial"
-    L.max_saturation = 0.2
-
-    L.key_light.source = "deep_core"
-    L.key_light.type = "diffuse_furnace"
-    L.key_light.intensity = 0.8
-    L.key_light.color = { r = 0.9, g = 0.8, b = 0.5 } -- before desaturation
-
-    L.ambient.intensity = 0.3
-    L.ambient.color = { r = 0.6, g = 0.55, b = 0.5 }
-
-    L.fog.enabled = true
-    L.fog.color = { r = 0.4, g = 0.38, b = 0.35 }
-    L.fog.density = 0.6
-
-    L.shadows.depth = 0.9
-    L.shadows.softness = 0.4
-end
-```
-
-***
-
-## 8. Surface, Detail, and Object Logic
-
-### 8.1 Detail Density
-
-- Surfaces must be described with **dense fine lines**: hatching, crosshatching, etching-like marks.  
-- No large, blank planes; any large surface must show scratches, rivets, stains, or seams.  
-- Cables and chains must cross space in **diagonal or sagging arcs**, suggesting tension and weight.
-
-### 8.2 Object Catalogue (Logical, Not IP-Bound)
-
-Required motif classes:
-
-- **Cylindrical stacks**: segmented like vertebrae or reinforced piping.  
-- **Hull plates**: large planar forms with bolts, seams, and corrosion.  
-- **Cable webs**: horizontal/diagonal arcs, some frayed or broken.  
-- **Hanging chains**: thick links, partially visible, indicating larger unseen structures.  
-- **Catwalks**: narrow, curved walkways with railings, grating, and wear.
-
-***
-
-## 9. BCI + Haptic Integration
-
-### 9.1 BCI Channels
-
-Assume the engine receives **normalized BCI data** per player (0–1):
-
-- `bci_arousal` (general activation).  
-- `bci_attention` (focus on stimulus).  
-- `bci_anxiety` (inferred tightness / dread).  
-
-### 9.2 Haptic Channels
-
-Haptic system exposes:
-
-- `haptic_floor_vibration` (0–1, low-frequency rumble).  
-- `haptic_cable_tension` (0–1, sharp, high-tension pulls).  
-- `haptic_breath_chest` (0–1, subtle chest-level pulses).  
-
-### 9.3 Style-Specific Mapping
-
-Filename:  
-`src/bci_haptics/machine_canyon_mapping.lua`
-
-```lua
--- File: src/bci_haptics/machine_canyon_mapping.lua
-
-local MachineBCI = {}
-
-function MachineBCI.apply_bci_haptics(style_decision, inv, metrics, bci_data)
-    if style_decision.style_id ~= "MACHINE_CANYON_BIOMECH_BCI" then
-        return
-    end
-
-    local arousal  = bci_data.arousal  or 0.5
-    local anxiety  = bci_data.anxiety  or 0.5
-    local attention = bci_data.attention or 0.5
-
-    local base_rumble = inv.cic * 0.4 + inv.shci * 0.2
-    local floor_vibration = base_rumble * (0.5 + anxiety * 0.5)
-
-    local cable_tension = attention * 0.6 + anxiety * 0.3
-    local breath_pulse = (1.0 - arousal) * 0.5 + anxiety * 0.5
-
-    Haptics.set("haptic_floor_vibration", floor_vibration)
-    Haptics.set("haptic_cable_tension",   cable_tension)
-    Haptics.set("haptic_breath_chest",    breath_pulse)
-end
-
-return MachineBCI
-```
-
-Behavior:
-
-- As anxiety rises, **floor rumble** increases, as if the machine is “responding” at a sub-perceptual level.  
-- As attention narrows, **cable tension spikes**, synchronizing micro-jolts with visual cable motion.  
-- When arousal dips but anxiety remains high, **chest pulses** emphasize suffocating dread.
-
-***
-
-## 10. Prompt & Code-Generation Contracts
-
-### 10.1 Prompt Metadata
-
-Any AI content generator that targets this style should emit metadata similar to:
-
-```json
-{
-  "target_artstyle": "MACHINE_CANYON_BIOMECH_BCI",
-  "composition_tags": [
-    "composition_canyon_corridor",
-    "composition_lone_figure_bottom_center"
-  ],
-  "lighting_tags": [
-    "lighting_internal_furnace_glow",
-    "lighting_env_foggy_smoke"
-  ],
-  "palette_tags": [
-    "palette_desaturated_bone_iron",
-    "palette_no_vibrant_color"
-  ],
-  "detail_tags": [
-    "detail_dense_hatching",
-    "detail_cable_bundles",
-    "detail_riveted_panels"
-  ],
-  "mood_tags": [
-    "mood_existential_mechanical_dread",
-    "mood_lost_in_megastructure"
-  ],
-  "bci_haptic_tags": [
-    "bci_channel_heartbeat_resonance",
-    "haptic_channel_floor_vibration"
-  ]
-}
-```
-
-### 10.2 Machine-Enforced Rules for Generated Code
-
-Any script claiming this style must:
-
-1. Import the style profile:  
-   `local MachineStyle = require("artstyles.machine_canyon_biomech_bci")`
-
-2. Call invariant gate:  
-   `MachineStyle.invariant_requirements(inv)` before applying visuals.
-
-3. Respect palette and lighting constraints (no bright colors, furnace-based key light).
-
-4. Use **BCI + haptic mapping** when available; otherwise fall back to neutral rumble patterns.
-
-5. Log style and context into telemetry:
-
-```lua
-Telemetry.log_event("style_activation", {
-    style_id = "MACHINE_CANYON_BIOMECH_BCI",
-    region_id = region_id,
-    tile_id = tile_id,
-    invariants = inv,
-    metrics = metrics
-})
-```
-
-***
-
-## 11. Validation and Linting
-
-A future `style_lint.lua` module should:
-
-- Reject assets or code that:  
-  - Use vivid colors when `palette_no_vibrant_color` is implied.  
-  - Omit canyon/wall composition while claiming this style.  
-  - Spawn crowds of humans instead of a single observer.  
-  - Fail to integrate BCI/haptic channels where hardware is available.
-
-***
+**Document Status:** Active  
+**Last Updated:** 2026-01-01  
+**Maintainer:** Horror$Place Art Direction Team  
+**Related Files:** `src/spectral_library.rs`, `docs/artstyle_spectral_engraving_dark_sublime.md`, `docs/style_router_module_spec.md`
