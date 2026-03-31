@@ -1,0 +1,63 @@
+{
+  "id": "SPECTRAL_ENGRAVING_DARK_SUBLIME",
+  "version": "v1.0",
+  "safety_tier": "mature",
+  "allowed_builds": ["mature", "research"],
+  "invariants": {
+    "min": {
+      "CIC": 0.75,
+      "MDI": 0.70,
+      "AOS": 0.60,
+      "SPR": 0.70,
+      "SHCI": 0.80
+    },
+    "recommended": {
+      "LSG": 0.70,
+      "RRM": 0.50
+    }
+  },
+  "metrics": {
+    "UEC":  { "min": 0.60, "max": 0.80 },
+    "EMD":  { "min": 0.70, "max": 0.90 },
+    "STCI": { "min": 0.50, "max": 0.70 },
+    "CDL":  { "min": 0.70, "max": 0.90 },
+    "ARR":  { "min": 0.75, "max": 1.00 }
+  },
+  "visual": {
+    "palette": {
+      "monochrome_only": true,
+      "max_saturation": 0.05
+    },
+    "composition_tags_required": [
+      "composition_radial_divine_core",
+      "composition_lone_figure_scale_anchor"
+    ],
+    "lighting_tags_required": [
+      "lighting_backlit_celestial_shaft",
+      "lighting_halo_corona_edges"
+    ]
+  },
+  "semantic": {
+    "mood_tags_required": [
+      "mood_cosmic_dread",
+      "mood_devotional_horror"
+    ],
+    "subject_tags_required": [
+      "subject_human_body_cluster_entity",
+      "subject_lone_cloaked_observer"
+    ]
+  },
+  "bci_haptics": {
+    "requires_bci": false,
+    "channels": []
+  },
+  "implication_rules": {
+    "explicit_violence_forbidden": true,
+    "evidence_types_allowed": [
+      "bloodstained_object",
+      "contradictory_record",
+      "spectral_testimony_fragment",
+      "empty_space_implication"
+    ]
+  }
+}
