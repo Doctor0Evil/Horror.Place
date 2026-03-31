@@ -1,243 +1,189 @@
-//! # Horror$Place Spectral Library
-//!
-//! The core API for querying the Geo-Historical Invariant Layer.
-//! This module defines the structural relationship between historical evidence
-//! and procedural horror generation, ensuring all terror is grounded in
-//! verifiable data (CIC, MDI, AOS) rather than arbitrary spookiness.
-//!
-//! ## Directional Flow
-//! 1. **History Layer** (Real-world data, folklore, disasters)
-//! 2. **Invariants** (CIC, MDI, AOS, etc. - The "Truth" of the location)
-//! 3. **Expression** (Art, Audio, AI - The "Echo" of the truth)
-//! 4. **Metrics** (UEC, EMD, ARR, etc. - The "Entertainment" validation)
-//!
-//! ## Safety Compliance
-//! All queries must adhere to the `RiversOfBloodCharter`.
-//! Explicit violence is forbidden; only evidence/implication is permitted.
+// src/spectral_library.rs
+//
+// The Spectral Library module provides the authoritative backend for Horror$Place invariants.
+// It manages a database of regions and their associated invariant values (CIC, MDI, AOS, etc.).
+// It exposes functions for querying these values and evaluating preconditions against them.
+// This module is designed to be safe for FFI (Foreign Function Interface) binding to Lua.
 
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
+use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 
-// ============================================================================
-// SECTION 1: HISTORY-HORROR ATTRIBUTION TERMS (The Input Layer)
-// ============================================================================
-// These 10 terms serve as machine-readable tags bridging historical fact
-// and horror-system design. They are the "Truth" the engine reads.
+// --- Data Structures ---
 
-/// **Catastrophic Imprint Coefficient (CIC)**
-/// Quantifies how heavily a location is stamped by major disasters (wars, spills, plagues).
-/// Range: 0.0 (None) to 1.0 (Ground Zero)
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct CatastrophicImprintCoefficient(pub f32);
+/// Unique identifier for a region or location.
+pub type RegionId = String; // e.g., "aral_sea_basin", "soviet_factory_block_17"
 
-/// **Mythic Density Index (MDI)**
-/// Measures concentration of rumors/myths normalized by population/time.
-/// High MDI drives audio anomalies and reality glitches.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct MythicDensityIndex(pub f32);
-
-/// **Archival Opacity Score (AOS)**
-/// Captures how incomplete/contradictory historical records are.
-/// High AOS biases hidden dungeons and sanity breaks.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct ArchivalOpacityScore(pub f32);
-
-/// **Liminal Stress Gradient (LSG)**
-/// Describes sharp transitions between states (land-water, living-abandoned).
-/// High LSG lines are perfect for thresholds/stalker spawns.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct LiminalStressGradient(pub f32);
-
-/// **Spectral Plausibility Rating (SPR)**
-/// Computed likelihood that a legend could be "true" within world rules.
-/// Keeps horror grounded (Low SPR = ambient text, High SPR = systemic enemies).
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct SpectralPlausibilityRating(pub f32);
-
-/// **Ritual Residue Map (RRM)**
-/// Spatial layer marking repeated structured human behavior (cults, experiments).
-/// Drives occult mechanics boot-up speed.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct RitualResidueMap(pub f32);
-
-/// **Folkloric Convergence Factor (FCF)**
-/// Measures how many independent storylines point to the same area.
-/// High FCF sites are natural boss zones.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct FolkloricConvergenceFactor(pub f32);
-
-/// **Reliability Weighting Factor (RWF)**
-/// Rates each source contributing to a region's story (Official vs. Drunk Tale).
-/// Low RWF + High CIC = Uncanny side-events.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct ReliabilityWeightingFactor(pub f32);
-
-/// **Dread Exposure Threshold (DET)**
-/// Time limit before psychological effects occur in this area.
-/// Drives sanity systems and hallucination triggers.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct DreadExposureThreshold(pub f32);
-
-/// **Haunt Vector Field (HVF)**
-/// Directional "flow" of uncanny pressure across the map.
-/// Biases movement, weather, and ambient sound migration.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct HauntVectorField {
-    pub x: f32,
-    pub y: f32,
-    pub magnitude: f32,
-}
-
-/// Aggregated Historical Invariant Profile for a specific Coordinate/Tile.
+/// Enum to represent the type of threshold for an invariant.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HistoricalInvariantProfile {
-    pub cic: CatastrophicImprintCoefficient,
-    pub mdi: MythicDensityIndex,
-    pub aos: ArchivalOpacityScore,
-    pub lsg: LiminalStressGradient,
-    pub spr: SpectralPlausibilityRating,
-    pub rrm: RitualResidueMap,
-    pub fcf: FolkloricConvergenceFactor,
-    pub rwf: ReliabilityWeightingFactor,
-    pub det: DreadExposureThreshold,
-    pub hvf: HauntVectorField,
+pub enum InvariantThreshold {
+    Min(f64),
+    Max(f64),
 }
 
-// ============================================================================
-// SECTION 2: ENTERTAINMENT METRICS (The Validation Layer)
-// ============================================================================
-// These 5 terms measure player experience to ensure horror is entertaining.
-// Linked to `schemas/entertainment_metrics_v1.json`.
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct EntertainmentMetrics {
-    /// Uncertainty Engagement Coefficient (Target: 0.55 - 0.85)
-    pub uec: f32,
-    /// Evidential Mystery Density (Target: 0.60 - 0.90)
-    pub emd: f32,
-    /// Safe-Threat Contrast Index (Target: 0.40 - 0.70)
-    pub stci: f32,
-    /// Cognitive Dissonance Load (Target: 0.70 - 0.95)
-    pub cdl: f32,
-    /// Ambiguous Resolution Ratio (Target: 0.70 - 1.0)
-    pub arr: f32,
+/// Struct holding all 11 core invariant values.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HorrorInvariants {
+    pub CIC: f64, // Catastrophic Imprint Coefficient
+    pub MDI: f64, // Mythic Density Index
+    pub AOS: f64, // Archival Opacity Score
+    pub RRM: f64, // Ritual Residue Map
+    pub FCF: f64, // Folkloric Convergence Factor
+    pub SPR: f64, // Spectral Plausibility Rating
+    pub RWF: f64, // Reliability Weighting Factor
+    pub DET: f64, // Dread Exposure Threshold
+    pub HVF: f64, // Historical Veracity Factor
+    pub LSG: f64, // Liminal Stress Gradient
+    pub SHCI: f64, // Spectral-Historical Coherence Index
 }
 
-impl EntertainmentMetrics {
-    /// Validates if the current session meets "Effective Mystery" state.
-    /// Logic: UEC > 0.55 AND ARR > 0.70
-    pub fn is_effective_mystery(&self) -> bool {
-        self.uec > 0.55 && self.arr > 0.70
-    }
-
-    /// Checks for player overwhelm (STCI > 0.85 OR UEC < 0.30)
-    pub fn is_overwhelmed(&self) -> bool {
-        self.stci > 0.85 || self.uec < 0.30
-    }
-}
-
-// ============================================================================
-// SECTION 3: THE SPECTRAL API (The Directional Bridge)
-// ============================================================================
-
-/// The core trait for querying the History Layer.
-/// Implementations may load from JSON, SQLite, or Procedural Seeds.
-pub trait SpectralLibrary {
-    /// Query the historical invariant profile for a given coordinate.
-    fn query_invariants(&self, x: f32, y: f32) -> HistoricalInvariantProfile;
-
-    /// Calculate expected entertainment metrics based on invariants.
-    /// This is the predictive model used by PCG to ensure fun before spawning.
-    fn predict_metrics(&self, profile: &HistoricalInvariantProfile) -> EntertainmentMetrics;
-
-    /// Validate that a proposed horror event complies with the Rivers of Blood Charter.
-    /// Returns false if the event relies on explicit violence rather than evidence.
-    fn validate_charter_compliance(&self, event_type: &str, profile: &HistoricalInvariantProfile) -> bool;
-}
-
-/// Example Implementation Logic (Pseudo-code for Direction)
-/// This demonstrates how History drives Horror without explicit violence.
-pub struct StandardSpectralLibrary;
-
-impl SpectralLibrary for StandardSpectralLibrary {
-    fn query_invariants(&self, x: f32, y: f32) -> HistoricalInvariantProfile {
-        // In production, this queries the Geo-Historical Database.
-        // For now, returns a seeded default to establish type safety.
-        HistoricalInvariantProfile {
-            cic: CatastrophicImprintCoefficient(0.0),
-            mdi: MythicDensityIndex(0.0),
-            aos: ArchivalOpacityScore(0.0),
-            lsg: LiminalStressGradient(0.0),
-            spr: SpectralPlausibilityRating(0.0),
-            rrm: RitualResidueMap(0.0),
-            fcf: FolkloricConvergenceFactor(0.0),
-            rwf: ReliabilityWeightingFactor(0.0),
-            det: DreadExposureThreshold(0.0),
-            hvf: HauntVectorField { x: 0.0, y: 0.0, magnitude: 0.0 },
+impl HorrorInvariants {
+    /// Creates a new instance with default values (0.0).
+    pub fn new() -> Self {
+        HorrorInvariants {
+            CIC: 0.0,
+            MDI: 0.0,
+            AOS: 0.0,
+            RRM: 0.0,
+            FCF: 0.0,
+            SPR: 0.0,
+            RWF: 0.0,
+            DET: 0.0,
+            HVF: 0.0,
+            LSG: 0.0,
+            SHCI: 0.0,
         }
     }
-
-    fn predict_metrics(&self, profile: &HistoricalInvariantProfile) -> EntertainmentMetrics {
-        // DIRECTIONAL LOGIC:
-        // High AOS (Opacity) -> High EMD (Mystery Density)
-        // High CIC (Catastrophe) -> High UEC (Uncertainty Engagement)
-        // High LSG (Liminal) -> High STCI (Contrast)
-        
-        let emd = (profile.aos.0 * 0.8) + 0.2; 
-        let uec = (profile.cic.0 * 0.7) + 0.3;
-        
-        EntertainmentMetrics {
-            uec: uec.min(1.0),
-            emd: emd.min(1.0),
-            stci: profile.lsg.0,
-            cdl: profile.fcf.0,
-            arr: 1.0 - (profile.rwf.0 * 0.5), // High Reliability lowers Ambiguity
-        }
-    }
-
-    fn validate_charter_compliance(&self, event_type: &str, profile: &HistoricalInvariantProfile) -> bool {
-        // RIVERS OF BLOOD CHARTER CHECK
-        // Forbidden: Explicit Gore, Jump Scares without Context, Gratuitous Violence.
-        // Allowed: Environmental Evidence, Audio Echoes, Contradictory Records.
-        
-        let forbidden_events = ["explicit_gore", "gratuitous_violence", "random_jump_scare"];
-        
-        if forbidden_events.contains(&event_type) {
-            return false;
-        }
-
-        // Safety: High CIC areas must use Evidence, not Violence.
-        if profile.cic.0 > 0.8 && event_type == "violent_encounter" {
-            return false; // Must be "disturbed earth" or "abandoned tools" instead
-        }
-
-        true
-    }
 }
 
-// ============================================================================
-// SECTION 4: ARCHIVIST PERSONALITY HOOKS
-// ============================================================================
-// Specific hooks for the Priority #1 AI Personality (The Archivist).
-// These allow the AI to query history to generate contradictory records.
+/// Type alias for a set of preconditions.
+pub type Precondition = HashMap<String, InvariantThreshold>;
+
+// --- Error Handling ---
 
 #[derive(Debug)]
-pub struct ArchivistQuery {
-    pub location_x: f32,
-    pub location_y: f32,
-    pub player_knowledge_level: f32, // 0.0 (Ignorant) to 1.0 (Aware)
+pub enum SpectralLibraryError {
+    RegionNotFound(String),
+    IoError(std::io::Error),
+    JsonError(serde_json::Error),
 }
 
-impl ArchivistQuery {
-    /// Determines if the Archivist should withhold or reveal information.
-    /// Logic: High AOS + Low Player Knowledge = Withhold (Raise Mystery)
-    pub fn should_withhold_truth(&self, profile: &HistoricalInvariantProfile) -> bool {
-        profile.aos.0 > 0.7 && self.player_knowledge_level < 0.5
-    }
-
-    /// Determines if the Archivist should introduce a contradiction.
-    /// Logic: High RWF (Reliability) + High FCF (Convergence) = Contradict Official Record
-    pub fn should_contradict_record(&self, profile: &HistoricalInvariantProfile) -> bool {
-        profile.rwf.0 > 0.8 && profile.fcf.0 > 0.6
+impl fmt::Display for SpectralLibraryError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SpectralLibraryError::RegionNotFound(id) => write!(f, "Region not found: {}", id),
+            SpectralLibraryError::IoError(e) => write!(f, "IO Error: {}", e),
+            SpectralLibraryError::JsonError(e) => write!(f, "JSON Error: {}", e),
+        }
     }
 }
+
+impl Error for SpectralLibraryError {}
+
+impl From<std::io::Error> for SpectralLibraryError {
+    fn from(error: std::io::Error) -> Self {
+        SpectralLibraryError::IoError(error)
+    }
+}
+
+impl From<serde_json::Error> for SpectralLibraryError {
+    fn from(error: serde_json::Error) -> Self {
+        SpectralLibraryError::JsonError(error)
+    }
+}
+
+// --- Main Module ---
+
+/// The core Spectral Library struct.
+pub struct SpectralLibrary {
+    regions: HashMap<RegionId, HorrorInvariants>,
+}
+
+impl SpectralLibrary {
+    /// Creates a new, empty Spectral Library.
+    pub fn new() -> Self {
+        SpectralLibrary {
+            regions: HashMap::new(),
+        }
+    }
+
+    /// Adds or updates a region's invariants.
+    pub fn add_region(&mut self, id: RegionId, invariants: HorrorInvariants) {
+        self.regions.insert(id, invariants);
+    }
+
+    /// Retrieves the invariants for a given region.
+    pub fn get_region_invariants(&self, region_id: &RegionId) -> Result<&HorrorInvariants, SpectralLibraryError> {
+        self.regions.get(region_id)
+            .ok_or_else(|| SpectralLibraryError::RegionNotFound(region_id.clone()))
+    }
+
+    /// Evaluates a set of preconditions against a given set of invariants.
+    pub fn evaluate_preconditions(context_invariants: &HorrorInvariants, preconditions: &Precondition) -> bool {
+        for (invariant_name, threshold) in preconditions {
+            let value = match invariant_name.as_str() {
+                "CIC" => context_invariants.CIC,
+                "MDI" => context_invariants.MDI,
+                "AOS" => context_invariants.AOS,
+                "RRM" => context_invariants.RRM,
+                "FCF" => context_invariants.FCF,
+                "SPR" => context_invariants.SPR,
+                "RWF" => context_invariants.RWF,
+                "DET" => context_invariants.DET,
+                "HVF" => context_invariants.HVF,
+                "LSG" => context_invariants.LSG,
+                "SHCI" => context_invariants.SHCI,
+                _ => return false, // Unknown invariant name
+            };
+
+            match threshold {
+                InvariantThreshold::Min(min_val) => {
+                    if value < *min_val {
+                        return false;
+                    }
+                }
+                InvariantThreshold::Max(max_val) => {
+                    if value > *max_val {
+                        return false;
+                    }
+                }
+            }
+        }
+        true
+    }
+
+    // Optional: Load initial data from a JSON file path (referenced via registry).
+    // pub fn load_from_file(&mut self, path: &str) -> Result<(), SpectralLibraryError> {
+    //     let contents = std::fs::read_to_string(path)?;
+    //     let new_regions: HashMap<RegionId, HorrorInvariants> = serde_json::from_str(&contents)?;
+    //     self.regions.extend(new_regions);
+    //     Ok(())
+    // }
+}
+
+// --- Example Usage ---
+/*
+fn main() {
+    let mut lib = SpectralLibrary::new();
+
+    let mut aral_basin_inv = HorrorInvariants::new();
+    aral_basin_inv.CIC = 0.85;
+    aral_basin_inv.AOS = 0.92;
+    aral_basin_inv.SPR = 0.78;
+    lib.add_region("aral_sea_basin".to_string(), aral_basin_inv);
+
+    match lib.get_region_invariants(&"aral_sea_basin".to_string()) {
+        Ok(invariants) => println!("CIC for Aral Sea: {}", invariants.CIC),
+        Err(e) => println!("Error: {}", e),
+    }
+
+    let mut event_precondition = Precondition::new();
+    event_precondition.insert("CIC".to_string(), InvariantThreshold::Min(0.8));
+    event_precondition.insert("SPR".to_string(), InvariantThreshold::Min(0.7));
+
+    let context_inv = lib.get_region_invariants(&"aral_sea_basin".to_string()).unwrap(); // Assume it exists
+    let is_triggered = SpectralLibrary::evaluate_preconditions(context_inv, &event_precondition);
+    println!("Event triggers: {}", is_triggered);
+}
+*/
