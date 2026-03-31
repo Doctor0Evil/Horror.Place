@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Horror$Place Style Contract Schema v1",
+  "description": "Schema for defining art and narrative styles, including constraints, evidence types, and metric impacts, compliant with the Rivers of Blood Charter.",
+  "type": "object",
+  "properties": {
+    "style_id": {
+      "type": "string",
+      "description": "Unique identifier for the style contract.",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the style."
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the style's aesthetic and thematic elements."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["standard", "mature", "research"],
+      "description": "Safety tier as defined by the Rivers of Blood Charter."
+    },
+    "platforms": {
+      "type": "array",
+      "description": "List of supported platforms (e.g., web, vr, bci).",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_types": {
+      "type": "array",
+      "description": "List of acceptable evidence types this style emphasizes (e.g., spectral_static, archival_ledger).",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_depictions": {
+      "type": "array",
+      "description": "List of explicitly forbidden visual or narrative elements that violate the Rivers of Blood Charter.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "human_anatomy_direct",
+          "graphic_violence",
+          "explicit_suffering",
+          "decontextualized_horror",
+          "violates_procedural_implication_doctrine"
+        ]
+      }
+    },
+    "metric_levers": {
+      "type": "object",
+      "description": "Defines how this style influences entertainment metrics.",
+      "properties": {
+        "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+      },
+      "additionalProperties": false
+    },
+    "invariant_requirements": {
+      "type": "object",
+      "description": "Minimum or preferred invariant values this style is designed for.",
+      "properties": {
+        "CIC_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "MDI_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "AOS_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "SPR_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    }
+  },
+  "required": [
+    "style_id",
+    "name",
+    "description",
+    "tier",
+    "platforms",
+    "evidence_types",
+    "forbidden_depictions",
+    "metric_levers"
+  ],
+  "additionalProperties": false
+}
