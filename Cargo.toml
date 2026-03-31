@@ -12,6 +12,7 @@
 # All features must adhere to the Rivers of Blood Charter (docs/rivers_of_blood_charter.md)
 # Explicit violence, gore, and gratuitous horror are forbidden at all tiers.
 #
+# REPOSITORY: https://github.com/Doctor0Evil/Horror.Place
 # REFERENCE: Darkwood 2 (Ice-Pick Lodge), Pathologic Series, Aral Sea Historical Archives
 
 [package]
@@ -19,13 +20,14 @@ name = "horror_place_core"
 version = "1.0.0"
 edition = "2021"
 rust-version = "1.75.0"
-authors = ["Horror$Place Core Team <core@horrorplace.org>"]
+authors = ["Horror$Place Core Team <doctor0evil@github.com>"]
 description = "Sovereign horror research engine with history-aware procedural generation"
 license = "AGPL-3.0-or-later"
-homepage = "https://horrorplace.org"
-repository = "https://github.com/horrorplace/horror-place-core"
+homepage = "https://github.com/Doctor0Evil/Horror.Place"
+repository = "https://github.com/Doctor0Evil/Horror.Place"
 keywords = ["horror", "procedural", "historical", "research", "darkwood"]
-categories = ["game-development", "simulation", "ethics"]
+categories = ["game-development", "simulation"]
+readme = "README.md"
 
 # ============================================================================
 # SAFETY TIER FEATURE FLAGS
@@ -66,17 +68,17 @@ research = [
 ]
 
 # Module-level features (can be mixed within tier constraints)
-spectral_library = []
-pcg_generator = ["spectral_library", "rand", "serde"]
+spectral_library = ["serde"]
+pcg_generator = ["spectral_library", "rand"]
 audio_automation = ["spectral_library", "serde"]
 style_router = ["spectral_library", "style_lint"]
 style_lint = ["serde", "serde_json"]
 charter_enforcement = []
 
 # Research modules (gated behind research tier)
-extended_datasets = []
-full_ai_personalities = ["extended_datasets"]
-historical_trauma_archives = ["mature"]
+extended_datasets = ["serde_json"]
+full_ai_personalities = ["extended_datasets", "serde_json"]
+historical_trauma_archives = ["mature", "serde_json"]
 underground_network = ["mature", "crypto_signatures"]
 bci_integration = ["research", "physiological_telemetry"]
 haptic_optimization = ["research"]
@@ -95,17 +97,17 @@ crypto_signatures = ["dep:ed25519", "dep:sha2"]
 
 [dependencies]
 # Serialization (for style contracts, metrics, telemetry)
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_yaml = "0.9"
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+serde_yaml = { version = "0.9", optional = true }
 
 # Random number generation (for PCG, seeded for reproducibility)
-rand = { version = "0.8", features = ["std_rng"] }
-rand_chacha = "0.3"
+rand = { version = "0.8", optional = true }
+rand_chacha = { version = "0.3", optional = true }
 
 # Logging (for telemetry, charter violations, research data)
 log = "0.4"
-env_logger = "0.10"
+env_logger = { version = "0.10", optional = true }
 
 # Error handling
 thiserror = "1.0"
@@ -118,16 +120,12 @@ tokio = { version = "1.0", features = ["full"], optional = true }
 ed25519 = { version = "2.0", optional = true }
 sha2 = { version = "0.10", optional = true }
 
-# BCI/Physiological data processing (Tier 3 research only)
-# Local-only processing, no cloud transmission
-neurosky = { version = "0.1", optional = true }
-biosensors = { version = "0.2", optional = true }
-
-# Audio middleware integration (FMOD/Wwise bindings)
+# Audio middleware integration (FMOD/Wwise bindings - optional)
+# Note: These are placeholder references; actual bindings require separate licensing
 fmod = { version = "0.1", optional = true }
 wwise = { version = "0.1", optional = true }
 
-# Game engine integrations (Unreal/Unity FFI bindings)
+# Game engine integrations (Unreal/Unity FFI bindings - optional)
 unreal_engine = { version = "0.1", optional = true }
 unity = { version = "0.1", optional = true }
 
@@ -138,16 +136,12 @@ unity = { version = "0.1", optional = true }
 
 [dev-dependencies]
 # Testing framework
-cargo-tarpaulin = "0.27"  # Code coverage
-criterion = "0.5"  # Benchmarking
-
-# Linting (style contracts, charter compliance)
-style_lint = { path = "tools/style_lint" }
-charter_validator = { path = "tools/charter_validator" }
+criterion = { version = "0.5", features = ["html_reports"] }
 
 # Mock data for testing (historical archives, telemetry)
-mock_invariants = { path = "test_data/mock_invariants" }
-mock_telemetry = { path = "test_data/mock_telemetry" }
+# These would be local path dependencies in actual repo structure
+# mock_invariants = { path = "test_data/mock_invariants" }
+# mock_telemetry = { path = "test_data/mock_telemetry" }
 
 # ============================================================================
 # BUILD DEPENDENCIES
@@ -156,7 +150,7 @@ mock_telemetry = { path = "test_data/mock_telemetry" }
 
 [build-dependencies]
 # Schema generation (JSON schemas for style contracts, metrics)
-schemars = "0.8"
+# schemars = { version = "0.8", optional = true }
 
 # Code generation (from DSL contracts)
 quote = "1.0"
@@ -384,9 +378,9 @@ underground_distribution = { enabled = true, protocol = "IPFS+SSB", encryption =
 
 [package.metadata.documentation]
 # Public docs (Tier 1 only)
-public_docs_url = "https://docs.horrorplace.org"
-charter_docs_url = "https://docs.horrorplace.org/charter"
-research_docs_url = "https://research.horrorplace.org"  # Tier 3, access-gated
+public_docs_url = "https://github.com/Doctor0Evil/Horror.Place#readme"
+charter_docs_url = "https://github.com/Doctor0Evil/Horror.Place/blob/main/docs/rivers_of_blood_charter.md"
+research_docs_url = "https://github.com/Doctor0Evil/Horror.Place/tree/main/docs/research"  # Tier 3, access-gated
 
 # Documentation features
 docs_features = ["standard", "spectral_library", "pcg_generator", "audio_automation"]
@@ -407,7 +401,7 @@ amendment_voting_threshold = 0.75  # 75% approval across all tiers
 
 # Changelog format
 changelog_format = "keep-a-changelog"
-changelog_url = "https://github.com/horrorplace/horror-place-core/blob/main/CHANGELOG.md"
+changelog_url = "https://github.com/Doctor0Evil/Horror.Place/blob/main/CHANGELOG.md"
 
 # ============================================================================
 # CONTACT & SUPPORT
@@ -415,16 +409,17 @@ changelog_url = "https://github.com/horrorplace/horror-place-core/blob/main/CHAN
 
 [package.metadata.contact]
 # Public support (Tier 1)
-public_email = "support@horrorplace.org"
-public_discord = "https://discord.gg/horrorplace"
+public_email = "horror.place@github.com"
+public_discord = "https://discord.gg/horrorplace"  # Placeholder - update when created
+public_github = "https://github.com/Doctor0Evil/Horror.Place"
 
 # Research inquiries (Tier 3)
-research_email = "research@horrorplace.org"
-irb_contact = "irb@horrorplace.org"
+research_email = "research@horrorplace.github.io"  # Placeholder - update when created
+irb_contact = "irb@horrorplace.github.io"  # Placeholder - update when created
 
 # Security reports
-security_email = "security@horrorplace.org"
-security_policy_url = "https://github.com/horrorplace/horror-place-core/blob/main/SECURITY.md"
+security_email = "security@horrorplace.github.io"  # Placeholder - update when created
+security_policy_url = "https://github.com/Doctor0Evil/Horror.Place/blob/main/SECURITY.md"
 
 # ============================================================================
 # SPONSORS & ACKNOWLEDGMENTS
