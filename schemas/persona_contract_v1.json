@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Horror$Place Persona Contract Schema v1",
+  "description": "Schema for defining AI persona characteristics, state spaces, constraints, and metric targets, compliant with the Rivers of Blood Charter and the Archivist state machine principles.",
+  "type": "object",
+  "properties": {
+    "persona "type": "string",
+      "description": "Unique identifier for the persona contract.",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the persona."
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the persona's role and nature."
+    },
+    "archetype": {
+      "type": "string",
+      "enum": ["Archivist", "Witness", "Echo", "Threshold", "Process", "Other"],
+      "description": "Broad category of the persona, influencing base behavior patterns."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["standard", "mature", "research"],
+      "description": "Safety tier as defined by the Rivers of Blood Charter."
+    },
+    "state_space": {
+      "type": "object",
+      "description": "Defines the numerical ranges for key persona attributes.",
+      "properties": {
+        "information_density": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "How much information the persona presents at once."
+        },
+        "contradiction_budget": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "For Archivist-type personas; how much internal conflict is allowed."
+        },
+        "historical_veracity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "How closely the persona adheres to documented history."
+        },
+        "spectral_coherence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "For spectral-type personas; how stable their presence is."
+        },
+        "dissolution_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Rate at which the persona fades or fragments under stress."
+        }
+      },
+      "required": ["information_density"]
+    },
+    "constraints": {
+      "type": "array",
+      "description": "List of specific behavioral constraints for the persona.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metric_targets": {
+      "type": "object",
+      "description": "Desired impact of the persona on entertainment metrics.",
+      "properties": {
+        "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+      },
+      "additionalProperties": false
+    },
+    "invariant_preferences": {
+      "type": "object",
+      "description": "Preferred invariant values for optimal persona performance.",
+      "properties": {
+        "CIC_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "SHCI_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "SPR_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    }
+  },
+  "required": [
+    "persona_id",
+    "name",
+    "description",
+    "archetype",
+    "tier",
+    "state_space",
+    "metric_targets"
+  ],
+  "additionalProperties": false
+}
