@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/schemas/style/disaster-warden.json",
+  "title": "God’s Image: Disaster Warden Style Schema",
+  "description": "Validation schema for AI assets utilizing the chrome-brush, vivid natural-disaster colors, and divine retribution aesthetic.",
+  "type": "object",
+  "properties": {
+    "asset_metadata": {
+      "type": "object",
+      "properties": {
+        "filename": { "type": "string" },
+        "style_fidelity": {
+          "type": "string",
+          "const": "God’s Image: Disaster Warden",
+          "description": "Ensures this asset is explicitly tagged as Disaster Warden style."
+        },
+        "chrome_technique": {
+          "type": "boolean",
+          "default": true,
+          "description": "True if high-specular chrome-brush or equivalent reflective rendering is used for major surfaces."
+        },
+        "ink_exclusion": {
+          "type": "boolean",
+          "default": true,
+          "description": "True if pen, ink, crosshatching, and thin sketch lines are absent from the final image."
+        }
+      },
+      "required": ["filename", "style_fidelity"]
+    },
+    "visual_parameters": {
+      "type": "object",
+      "properties": {
+        "primary_disaster_color": {
+          "type": "string",
+          "enum": [
+            "flood_red",
+            "wildfire_orange",
+            "toxic_blue",
+            "silt_brown",
+            "smoke_magenta",
+            "industrial_green"
+          ],
+          "description": "Dominant natural-disaster color motif driving the palette and emotional tone."
+        },
+        "specularity_index": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 1.0,
+          "description": "Normalized index (0–1) representing the degree of chrome-like reflectivity on key forms."
+        },
+        "warden_scale": {
+          "type": "string",
+          "enum": [
+            "city_block",
+            "mountain_range",
+            "continental",
+            "planetary",
+            "dyson_shell"
+          ],
+          "description": "Perceptual scale of the Warden entity relative to human and planetary reference frames."
+        },
+        "silhouette_method": {
+          "type": "string",
+          "const": "Hand-Painted",
+          "description": "Indicates silhouettes were painted or hand-emulated, not procedurally line-rendered."
+        }
+      },
+      "required": ["primary_disaster_color", "specularity_index", "warden_scale"]
+    },
+    "environment_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["sky", "ground", "water", "buildings"]
+      },
+      "minItems": 2,
+      "uniqueItems": true,
+      "description": "At least two environment domains prominently expressed in the asset."
+    },
+    "warning_strings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "On-screen or embedded textual warnings and narrative strings about environmental collapse and divine retribution."
+    }
+  },
+  "required": ["asset_metadata", "visual_parameters", "environment_tags"]
+}
