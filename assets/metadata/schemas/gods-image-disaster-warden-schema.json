@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gods_Image_Disaster_Warden_Metadata",
+  "description": "Schema for generating and validating environmental assets under the God's Image: Disaster Warden style for Horror$Place.",
+  "type": "object",
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "pattern": "^GI-DW-[0-9]{4}$"
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["god_face_skybox", "warden_silhouette", "chrome_architecture", "reflective_hazard_basin"]
+    },
+    "visual_parameters": {
+      "type": "object",
+      "properties": {
+        "chrome_brush_intensity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Intensity of the specular rim-lighting on silhouettes."
+        },
+        "matte_base_opacity": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 1.0
+        },
+        "dominant_hazard_color": {
+          "type": "string",
+          "enum": ["#00FFAA", "#FF4500", "#00FFFF"],
+          "description": "Hex code for the primary reflection accent (Toxic Teal, Furnace Orange, Emergency Cyan)."
+        }
+      },
+      "required": ["chrome_brush_intensity", "dominant_hazard_color"]
+    },
+    "horror_metrics": {
+      "type": "object",
+      "properties": {
+        "reflective_omen_density_rod": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "divine_exclusion_gradient_deg": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "omen_to_human_scale_ratio_ohsr": {
+          "type": "integer",
+          "minimum": 10
+        }
+      },
+      "required": ["reflective_omen_density_rod", "omen_to_human_scale_ratio_ohsr"]
+    },
+    "environmental_effects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "drifting_ash",
+          "volumetric_steam_rays",
+          "oil_slick_warping",
+          "chrome_sky_veins"
+        ]
+      }
+    }
+  },
+  "required": ["asset_id", "classification", "visual_parameters", "horror_metrics", "environmental_effects"]
+}
