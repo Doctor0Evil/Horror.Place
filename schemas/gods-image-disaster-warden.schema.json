@@ -1,0 +1,317 @@
+{
+  "$id": "horror.place.schemas.gods-image-disaster-warden",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "God's Image: Disaster Warden Style Schema",
+  "description": "Configuration schema for the 'God's Image: Disaster Warden' horror art-style, intended only for Horror.Place game and movie pipelines.",
+  "type": "object",
+  "properties": {
+    "style_id": {
+      "type": "string",
+      "const": "GI-Disaster-Warden-001",
+      "description": "Fixed identifier for this style."
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether this style is active in the Horror.Place pipeline."
+    },
+    "intended_use": {
+      "type": "string",
+      "enum": [
+        "environment_concept",
+        "in_game_environment",
+        "cinematic_sequence",
+        "marketing_key_art"
+      ],
+      "description": "Primary deployment context within Horror.Place."
+    },
+    "palette": {
+      "type": "object",
+      "description": "Color palette configuration for the style.",
+      "properties": {
+        "base_family": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#?[0-9A-Fa-f]{6}$"
+          },
+          "minItems": 2,
+          "description": "Void and matte base colors (dark, desaturated)."
+        },
+        "structural_family": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#?[0-9A-Fa-f]{6}$"
+          },
+          "minItems": 2,
+          "description": "Concrete, metal, and ruin tones."
+        },
+        "hazard_accent_family": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#?[0-9A-Fa-f]{6}$"
+          },
+          "minItems": 1,
+          "description": "Toxic greens, furnace oranges, emergency cyans for reflections."
+        },
+        "chrome_highlight_color": {
+          "type": "string",
+          "pattern": "^#?[0-9A-Fa-f]{6}$",
+          "description": "Nominal highlight color used for chrome reflections before palette modulation."
+        },
+        "max_accent_coverage": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.4,
+          "description": "Maximum fraction of the frame that may be covered by bright hazard accents."
+        }
+      },
+      "required": [
+        "base_family",
+        "structural_family",
+        "hazard_accent_family",
+        "chrome_highlight_color",
+        "max_accent_coverage"
+      ],
+      "additionalProperties": false
+    },
+    "lighting": {
+      "type": "object",
+      "description": "Lighting and reflection behavior controls.",
+      "properties": {
+        "divine_light_direction": {
+          "type": "string",
+          "enum": [
+            "zenith",
+            "horizon_left",
+            "horizon_right",
+            "backlit",
+            "custom"
+          ],
+          "description": "Primary light vector for 'divine' reflections."
+        },
+        "allow_multiple_light_sources": {
+          "type": "boolean",
+          "description": "Whether secondary hazard lights are active (fires, beacons)."
+        },
+        "chrome_reflection_strength": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Global multiplier for chrome highlight intensity."
+        },
+        "shadow_depth": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Overall shadow heaviness; higher values deepen silhouettes."
+        }
+      },
+      "required": [
+        "divine_light_direction",
+        "allow_multiple_light_sources",
+        "chrome_reflection_strength",
+        "shadow_depth"
+      ],
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "description": "Parameters for sky, ground, water, and architecture.",
+      "properties": {
+        "sky_omen_density": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Probability and density of omen-like patterns (faces, sigils) in the sky."
+        },
+        "water_reflectivity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Reflectivity of water surfaces, from murky to mirror-like."
+        },
+        "architecture_seal_frequency": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Frequency of seal/crown/wound-like macro structures in architecture."
+        },
+        "environmental_disaster_index": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Strength of environmental collapse signals (flooding, ruin, ash)."
+        }
+      },
+      "required": [
+        "sky_omen_density",
+        "water_reflectivity",
+        "architecture_seal_frequency",
+        "environmental_disaster_index"
+      ],
+      "additionalProperties": false
+    },
+    "entities": {
+      "type": "object",
+      "description": "Controls for gods, beasts, and humans.",
+      "properties": {
+        "god_face_frequency": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "How often large-scale god faces are allowed to form in environments."
+        },
+        "warden_beast_density": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.4,
+          "description": "How frequently Disaster Wardens appear per scene; capped to preserve isolation."
+        },
+        "beast_silhouette_complexity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Amount of limb segmentation and silhouette complexity for beasts."
+        },
+        "human_scale_ratio": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 0.5,
+          "description": "Approximate size ratio of humans relative to the largest visible god/omen."
+        }
+      },
+      "required": [
+        "god_face_frequency",
+        "warden_beast_density",
+        "beast_silhouette_complexity",
+        "human_scale_ratio"
+      ],
+      "additionalProperties": false
+    },
+    "style_metrics": {
+      "type": "object",
+      "description": "Derived metrics for scripted-learning and safety routing inside Horror.Place.",
+      "properties": {
+        "reflective_omen_density_target": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Target range for Reflective Omen Density (ROD)."
+        },
+        "divine_exclusion_gradient_target": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Target strength for Divine Exclusion Gradient (DEG)."
+        },
+        "cataclysm_echo_index_target": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Desired coherence of catastrophic shapes across the environment (CEI)."
+        },
+        "chrome_warning_saturation_cap": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Upper bound on Chrome Warning Saturation (CWS) to avoid visual overload."
+        },
+        "sanctum_obscurity_coefficient_min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Minimum obscurity for the most forbidden zones (SOC)."
+        }
+      },
+      "required": [
+        "reflective_omen_density_target",
+        "divine_exclusion_gradient_target",
+        "cataclysm_echo_index_target",
+        "chrome_warning_saturation_cap",
+        "sanctum_obscurity_coefficient_min"
+      ],
+      "additionalProperties": false
+    },
+    "safety": {
+      "type": "object",
+      "description": "Safety and abstraction constraints specific to Horror.Place.",
+      "properties": {
+        "allow_gore": {
+          "type": "boolean",
+          "const": false,
+          "description": "Gore is disallowed in this style; must remain false."
+        },
+        "allow_explicit_violence": {
+          "type": "boolean",
+          "const": false,
+          "description": "Explicit depictions of violence are disallowed in this style."
+        },
+        "abstract_disaster_rendering": {
+          "type": "boolean",
+          "description": "If true, disasters must be rendered abstractly (environmental symbols, not bodies)."
+        },
+        "max_human_closeup_ratio": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 0.3,
+          "description": "Maximum fraction of shots that may place humans in close-up; keeps focus on environment-scale horror."
+        }
+      },
+      "required": [
+        "allow_gore",
+        "allow_explicit_violence",
+        "abstract_disaster_rendering",
+        "max_human_closeup_ratio"
+      ],
+      "additionalProperties": false
+    },
+    "tags": {
+      "type": "object",
+      "description": "Internal Horror.Place tagging for routers and generators.",
+      "properties": {
+        "style_tag": {
+          "type": "string",
+          "const": "style:gods_image_disaster_warden",
+          "description": "Canonical style tag."
+        },
+        "environment_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Environment-related tags (e.g., env:divine_exclusion_zone)."
+        },
+        "entity_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Entity-related tags (e.g., entity:disaster_warden_beast)."
+        }
+      },
+      "required": [
+        "style_tag",
+        "environment_tags",
+        "entity_tags"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "style_id",
+    "enabled",
+    "intended_use",
+    "palette",
+    "lighting",
+    "environment",
+    "entities",
+    "style_metrics",
+    "safety",
+    "tags"
+  ],
+  "additionalProperties": false
+}
