@@ -1,0 +1,53 @@
+name: Orchestrate Public Registry Sync
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Horror.Place Repository
+        uses: actions/checkout@v4
+        with:
+          repository: Doctor0Evil/Horror.Place
+          token: ${{ secrets.ORCHESTRATOR_TOKEN }}
+
+      - name: Fetch Atrocity-Seeds Registry
+        run: |
+          curl -H "Authorization: token ${{ secrets.ATROCITY_SEEDS_TOKEN }}" \
+            https://api.github.com/repos/Doctor0Evil/HorrorPlace-Atrocity-Seeds/contents/registry/events.json \
+            -o registry/events_atrocity_seeds.json
+
+      - name: Verify Event Hashes
+        run: |
+          python3 scripts/verify_atrocity_seeds_hashes.py \
+            --atrocity-registry registry/events_atrocity_seeds.json \
+            --atrocity-token ${{ secrets.ATROCITY_SEEDS_TOKEN }} \
+            --atrocity-repo Doctor0Evil/HorrorPlace-Atrocity-Seeds
+
+      - name: Generate Public Descriptors
+        run: |
+          python3 scripts/generate_public_descriptors.py \
+            --atrocity-registry registry/events_atrocity_seeds.json \
+            --output registry/public_event_beacons.json \
+            --sanitization-level tier1
+
+      - name: Update Public Registry
+        run: |
+          python3 scripts/update_public_registry.py \
+            --public-registry registry/registryevents.json \
+            --new-beacons registry/public_event_beacons.json
+
+      - name: Commit Public Registry Updates
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "CI: Sync public registry with Atrocity-Seeds vault"
+          file_pattern: registry/*.json
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Public registry sync failed. Check logs for details."
