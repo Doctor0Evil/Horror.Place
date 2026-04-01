@@ -1,0 +1,57 @@
+{
+  "event_id": "EVT.ARCHIVAL.DRIP001",
+  "schema": "schemas/event_contract_v1.json",
+  "name": "Archival Drip → Contradiction Spike → Silent Redaction",
+  "phases": [
+    { "id": "LEDGER_DRIPS", "role": "buildup" },
+    { "id": "DOUBLE_ENTRY", "role": "pre_shock" },
+    { "id": "CONTRADICTION_SPIKE", "role": "shock" },
+    { "id": "LEDGER_BLEED", "role": "echo" },
+    { "id": "SILENT_REDACTION", "role": "decay" }
+  ],
+  "invariant_preconditions": {
+    "CIC_min": 0.7,
+    "AOS_min": 0.7,
+    "RWF_max": 0.5,
+    "SHCI_min": 0.8
+  },
+  "metric_targets": {
+    "UEC_curve": "slow_rise_to_peak",
+    "EMD_curve": "steady_rise",
+    "STCI_inversion_phase": "CONTRADICTION_SPIKE",
+    "CDL_spike_phase": "CONTRADICTION_SPIKE",
+    "ARR_min": 0.7
+  },
+  "style_id": "SPECTRALENGRAVINGDARKSUBLIME",
+  "implication_rules_ref": "schemas/stylecontract_v1.json",
+  "constellation": {
+    "transition_channels": [
+      "history_layer",
+      "persona_layer",
+      "ledger_layer"
+    ],
+    "roles": {
+      "history_source": "VAULT.BLACK-ARCHIVUM",
+      "persona_source": "VAULT.SPECTRAL-FOUNDRY",
+      "ledger_sink":   "LAB.DEAD-LEDGER-NETWORK"
+    },
+    "impl_descriptors": {
+      "VAULT.BLACK-ARCHIVUM": {
+        "impl_type": "archive_variant_v1",
+        "impl_id": "ARCHIVE.ADRIP.BAND01",
+        "locator": "zk-ipfs:Qm...redacted"
+      },
+      "VAULT.SPECTRAL-FOUNDRY": {
+        "impl_type": "persona_impl_v1",
+        "impl_id": "P.ARCHIVIST.CONTRADICTION.V2",
+        "locator": "zk-ipfs:Qm...redacted"
+      },
+      "LAB.DEAD-LEDGER-NETWORK": {
+        "impl_type": "ledger_rule_v1",
+        "impl_id": "LEDGER.SILENT_REDACTION_RULE01",
+        "locator": "aln://dead-ledger/networkspec#SR01"
+      }
+    }
+  },
+  "safety_tier": "mature"
+}
