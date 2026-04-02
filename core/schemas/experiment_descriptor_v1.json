@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema:Horror.Place:core:schemas:experiment_descriptor_v1",
+  "title": "Horror.Place Experiment Descriptor",
+  "description": "Defines a bounded experiment (e.g., 10-run microstudy) with metric bands and guardrail expectations.",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "schemaref",
+    "version",
+    "target_entity",
+    "runs",
+    "metric_bands",
+    "guardrail_expectations",
+    "environment",
+    "telemetry_inputs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaref": {
+      "type": "string",
+      "const": "schema:Horror.Place:core:schemas:experiment_descriptor_v1",
+      "description": "Canonical schema URI for experiment descriptors."
+    },
+    "experiment_id": {
+      "type": "string",
+      "pattern": "EXP-[0-9]{4,}",
+      "description": "Unique experiment identifier, e.g., EXP-0001."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "0|[1-9][0-9]*\\.[0-9]+\\.[0-9]+",
+      "description": "Semantic version of the experiment design."
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label, e.g., 'Process persona v0.2 10-run microstudy'."
+    },
+    "target_entity": {
+      "type": "object",
+      "required": ["type", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["agent", "persona", "event", "style_contract"],
+          "description": "What is being tested."
+        },
+        "id": {
+          "type": "string",
+          "description": "Opaque ID of the target entity (agent ID, persona ID, event ID, or style contract ID)."
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["regionref", "invariant_band"],
+      "additionalProperties": false,
+      "properties": {
+        "regionref": {
+          "type": "string",
+          "description": "Opaque reference to the region or tile where runs occur."
+        },
+        "invariant_band": {
+          "type": "object",
+          "required": ["CIC", "AOS", "SPR"],
+          "additionalProperties": false,
+          "properties": {
+            "CIC": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" }
+              },
+              "description": "Expected Catastrophic Imprint Coefficient band for the experiment."
+            },
+            "AOS": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" }
+              },
+              "description": "Expected Archival Opacity Score band."
+            },
+            "SPR": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" }
+              },
+              "description": "Expected Spectral Plausibility Rating band."
+            }
+          }
+        }
+      }
+    },
+    "runs": {
+      "type": "object",
+      "required": ["planned", "min_required"],
+      "additionalProperties": false,
+      "properties": {
+        "planned": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Number of runs planned (10 for microstudies)."
+        },
+        "min_required": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum completed runs required before judging promotion readiness."
+        }
+      }
+    },
+    "metric_bands": {
+      "type": "object",
+      "required": ["UEC", "ARR", "CDL"],
+      "additionalProperties": false,
+      "properties": {
+        "UEC": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "description": "Target Uncertainty Engagement Coefficient band, e.g., [0.55, 0.8]."
+        },
+        "ARR": {
+          "type": "object",
+          "required": ["min"],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "description": "Minimum Ambiguous Resolution Ratio, e.g., ≥ 0.7."
+        },
+        "CDL": {
+          "type": "object",
+          "required": ["target_level"],
+          "additionalProperties": false,
+          "properties": {
+            "target_level": {
+              "type": "string",
+              "enum": ["low", "moderate", "high"],
+              "description": "Qualitative band for Cognitive Dissonance Load."
+            }
+          },
+          "description": "Desired qualitative CDL band for the region's theme."
+        }
+      }
+    },
+    "guardrail_expectations": {
+      "type": "object",
+      "required": [
+        "invariant_fidelity_required",
+        "cryptographic_hygiene_required",
+        "bci_safety_required",
+        "entitlement_mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "invariant_fidelity_required": {
+          "type": "boolean",
+          "const": true,
+          "description": "Must be true; any invariant violation is a hard failure."
+        },
+        "cryptographic_hygiene_required": {
+          "type": "boolean",
+          "const": true,
+          "description": "Must be true; any signature/contract failure is a hard failure."
+        },
+        "bci_safety_required": {
+          "type": "boolean",
+          "description": "If true, BCI safety envelopes must be respected in all runs."
+        },
+        "entitlement_mode": {
+          "type": "string",
+          "enum": ["tier1", "tier2", "tier3"],
+          "description": "Intensity entitlement tier for the experiment."
+        }
+      }
+    },
+    "telemetry_inputs": {
+      "type": "object",
+      "required": ["summary_source", "run_key"],
+      "additionalProperties": false,
+      "properties": {
+        "summary_source": {
+          "type": "string",
+          "enum": [
+            "Neural-Resonance-Lab",
+            "Redacted-Chronicles",
+            "Process-Gods-Research",
+            "Obscura-Nexus",
+            "Liminal-Continuum"
+          ],
+          "description": "Which lab emits the summary telemetry used for scoring."
+        },
+        "run_key": {
+          "type": "string",
+          "description": "Field name in telemetry summaries used to group runs (e.g., session_id or experiment_run_id)."
+        }
+      }
+    },
+    "promotion_policy": {
+      "type": "object",
+      "required": ["min_band_adherence_ratio", "max_guardrail_violations"],
+      "additionalProperties": false,
+      "properties": {
+        "min_band_adherence_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of runs that must satisfy metric bands, e.g., 0.7 for 70%."
+        },
+        "max_guardrail_violations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum number of guardrail violations allowed (typically 0)."
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional freeform notes about the hypothesis and design."
+    }
+  }
+}
