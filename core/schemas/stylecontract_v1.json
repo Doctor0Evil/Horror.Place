@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/stylecontract_v1",
+  "title": "Horror.Place Style Contract Schema v1",
+  "description": "Defines visual, audio, and narrative style parameters for Horror.Place experiences. No raw assets — style descriptors and opaque references only.",
+  "type": "object",
+  "required": ["style_id", "schema_ref", "version", "visual", "audio", "narrative"],
+  "properties": {
+    "style_id": {
+      "type": "string",
+      "pattern": "^STY-[A-Z0-9]{4,12}$"
+    },
+    "schema_ref": {
+      "type": "string",
+      "const": "schema://Horror.Place/core/schemas/stylecontract_v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "visual": {
+      "type": "object",
+      "properties": {
+        "palette_ref": { "type": "string", "description": "Opaque reference to color palette artifact." },
+        "lighting_profile": { "type": "string", "enum": ["low_key", "high_contrast", "ambient_decay", "strobe", "natural_dim"] },
+        "grain": { "type": "string", "enum": ["none", "film_16mm", "film_35mm", "digital_noise", "vhs"] },
+        "aspect_ratio": { "type": "string", "pattern": "^\\d+:\\d+$" }
+      }
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "soundscape_ref": { "type": "string", "description": "Opaque reference to soundscape artifact." },
+        "mix_profile": { "type": "string", "enum": ["ambient_dominant", "score_driven", "diegetic_only", "silence_heavy", "layered"] },
+        "frequency_bias": { "type": "string", "enum": ["sub_bass", "low_mid", "mid", "high_mid", "full_range"] }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "properties": {
+        "tone": { "type": "string", "enum": ["dread", "cosmic", "psychological", "visceral", "folklore", "absurdist", "gothic"] },
+        "pov": { "type": "string", "enum": ["first_person", "second_person", "third_limited", "third_omniscient", "unreliable"] },
+        "pacing_contract": { "type": "string", "description": "Reference to pacing invariant rule." }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "author": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "additionalProperties": false
+}
