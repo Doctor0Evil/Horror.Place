@@ -1,0 +1,232 @@
+version: 2.1
+
+orbs:
+  python: circleci/[email protected]
+
+jobs:
+  schema-validation:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install jsonschema
+          command: pip install jsonschema
+      - run:
+          name: Validate registry entries against declared schemas
+          command: |
+            python3 <<'PYEOF'
+            import json
+            import sys
+            import os
+            from pathlib import Path
+            from jsonschema import validate, ValidationError, SchemaError
+
+            SCHEMA_DIR = Path("core/schemas")
+            REGISTRY_DIR = Path("core/registry")
+
+            # Load all schemas, keyed by their $id
+            schemas = {}
+            for schema_file in SCHEMA_DIR.glob("*.json"):
+                with open(schema_file, "r") as f:
+                    schema = json.load(f)
+                schema_id = schema.get("$id", "")
+                if schema_id:
+                    schemas[schema_id] = schema
+                    print(f"[INFO] Loaded schema: {schema_id}")
+
+            if not schemas:
+                print("[ERROR] No schemas found in core/schemas/")
+                sys.exit(1)
+
+            errors = 0
+
+            for registry_file in REGISTRY_DIR.glob("*.json"):
+                print(f"\n[INFO] Validating {registry_file} ...")
+                with open(registry_file, "r") as f:
+                    for line_num, line in enumerate(f, start=1):
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            entry = json.loads(line)
+                        except json.JSONDecodeError as e:
+                            print(f"  [FAIL] {registry_file}:{line_num} — Invalid JSON: {e}")
+                            errors += 1
+                            continue
+
+                        schema_ref = entry.get("schema_ref", "")
+                        if schema_ref not in schemas:
+                            print(f"  [WARN] {registry_file}:{line_num} — "
+                                  f"schema_ref '{schema_ref}' not found locally, skipping validation")
+                            continue
+
+                        try:
+                            validate(instance=entry, schema=schemas[schema_ref])
+                            print(f"  [OK]   {registry_file}:{line_num} — {entry.get('id', 'unknown')}")
+                        except ValidationError as e:
+                            print(f"  [FAIL] {registry_file}:{line_num} — {entry.get('id', 'unknown')}: "
+                                  f"{e.message}")
+                            errors += 1
+                        except SchemaError as e:
+                            print(f"  [FAIL] Schema error for {schema_ref}: {e.message}")
+                            errors += 1
+
+            if errors:
+                print(f"\n[RESULT] {errors} validation error(s) found.")
+                sys.exit(1)
+            else:
+                print("\n[RESULT] All registry entries passed schema validation.")
+            PYEOF
+
+  registry-linter:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Lint registry files for structure and required fields
+          command: |
+            python3 <<'PYEOF'
+            import json
+            import sys
+            from pathlib import Path
+
+            REGISTRY_DIR = Path("core/registry")
+            REQUIRED_FIELDS = {"id", "schema_ref", "metadata"}
+            REF_FIELDS = {"artifact_id", "cid"}
+
+            errors = 0
+
+            for registry_file in REGISTRY_DIR.glob("*.json"):
+                print(f"[INFO] Linting {registry_file} ...")
+                with open(registry_file, "r") as f:
+                    for line_num, line in enumerate(f, start=1):
+                        line = line.strip()
+                        if not line:
+                            continue
+
+                        # Check valid JSON
+                        try:
+                            entry = json.loads(line)
+                        except json.JSONDecodeError as e:
+                            print(f"  [FAIL] {registry_file}:{line_num} — Invalid JSON: {e}")
+                            errors += 1
+                            continue
+
+                        if not isinstance(entry, dict):
+                            print(f"  [FAIL] {registry_file}:{line_num} — "
+                                  f"Expected JSON object, got {type(entry).__name__}")
+                            errors += 1
+                            continue
+
+                        # Check required fields
+                        missing = REQUIRED_FIELDS - set(entry.keys())
+                        if missing:
+                            print(f"  [FAIL] {registry_file}:{line_num} — "
+                                  f"Missing required fields: {missing}")
+                            errors += 1
+
+                        # Check at least one reference field
+                        if not REF_FIELDS & set(entry.keys()):
+                            print(f"  [FAIL] {registry_file}:{line_num} — "
+                                  f"Must have at least one of: {REF_FIELDS}")
+                            errors += 1
+
+                        # Check schema_ref prefix
+                        schema_ref = entry.get("schema_ref", "")
+                        if not schema_ref.startswith("schema://Horror.Place/"):
+                            print(f"  [FAIL] {registry_file}:{line_num} — "
+                                  f"schema_ref must start with 'schema://Horror.Place/', "
+                                  f"got '{schema_ref}'")
+                            errors += 1
+
+            if errors:
+                print(f"\n[RESULT] {errors} lint error(s) found.")
+                sys.exit(1)
+            else:
+                print("\n[RESULT] All registry files passed linting.")
+            PYEOF
+
+  api-leak-test:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Scan for leaked asset URLs, base64 data URIs, and hex-encoded binary
+          command: |
+            python3 <<'PYEOF'
+            import re
+            import sys
+            from pathlib import Path
+
+            SCAN_DIRS = ["core/", "public-api/", "docs/"]
+            PATTERNS = {
+                "direct_asset_url": re.compile(
+                    r'https?://[^\s"\']+\.(png|jpg|jpeg|gif|bmp|svg|webp|mp3|mp4|wav|ogg|flac|aac|webm|avi|mkv)',
+                    re.IGNORECASE
+                ),
+                "base64_data_uri": re.compile(
+                    r'data:[a-zA-Z0-9+/]+;base64,',
+                    re.IGNORECASE
+                ),
+                "hex_encoded_binary": re.compile(
+                    r'\\x[0-9a-fA-F]{2}(?:\\x[0-9a-fA-F]{2}){7,}'
+                ),
+            }
+
+            leaks = 0
+
+            for scan_dir in SCAN_DIRS:
+                base = Path(scan_dir)
+                if not base.exists():
+                    print(f"[INFO] Directory {scan_dir} not found, skipping.")
+                    continue
+                for filepath in base.rglob("*"):
+                    if not filepath.is_file():
+                        continue
+                    try:
+                        content = filepath.read_text(encoding="utf-8", errors="ignore")
+                    except Exception:
+                        continue
+                    for pattern_name, pattern in PATTERNS.items():
+                        for match in pattern.finditer(content):
+                            line_num = content[:match.start()].count("\n") + 1
+                            print(f"  [LEAK] {filepath}:{line_num} — "
+                                  f"{pattern_name}: {match.group()[:80]}...")
+                            leaks += 1
+
+            if leaks:
+                print(f"\n[RESULT] {leaks} potential leak(s) detected.")
+                sys.exit(1)
+            else:
+                print("\n[RESULT] No leaked assets or encoded binary found.")
+            PYEOF
+
+  lua-lint:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Install Lua 5.3 and Luacheck
+          command: |
+            sudo apt-get update && sudo apt-get install -y lua5.3 liblua5.3-dev luarocks
+            sudo luarocks install luacheck
+      - run:
+          name: Run Luacheck on public-api/
+          command: |
+            if [ -d "public-api/" ]; then
+              luacheck public-api/ --std lua53 --no-color
+            else
+              echo "[INFO] public-api/ directory not found, skipping Lua lint."
+            fi
+
+workflows:
+  validate-and-lint:
+    jobs:
+      - schema-validation
+      - registry-linter
+      - api-leak-test
+      - lua-lint
