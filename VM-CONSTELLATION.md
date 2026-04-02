@@ -1,41 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
-# 'Create' short-descriptions with a tag for each repository, below, and as an exportable markdown-document for the public repository ( Horror\$Place );
-
-\;
-HorrorPlace-Codebase-of-Death Private
-
-HorrorPlace-Dead-Ledger-Network
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Dead-Ledger-Network](https://github.com/Doctor0Evil/HorrorPlace-Dead-Ledger-Network),
-
-HorrorPlace-Neural-Resonance-Lab
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Neural-Resonance-Lab](https://github.com/Doctor0Evil/HorrorPlace-Neural-Resonance-Lab)
-
-HorrorPlace-Redacted-Chronicles
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Redacted-Chronicles](https://github.com/Doctor0Evil/HorrorPlace-Redacted-Chronicles),
-
-HorrorPlace-Process-Gods-Research
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Process-Gods-Research](https://github.com/Doctor0Evil/HorrorPlace-Process-Gods-Research),
-
-HorrorPlace-Liminal-Continuum
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Liminal-Continuum](https://github.com/Doctor0Evil/HorrorPlace-Liminal-Continuum)
-
-HorrorPlace-Obscura-Nexus
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Obscura-Nexus](https://github.com/Doctor0Evil/HorrorPlace-Obscura-Nexus)
-
-HorrorPlace-Atrocity-Seeds
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Atrocity-Seeds](https://github.com/Doctor0Evil/HorrorPlace-Atrocity-Seeds)
-
-HorrorPlace-Spectral-Foundry
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Spectral-Foundry](https://github.com/Doctor0Evil/HorrorPlace-Spectral-Foundry)
-
-HorrorPlace-Black-Archivum
-Private: [https://github.com/Doctor0Evil/HorrorPlace-Black-Archivum](https://github.com/Doctor0Evil/HorrorPlace-Black-Archivum)
-
-Horror.Place
-Public: [https://github.com/Doctor0Evil/Horror.Place](https://github.com/Doctor0Evil/Horror.Place)
-
-```markdown
 # Horror$Place VM-Constellation: Repository Tags and Short Descriptions
 
 This document summarizes the role of each Horror$Place repository within the tiered VM‑constellation, for reference from the public core repository `Horror.Place`.[file:5]
@@ -160,13 +122,3 @@ Tag: `PUBLIC_CORE`
 
 Short description:  
 Sovereign, GitHub‑visible rules engine defining invariants, entertainment metrics, style contracts, schemas, narrow Lua/Rust APIs, and CI workflows; it never stores raw horror content, only machine‑checkable contracts that orchestrate the entire VM‑constellation.[file:5][file:6]
-```
-
-<span style="display:none">[^1][^2]</span>
-
-<div align="center">⁂</div>
-
-[^1]: a-new-addition-to-the-rivers-o-kBKpoeZeQ9mj8PyJlgtxSg.md
-
-[^2]: this-research-focuses-on-advan-nfmYmGc6R5iLLtRfYigbWw.md
-
