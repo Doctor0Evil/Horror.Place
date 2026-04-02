@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/entertainment_metrics_v1",
+  "title": "Horror.Place Entertainment Metrics Schema v1",
+  "description": "Schema for tracking entertainment quality metrics: engagement, tension curves, pacing, and audience response. No raw content — metrics only.",
+  "type": "object",
+  "required": ["metric_id", "schema_ref", "timestamp", "session_id", "metrics"],
+  "properties": {
+    "metric_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique metric record identifier."
+    },
+    "schema_ref": {
+      "type": "string",
+      "const": "schema://Horror.Place/core/schemas/entertainment_metrics_v1",
+      "description": "Canonical schema URI for validation."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["engagement_score", "tension_curve", "pacing"],
+      "properties": {
+        "engagement_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Normalized engagement score [0,1]."
+        },
+        "tension_curve": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["t", "value"],
+            "properties": {
+              "t": { "type": "number", "minimum": 0.0, "description": "Normalized time position [0,1]." },
+              "value": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+            }
+          },
+          "minItems": 2,
+          "description": "Time-series tension values across the experience."
+        },
+        "pacing": {
+          "type": "object",
+          "properties": {
+            "beats_per_minute": { "type": "number", "minimum": 0 },
+            "variance": { "type": "number", "minimum": 0 },
+            "label": { "type": "string", "enum": ["slow_burn", "escalating", "staccato", "relentless", "mixed"] }
+          },
+          "required": ["label"]
+        },
+        "audience_response": {
+          "type": "object",
+          "properties": {
+            "completion_rate": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "repeat_rate": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "satisfaction_index": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          }
+        }
+      }
+    },
+    "region_ref": {
+      "type": "string",
+      "description": "Opaque reference to the region where metrics were collected."
+    },
+    "event_ref": {
+      "type": "string",
+      "description": "Opaque reference to the event triggering the metric."
+    }
+  },
+  "additionalProperties": false
+}
