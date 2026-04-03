@@ -1,0 +1,217 @@
+# Horror.Place/configs/routing_profiles.toml
+# © Horror.Place Framework | Routing Profiles v1.2.0
+# Model-specific defaults for metric-to-prompt translation
+
+# ============================================================================
+# GLOBAL DEFAULTS (applied to all profiles unless overridden)
+# ============================================================================
+
+[global]
+# Weight clamping bounds for all token weights
+weight_min = 0.1
+weight_max = 2.0
+# Default emphasis syntax for positive/negative tokens
+emphasis_positive = "({token}:{weight:.2f})"
+emphasis_negative = "-({token}:{weight:.2f})"
+# Token joining strategy
+token_separator = ", "
+# Safety: block these tokens globally
+blocked_tokens = ["gore", "blood", "violence", "self-harm", "non-consensual"]
+blocked_action = "replace"  # options: "strip", "replace", "abort"
+
+# ============================================================================
+# STABLE DIFFUSION 1.5 PROFILE
+# ============================================================================
+
+[SD1.5]
+model_id = "runwayml/stable-diffusion-v1-5"
+syntax_flavor = "SD"
+# Weight range specific to SD1.5 token emphasis
+weight_range = [0.1, 2.0]
+# Token combination: comma-separated
+token_combinator = "comma"
+# Negative prompt format
+negative_prompt = { separate_field = true, prefix = "-", separator = ", " }
+# Palette support: no direct hex, use descriptive text
+palette_support = { hex_input = false, description_style = "descriptive" }
+
+# Metric routing overrides for SD1.5
+[SD1.5.metrics]
+# VoidProximity: high values drive void tokens with exponential scaling
+VoidProximity = { expression = "exponential", min_threshold = 0.6 }
+# WaxMeltPresence: linear scaling, emphasize texture tokens
+WMP = { expression = "linear", min_threshold = 0.3 }
+# NeonSporesGlow: logistic curve for smooth neon intensity
+NSG = { expression = "logistic", k = 8.0, x0 = 0.5 }
+
+# SD1.5-specific renderer controls
+[SD1.5.renderer_defaults]
+cfg_scale = 7.0
+steps = 30
+sampler = "Euler a"
+width = 512
+height = 512
+
+# ============================================================================
+# STABLE DIFFUSION XL PROFILE
+# ============================================================================
+
+[SDXL]
+model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+syntax_flavor = "SD"
+weight_range = [0.1, 2.0]
+token_combinator = "comma"
+negative_prompt = { separate_field = true, prefix = "-", separator = ", " }
+palette_support = { hex_input = false, description_style = "descriptive" }
+
+# SDXL benefits from stronger emphasis on composition tokens
+[SDXL.metrics]
+VoidProximity = { expression = "exponential", min_threshold = 0.5 }
+WMP = { expression = "exponential", min_threshold = 0.4 }
+NSG = { expression = "logistic", k = 10.0, x0 = 0.5 }
+# Additional SDXL-specific metrics
+CompositionBalance = { expression = "linear", min_threshold = 0.0 }
+
+[SDXL.renderer_defaults]
+cfg_scale = 6.5
+steps = 40
+sampler = "DPM++ 2M Karras"
+width = 1024
+height = 1024
+refiner_steps = 20
+
+# ============================================================================
+# MIDJOURNEY PROFILE (via API or prompt adaptation)
+# ============================================================================
+
+[Midjourney]
+# Note: Midjourney doesn't support direct API prompt weights; use repetition/heuristics
+syntax_flavor = "Midjourney"
+weight_range = [0.0, 2.0]
+# Midjourney uses :: for alternation, -- for parameters
+token_combinator = "space"
+negative_prompt = { separate_field = true, prefix = "--no", separator = " " }
+palette_support = { hex_input = false, description_style = "named" }
+
+# Midjourney-specific token handling
+[Midjourney.token_rules]
+# Use repetition instead of weights for emphasis
+emphasis_via_repetition = true
+max_repetitions = 3
+# Alternation syntax: token1|token2
+alternation_enabled = true
+# Blending syntax: token1--token2
+blending_enabled = true
+
+[Midjourney.metrics]
+# Midjourney responds better to descriptive phrases than weighted tokens
+VoidProximity = { expression = "fixed", descriptive_boost = true }
+WMP = { expression = "linear", texture_keywords = ["dripping", "melting", "wax"] }
+NSG = { expression = "linear", color_keywords = ["neon", "glow", "fluorescent"] }
+
+[Midjourney.parameters]
+# Default Midjourney parameters (applied via --flags)
+stylize = 100
+chaos = 0
+style = "raw"  # for more prompt adherence
+aspect = "16:9"
+
+# ============================================================================
+# DALL-E 3 PROFILE (natural language focus)
+# ============================================================================
+
+[DALL-E3]
+syntax_flavor = "DALL-E"
+# DALL-E 3 ignores weights; use descriptive modifiers
+weight_range = [1.0, 1.0]  # weights disabled
+token_combinator = "natural"  # assemble as prose
+negative_prompt = { separate_field = false, inline_phrases = ["avoid", "without", "no"] }
+palette_support = { hex_input = false, description_style = "vivid" }
+
+# DALL-E 3: convert metrics to natural language modifiers
+[DALL-E3.metrics]
+VoidProximity = { expression = "fixed", prose_template = "an endless, crushing void of {intensity} darkness" }
+WMP = { expression = "fixed", prose_template = "surfaces that appear to melt and drip like {material}" }
+NSG = { expression = "fixed", prose_template = "pulses with {color} luminescence that seems alive" }
+
+[DALL-E3.style_guidance]
+# DALL-E 3 benefits from explicit style framing
+prepend_style_frame = true
+style_frame_template = "A {style_name} horror artwork in the style of {reference_artists}, featuring: {subject}"
+reference_artists = ["Zdzisław Beksiński", "H.R. Giger", "Junji Ito"]
+
+# ============================================================================
+# CUSTOM/RESEARCH PROFILE (for internal testing)
+# ============================================================================
+
+[Custom]
+syntax_flavor = "Generic"
+weight_range = [0.1, 2.0]
+token_combinator = "comma"
+negative_prompt = { separate_field = true, prefix = "NEG:", separator = ", " }
+palette_support = { hex_input = true, description_style = "technical" }
+
+# Custom profile allows experimental routing rules
+[Custom.metrics]
+# All metrics use configurable expressions
+__default__ = { expression = "linear", min_threshold = 0.0, max_threshold = 1.0 }
+
+[Custom.renderer_defaults]
+# Fully configurable
+cfg_scale = 7.5
+steps = 35
+sampler = "configurable"
+width = 768
+height = 768
+
+# ============================================================================
+# ROUTING RULE TEMPLATES (reusable fragments)
+# ============================================================================
+
+[templates.void_tokens]
+# Reusable token set for high VoidProximity
+positive = [
+  { token = "endless dark void", weight_expr = "exponential", emphasize = true },
+  { token = "cosmic emptiness", weight_expr = "linear", emphasize = false },
+  { token = "infinite abyss", weight_expr = "logistic", emphasize = true }
+]
+negative = [
+  { token = "crowded city", weight_expr = "fixed", emphasize = true },
+  { token = "detailed architecture", weight_expr = "fixed", emphasize = true },
+  { token = "busy composition", weight_expr = "fixed", emphasize = false }
+]
+
+[templates.wax_tokens]
+# Reusable token set for high WaxMeltPresence
+positive = [
+  { token = "wax-drip textures", weight_expr = "linear", emphasize = true },
+  { token = "melting surfaces", weight_expr = "exponential", emphasize = false },
+  { token = "candle-warp deformation", weight_expr = "logistic", emphasize = true }
+]
+negative = [
+  { token = "pristine surfaces", weight_expr = "fixed", emphasize = true },
+  { token = "sharp edges", weight_expr = "fixed", emphasize = false }
+]
+
+[templates.neon_tokens]
+# Reusable token set for high NeonSporesGlow
+positive = [
+  { token = "neon glow", weight_expr = "linear", emphasize = true },
+  { token = "fluorescent highlights", weight_expr = "exponential", emphasize = false },
+  { token = "phosphorescent accents", weight_expr = "logistic", emphasize = true }
+]
+negative = [
+  { token = "natural daylight", weight_expr = "fixed", emphasize = true },
+  { token = "pastel tones", weight_expr = "fixed", emphasize = false }
+]
+
+# ============================================================================
+# VERSIONING & COMPATIBILITY
+# ============================================================================
+
+[metadata]
+schema_version = "v1.2.0"
+last_updated = "2026-01-22T00:00:00Z"
+compatible_models = ["SD1.5", "SDXL", "Midjourney", "DALL-E3", "Custom"]
+deprecated_profiles = []
+migration_notes = "v1.2.0: added Custom profile for research; updated SDXL defaults for refiner support"
