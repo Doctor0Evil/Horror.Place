@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/historyinvariantsv1.json",
+  "title": "Horror.Place History Invariants",
+  "description": "Canonical schema for history-grounded invariants (CIC, MDI, AOS, RRM, FCF, SPR, RWF, DET, HVF, LSG, SHCI) used by Spectral and VM-constellation vaults.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "region_id",
+    "tile_id",
+    "CIC",
+    "MDI",
+    "AOS",
+    "RRM",
+    "FCF",
+    "SPR",
+    "RWF",
+    "DET",
+    "HVF",
+    "LSG",
+    "SHCI"
+  ],
+  "properties": {
+    "region_id": {
+      "type": "string",
+      "description": "Logical region identifier (e.g., map region or site profile key).",
+      "minLength": 1
+    },
+    "tile_id": {
+      "type": "string",
+      "description": "Logical tile or cell identifier within the region.",
+      "minLength": 1
+    },
+
+    "CIC": {
+      "type": "number",
+      "description": "Catastrophic Impact Coefficient, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "MDI": {
+      "type": "number",
+      "description": "Mass Displacement Index, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "AOS": {
+      "type": "number",
+      "description": "Apparitional Overshadowing Score, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "RRM": {
+      "type": "number",
+      "description": "Ritual Residue Magnitude, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "FCF": {
+      "type": "number",
+      "description": "Factual Contradiction Factor, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "SPR": {
+      "type": "number",
+      "description": "Spectral Persistence Ratio, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "RWF": {
+      "type": "number",
+      "description": "Residual Warp Field, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "DET": {
+      "type": "number",
+      "description": "Deterministic Entanglement Threshold, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "HVF": {
+      "type": "number",
+      "description": "Haunt Vector Field magnitude, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "LSG": {
+      "type": "number",
+      "description": "Liminal Stress Gradient, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "SHCI": {
+      "type": "number",
+      "description": "Spectral-Historical Coherence Index, normalized to [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+
+    "realism_cap": {
+      "type": "number",
+      "description": "Upper bound on fantastical escalation for this tile, in [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "intensity_cap": {
+      "type": "number",
+      "description": "Upper bound on scare intensity for this tile, in [0.0,1.0].",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+
+    "annotations": {
+      "type": "object",
+      "description": "Optional structured annotations tying invariants to history.",
+      "additionalProperties": false,
+      "properties": {
+        "disasters": {
+          "type": "array",
+          "description": "Descriptions or IDs of historical disasters linked to this tile.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rituals": {
+          "type": "array",
+          "description": "Descriptions or IDs of rituals influencing this tile.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "description": "Descriptions or IDs of archival gaps or missing records.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
