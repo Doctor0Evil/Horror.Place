@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/schemas/bci-events-stream-v1.json",
+  "title": "BCI / Director / Policy Event Stream v1",
+  "description": "Canonical schema for BCI, Director, and Policy.DeadLedger runtime events emitted as NDJSON records across the VM-constellation. Each line in telemetry/bci_events.ndjson MUST validate against this schema.",
+  "type": "object",
+  "properties": {
+    "schema_ref": {
+      "type": "string",
+      "const": "schemas/bci-events-stream-v1.json",
+      "description": "Local schema reference for validation tooling."
+    },
+
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the event was emitted."
+    },
+    "vm_id": {
+      "type": "string",
+      "description": "Identifier of the VM or runtime node emitting this event (e.g., NRL.Lab01, LC.SimHarness01).",
+      "pattern": "[A-Za-z0-9_.-]+"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Identifier for the logical playtest/run/session within the VM.",
+      "pattern": "[A-Za-z0-9_.-]+"
+    },
+
+    "event_type": {
+      "type": "string",
+      "description": "Type discriminator for the event.",
+      "enum": [
+        "BCI_INTENSITY_UPDATE",
+        "BCI_MODE_CHANGE",
+        "BCI_OVERLOAD_FLAG",
+        "SURPRISE_EVENT_TRIGGERED",
+        "SAFETY_DOWN_SHIFT",
+        "POLICY_DECISION",
+        "BCI_ADAPTER_REGISTERED"
+      ]
+    },
+
+    "bci": {
+      "type": "object",
+      "description": "Snapshot of BCI core state at event time, when applicable.",
+      "properties": {
+        "fear": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Current normalized fear index."
+        },
+        "arousal": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0,
+          "description": "Current arousal value."
+        },
+        "valence": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0,
+          "description": "Current valence value."
+        },
+        "mode": {
+          "type": "string",
+          "description": "Current intensity mode.",
+          "enum": [
+            "UNDERSTIMULATED",
+            "OPTIMAL_STRESS",
+            "OVERWHELMED"
+          ]
+        },
+        "overwhelmed_duration_s": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "Continuous time in seconds spent in OVERWHELMED up to this event."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "adapter": {
+      "type": "object",
+      "description": "Information about the BCI adapter involved, if any.",
+      "properties": {
+        "adapter_id": {
+          "type": "string",
+          "description": "Stable adapter identifier (e.g., NRL_EEG_FFT_V1).",
+          "pattern": "[A-Za-z0-9_.-]+"
+        },
+        "contract_version": {
+          "type": "string",
+          "description": "BCI contract version implemented by this adapter (e.g., v1, v1-nrl).",
+          "pattern": "v[0-9]+(-[A-Za-z0-9_.-]+)?"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "region": {
+      "type": "string",
+      "description": "Region or tile identifier where the event occurred, if applicable.",
+      "pattern": "[A-Za-z0-9_.-]+"
+    },
+    "event_id": {
+      "type": "string",
+      "description": "Game/event identifier (e.g., Surprise.Event ID) associated with this event, if any.",
+      "pattern": "[A-Za-z0-9_.-]+"
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "Agent/persona identifier involved in the event, if any.",
+      "pattern": "[A-Za-z0-9_.-]+"
+    },
+
+    "invariants": {
+      "type": "object",
+      "description": "Optional snapshot of selected invariant values at event time.",
+      "properties": {
+        "CIC": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "MDI": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "AOS": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "RRM": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "FCF": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "SPR": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "RWF": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "DET": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "HVF": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "LSG": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "SHCI": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      },
+      "additionalProperties": false
+    },
+
+    "entertainment": {
+      "type": "object",
+      "description": "Optional instantaneous or short-window entertainment metrics at event time.",
+      "properties": {
+        "UEC": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "EMD": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "STCI": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "CDL": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "ARR": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      },
+      "additionalProperties": false
+    },
+
+    "director": {
+      "type": "object",
+      "description": "Details specific to director decisions (e.g., Surprise.Events!).",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "High-level director action (e.g., RAMP_UP, PEAK, HOLD, FORCE_CALM).",
+          "pattern": "[A-Z_]+"
+        },
+        "tension": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Computed tension scalar used in decision-making."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "policy": {
+      "type": "object",
+      "description": "Fields related to Policy.DeadLedger decisions.",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "description": "Policy decision outcome (e.g., ALLOW, DENY, THROTTLE).",
+          "pattern": "[A-Z_]+"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Human-readable summary of the decision rationale."
+        },
+        "decision_token_ref": {
+          "type": "string",
+          "description": "Opaque reference to a signed decision token, if applicable.",
+          "pattern": "[A-Za-z0-9_.-]+"
+        },
+        "deadledger_ref": {
+          "type": "string",
+          "description": "Optional Dead-Ledger entry referenced by this policy event.",
+          "pattern": "DLN\\.[A-Za-z0-9_.-]+"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "required": [
+    "schema_ref",
+    "ts",
+    "vm_id",
+    "run_id",
+    "event_type"
+  ],
+
+  "additionalProperties": false
+}
