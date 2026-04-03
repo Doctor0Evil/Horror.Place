@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/personacontractv1.json",
+  "title": "Horror.Place Persona Contract v1",
+  "description": "Canonical persona contract schema for Archivist, Witness, Echo, Threshold, Process, and other AI personas in the Horror.Place VM-constellation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "persona_id",
+    "version",
+    "safety_tier",
+    "role",
+    "schema_ref",
+    "allowed_tiers",
+    "allowed_regions",
+    "allowed_styles",
+    "invariant_envelope",
+    "metric_targets",
+    "state_space"
+  ],
+  "properties": {
+    "persona_id": {
+      "type": "string",
+      "description": "Stable identifier for this persona.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this persona contract.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$"
+    },
+    "safety_tier": {
+      "type": "string",
+      "description": "Safety tier for this persona.",
+      "enum": [
+        "standard",
+        "mature",
+        "research"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "description": "Narrative/system role of the persona.",
+      "enum": [
+        "archivist",
+        "witness",
+        "echo",
+        "threshold",
+        "process",
+        "director",
+        "other"
+      ]
+    },
+    "schema_ref": {
+      "type": "string",
+      "description": "Canonical URI of this schema (self-reference for registries).",
+      "const": "schema://Horror.Place/core/schemas/personacontractv1.json"
+    },
+
+    "allowed_tiers": {
+      "type": "array",
+      "description": "Entitlement tiers where this persona may operate.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "tier1_core",
+          "tier2_vault",
+          "tier3_lab"
+        ]
+      }
+    },
+    "allowed_regions": {
+      "type": "array",
+      "description": "Region IDs or patterns where the persona is allowed to manifest.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "allowed_styles": {
+      "type": "array",
+      "description": "Style contract IDs this persona may invoke.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+
+    "invariant_envelope": {
+      "type": "object",
+      "description": "History invariant ranges where this persona is allowed to operate.",
+      "additionalProperties": false,
+      "required": [
+        "CIC",
+        "MDI",
+        "AOS",
+        "RRM",
+        "FCF",
+        "SPR",
+        "RWF",
+        "DET",
+        "HVF",
+        "LSG",
+        "SHCI"
+      ],
+      "properties": {
+        "CIC": { "$ref": "#/$defs/range01" },
+        "MDI": { "$ref": "#/$defs/range01" },
+        "AOS": { "$ref": "#/$defs/range01" },
+        "RRM": { "$ref": "#/$defs/range01" },
+        "FCF": { "$ref": "#/$defs/range01" },
+        "SPR": { "$ref": "#/$defs/range01" },
+        "RWF": { "$ref": "#/$defs/range01" },
+        "DET": { "$ref": "#/$defs/range01" },
+        "HVF": { "$ref": "#/$defs/range01" },
+        "LSG": { "$ref": "#/$defs/range01" },
+        "SHCI": { "$ref": "#/$defs/range01" }
+      }
+    },
+
+    "metric_targets": {
+      "type": "object",
+      "description": "Preferred entertainment metric bands this persona aims to maintain.",
+      "additionalProperties": false,
+      "required": [
+        "UEC",
+        "EMD",
+        "STCI",
+        "CDL",
+        "ARR"
+      ],
+      "properties": {
+        "UEC": { "$ref": "#/$defs/range01" },
+        "EMD": { "$ref": "#/$defs/range01" },
+        "STCI": { "$ref": "#/$defs/range01" },
+        "CDL": { "$ref": "#/$defs/range01" },
+        "ARR": { "$ref": "#/$defs/range01" }
+      }
+    },
+
+    "state_space": {
+      "type": "object",
+      "description": "Persona states and transitions.",
+      "additionalProperties": false,
+      "required": [
+        "states",
+        "initial_state",
+        "transitions",
+        "parameters"
+      ],
+      "properties": {
+        "states": {
+          "type": "array",
+          "description": "Named states this persona can occupy.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "initial_state": {
+          "type": "string",
+          "description": "Name of the initial state.",
+          "minLength": 1
+        },
+        "transitions": {
+          "type": "array",
+          "description": "Allowed state transitions and their triggers.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "trigger"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "trigger": {
+                "type": "string",
+                "description": "Opaque trigger ID or description (e.g., metric/invariant condition).",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Numeric state parameters (e.g., contradiction budget, aggression factor).",
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      }
+    },
+
+    "platforms": {
+      "type": "array",
+      "description": "Platforms where this persona is allowed to operate (e.g., engine, chat, analysis).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required_proofs": {
+      "type": "array",
+      "description": "Opaque proof types or IDs required to enable this persona (age, Charter, research consent).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional human-readable description or implementation hints.",
+      "maxLength": 4096
+    }
+  },
+  "$defs": {
+    "range01": {
+      "type": "object",
+      "description": "Inclusive [min,max] range within [0.0,1.0].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "role": { "const": "archivist" }
+        }
+      },
+      "then": {
+        "properties": {
+          "state_space": {
+            "properties": {
+              "parameters": {
+                "properties": {
+                  "contradiction_budget": {
+                    "type": "number",
+                    "description": "Recommended contradiction budget for Archivist personas."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
