@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/aln_routing_profile_v1.json",
+  "title": "Horror.Place ALN Routing Profile v1",
+  "description": "Schema for ALN routing profiles binding actor attributes, proofs, invariants, metrics, and style/persona allowlists to policy and entitlement decisions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "version",
+    "safety_tier",
+    "schema_ref",
+    "conditions",
+    "invariant_windows",
+    "metric_windows",
+    "allowed_styles",
+    "allowed_personas",
+    "policy_profile_id",
+    "deadledger_policy_ref"
+  ],
+  "properties": {
+    "profile_id": {
+      "type": "string",
+      "description": "Stable identifier for this routing profile.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this routing profile.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$"
+    },
+    "safety_tier": {
+      "type": "string",
+      "description": "Tier of content this profile routes to.",
+      "enum": [
+        "standard",
+        "mature",
+        "research"
+      ]
+    },
+    "schema_ref": {
+      "type": "string",
+      "description": "Canonical URI of this schema (self-reference for registries).",
+      "const": "schema://Horror.Place/core/schemas/aln_routing_profile_v1.json"
+    },
+
+    "conditions": {
+      "type": "object",
+      "description": "High-level ALN conditions over actor attributes and proofs.",
+      "additionalProperties": false,
+      "properties": {
+        "min_age": {
+          "type": "integer",
+          "description": "Minimum age for this profile (if applicable).",
+          "minimum": 0
+        },
+        "requires_charter_acceptance": {
+          "type": "boolean",
+          "description": "Whether Rivers-of-Blood Charter acceptance is required."
+        },
+        "required_proof_types": {
+          "type": "array",
+          "description": "Proof types (e.g., DID/VC claims) required by this profile.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+
+    "invariant_windows": {
+      "type": "object",
+      "description": "Aggregate history invariant bands where this profile may route traffic.",
+      "additionalProperties": false,
+      "required": [
+        "CIC",
+        "MDI",
+        "AOS",
+        "RRM",
+        "FCF",
+        "SPR",
+        "RWF",
+        "DET",
+        "HVF",
+        "LSG",
+        "SHCI"
+      ],
+      "properties": {
+        "CIC": { "$ref": "#/$defs/range01" },
+        "MDI": { "$ref": "#/$defs/range01" },
+        "AOS": { "$ref": "#/$defs/range01" },
+        "RRM": { "$ref": "#/$defs/range01" },
+        "FCF": { "$ref": "#/$defs/range01" },
+        "SPR": { "$ref": "#/$defs/range01" },
+        "RWF": { "$ref": "#/$defs/range01" },
+        "DET": { "$ref": "#/$defs/range01" },
+        "HVF": { "$ref": "#/$defs/range01" },
+        "LSG": { "$ref": "#/$defs/range01" },
+        "SHCI": { "$ref": "#/$defs/range01" }
+      }
+    },
+
+    "metric_windows": {
+      "type": "object",
+      "description": "Entertainment metric bands this profile is allowed to target.",
+      "additionalProperties": false,
+      "required": [
+        "UEC",
+        "EMD",
+        "STCI",
+        "CDL",
+        "ARR"
+      ],
+      "properties": {
+        "UEC": { "$ref": "#/$defs/range01" },
+        "EMD": { "$ref": "#/$defs/range01" },
+        "STCI": { "$ref": "#/$defs/range01" },
+        "CDL": { "$ref": "#/$defs/range01" },
+        "ARR": { "$ref": "#/$defs/range01" }
+      }
+    },
+
+    "allowed_styles": {
+      "type": "array",
+      "description": "Style contract IDs this routing profile may select.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "allowed_personas": {
+      "type": "array",
+      "description": "Persona contract IDs this routing profile may activate.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+
+    "policy_profile_id": {
+      "type": "string",
+      "description": "ID of the policy profile (as defined in docs/policy_profiles_standard_mature_research.md) this routing profile implements.",
+      "minLength": 1
+    },
+    "deadledger_policy_ref": {
+      "type": "string",
+      "description": "Opaque reference to the corresponding Dead-Ledger policy entry.",
+      "minLength": 1
+    },
+
+    "notes": {
+      "type": "string",
+      "description": "Optional human-readable description or guidance.",
+      "maxLength": 4096
+    }
+  },
+  "$defs": {
+    "range01": {
+      "type": "object",
+      "description": "Inclusive [min,max] range within [0.0,1.0].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    }
+  }
+}
