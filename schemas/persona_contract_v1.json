@@ -4,7 +4,8 @@
   "description": "Schema for defining AI persona characteristics, state spaces, constraints, and metric targets, compliant with the Rivers of Blood Charter and the Archivist state machine principles.",
   "type": "object",
   "properties": {
-    "persona "type": "string",
+    "persona_id": {
+      "type": "string",
       "description": "Unique identifier for the persona contract.",
       "pattern": "^[a-z0-9_-]+$"
     },
@@ -61,7 +62,8 @@
           "description": "Rate at which the persona fades or fragments under stress."
         }
       },
-      "required": ["information_density"]
+      "required": ["information_density"],
+      "additionalProperties": false
     },
     "constraints": {
       "type": "array",
@@ -89,7 +91,8 @@
         "CIC_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
         "SHCI_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
         "SPR_min": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": [
