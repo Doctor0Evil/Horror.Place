@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/eventcontractv1.json",
+  "title": "Horror.Place Event Contract v1",
+  "description": "Contract schema for Surprise.Events! and Vanish.Dissipation! chains, binding history invariants, entertainment metrics, style contracts, and personas.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "version",
+    "safety_tier",
+    "kind",
+    "schema_ref",
+    "invariant_preconditions",
+    "metric_impact",
+    "phases",
+    "style_ids",
+    "persona_ids"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Globally unique event identifier.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this event contract.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$"
+    },
+    "safety_tier": {
+      "type": "string",
+      "description": "Safety tier for this event contract.",
+      "enum": [
+        "standard",
+        "mature",
+        "research"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "description": "High-level event kind.",
+      "enum": [
+        "surprise",
+        "vanish",
+        "ambient",
+        "structural"
+      ]
+    },
+    "schema_ref": {
+      "type": "string",
+      "description": "Canonical URI of this schema (self-reference for registries).",
+      "const": "schema://Horror.Place/core/schemas/eventcontractv1.json"
+    },
+
+    "trigger": {
+      "type": "object",
+      "description": "Conditions under which this event may be scheduled.",
+      "additionalProperties": false,
+      "properties": {
+        "trigger_type": {
+          "type": "string",
+          "description": "Trigger classification.",
+          "enum": [
+            "time_window",
+            "metric_threshold",
+            "region_entry",
+            "region_exit",
+            "scripted"
+          ]
+        },
+        "preconditions": {
+          "type": "array",
+          "description": "Opaque precondition descriptors (e.g., flags, quest states).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "cooldown_seconds": {
+          "type": "integer",
+          "description": "Minimum seconds before this event may fire again.",
+          "minimum": 0
+        }
+      }
+    },
+
+    "invariant_preconditions": {
+      "type": "object",
+      "description": "Required invariant ranges in which this event is eligible to occur.",
+      "additionalProperties": false,
+      "required": [
+        "CIC",
+        "MDI",
+        "AOS",
+        "RRM",
+        "FCF",
+        "SPR",
+        "RWF",
+        "DET",
+        "HVF",
+        "LSG",
+        "SHCI"
+      ],
+      "properties": {
+        "CIC": { "$ref": "#/$defs/range01" },
+        "MDI": { "$ref": "#/$defs/range01" },
+        "AOS": { "$ref": "#/$defs/range01" },
+        "RRM": { "$ref": "#/$defs/range01" },
+        "FCF": { "$ref": "#/$defs/range01" },
+        "SPR": { "$ref": "#/$defs/range01" },
+        "RWF": { "$ref": "#/$defs/range01" },
+        "DET": { "$ref": "#/$defs/range01" },
+        "HVF": { "$ref": "#/$defs/range01" },
+        "LSG": { "$ref": "#/$defs/range01" },
+        "SHCI": { "$ref": "#/$defs/range01" }
+      }
+    },
+
+    "metric_impact": {
+      "type": "object",
+      "description": "Expected entertainment metric deltas or target ranges when this event is executed.",
+      "additionalProperties": false,
+      "required": [
+        "UEC",
+        "EMD",
+        "STCI",
+        "CDL",
+        "ARR"
+      ],
+      "properties": {
+        "UEC": { "$ref": "#/$defs/delta_range" },
+        "EMD": { "$ref": "#/$defs/delta_range" },
+        "STCI": { "$ref": "#/$defs/delta_range" },
+        "CDL": { "$ref": "#/$defs/delta_range" },
+        "ARR": { "$ref": "#/$defs/delta_range" }
+      }
+    },
+
+    "phases": {
+      "type": "array",
+      "description": "Ordered phases of the event (e.g., setup, escalation, release).",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phase_id",
+          "role",
+          "duration_hint_seconds",
+          "actions"
+        ],
+        "properties": {
+          "phase_id": {
+            "type": "string",
+            "description": "Local identifier for this phase.",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "description": "Narrative/structural role of this phase.",
+            "enum": [
+              "setup",
+              "escalation",
+              "sustain",
+              "release",
+              "cooldown"
+            ]
+          },
+          "duration_hint_seconds": {
+            "type": "integer",
+            "description": "Approximate duration of this phase in seconds.",
+            "minimum": 0
+          },
+          "actions": {
+            "type": "array",
+            "description": "Opaque action descriptors or IDs executed in this phase.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+
+    "style_ids": {
+      "type": "array",
+      "description": "Style contract IDs that may render this event.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "persona_ids": {
+      "type": "array",
+      "description": "Persona contract IDs allowed to narrate or mediate this event.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+
+    "tags": {
+      "type": "array",
+      "description": "Free-form tags used for routing, analysis, or curation.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional human-readable notes or implementation hints.",
+      "maxLength": 4096
+    }
+  },
+  "$defs": {
+    "range01": {
+      "type": "object",
+      "description": "Inclusive [min,max] range within [0.0,1.0].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "delta_range": {
+      "type": "object",
+      "description": "Inclusive [min,max] range for metric delta; may be negative or positive.",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
