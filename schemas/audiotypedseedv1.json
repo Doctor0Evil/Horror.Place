@@ -1,0 +1,438 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HorrorPlaceAudioTypedSeed",
+  "type": "object",
+  "required": [
+    "id",
+    "safetytier",
+    "intensityband",
+    "detcap",
+    "invariantbindings",
+    "implicationrules",
+    "eligibility",
+    "audiotype",
+    "channel_family",
+    "style_refs",
+    "rtpc_bindings",
+    "metric_envelopes",
+    "explicitviolenceforbidden"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.]+$",
+      "description": "Unique audio seed identifier, e.g. audio.negspace.closedcity.breathingducts.v1."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+$",
+      "description": "Semantic version of this seed contract."
+    },
+    "safetytier": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "Safety tier 1–3 aligned with build and entitlement tiers."
+    },
+    "intensityband": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Nominal intensity band for this audio seed."
+    },
+    "detcap": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Maximum effective DET this seed is allowed to push toward."
+    },
+    "invariantbindings": {
+      "type": "object",
+      "description": "Baseline bindings to the invariant stack, mirroring multisensory seeds.",
+      "required": ["CIC", "MDI", "AOS", "RRM", "SPR", "SHCI", "DET"],
+      "additionalProperties": false,
+      "properties": {
+        "CIC": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "MDI": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "AOS": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "RRM": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "SPR": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "SHCI": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "DET": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "implicationrules": {
+      "type": "object",
+      "description": "Expected metric shifts, mirroring other contracts.",
+      "required": ["deltaUEC", "deltaEMD", "deltaSTCI", "deltaCDL", "deltaARR"],
+      "additionalProperties": false,
+      "properties": {
+        "deltaUEC": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaEMD": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0"
+        },
+        "deltaSTCI": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaCDL": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaARR": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "eligibility": {
+      "type": "object",
+      "description": "Preconditions for seed to be considered, same semantics as eventcontractv1.",
+      "required": ["invariantpreconditions"],
+      "additionalProperties": false,
+      "properties": {
+        "invariantpreconditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "CIC": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+                "max": { "type": "number", "minimum": 0.0, "maximum": 10.0 }
+              }
+            },
+            "AOS": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+                "max": { "type": "number", "minimum": 0.0, "maximum": 10.0 }
+              }
+            },
+            "RRM": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+                "max": { "type": "number", "minimum": 0.0, "maximum": 10.0 }
+              }
+            },
+            "SHCI": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+                "max": { "type": "number", "minimum": 0.0, "maximum": 10.0 }
+              }
+            },
+            "DET": {
+              "type": "object",
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+                "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audiotype": {
+      "type": "string",
+      "enum": [
+        "negative_space",
+        "evidence_voice",
+        "spatial_misdirection",
+        "rhythmic_structure"
+      ],
+      "description": "Primary behavioral class for this audio seed."
+    },
+    "channel_family": {
+      "type": "string",
+      "enum": [
+        "ambience",
+        "diegetic_loop",
+        "whisper_bed",
+        "one_shot_spatial"
+      ],
+      "description": "High-level routing family for engine binding."
+    },
+    "style_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs into style and loop contracts, not raw assets."
+    },
+    "negative_space": {
+      "type": "object",
+      "description": "Parameters for audiotype = negative_space.",
+      "required": [
+        "silence_duty_cycle",
+        "floor_noise_band",
+        "gap_jitter_ms",
+        "tension_curve"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "silence_duty_cycle": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "floor_noise_band": {
+          "type": "string",
+          "enum": ["low", "mid", "high"]
+        },
+        "gap_jitter_ms": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "tension_curve": {
+          "type": "string",
+          "enum": ["slow_rise", "plateau", "sawtooth"]
+        }
+      }
+    },
+    "evidence_voice": {
+      "type": "object",
+      "description": "Parameters for audiotype = evidence_voice.",
+      "required": [
+        "utterance_class",
+        "intelligibility",
+        "directional_confidence",
+        "band_limited_profile"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "utterance_class": {
+          "type": "string",
+          "enum": [
+            "ledger_fragment",
+            "time_code",
+            "machine_call_sign",
+            "ritual_phrase_opaque"
+          ]
+        },
+        "intelligibility": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "directional_confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "band_limited_profile": {
+          "type": "string",
+          "enum": ["telephone", "duct", "ground_loop"]
+        }
+      }
+    },
+    "spatial_misdirection": {
+      "type": "object",
+      "description": "Parameters for audiotype = spatial_misdirection.",
+      "required": [
+        "phantom_source_count",
+        "apparent_angle_range_deg",
+        "depth_bias",
+        "position_update_mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "phantom_source_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "apparent_angle_range_deg": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 360.0
+        },
+        "depth_bias": {
+          "type": "string",
+          "enum": ["near", "mid", "far"]
+        },
+        "position_update_mode": {
+          "type": "string",
+          "enum": [
+            "orbit_player",
+            "snap_between_ridges",
+            "crawl_along_thresholds"
+          ]
+        }
+      }
+    },
+    "rhythmic_structure": {
+      "type": "object",
+      "description": "Parameters for audiotype = rhythmic_structure.",
+      "required": [
+        "pattern_family",
+        "bpm_range",
+        "swing",
+        "phase_desync"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pattern_family": {
+          "type": "string",
+          "enum": [
+            "ventilation",
+            "drip",
+            "footstep_echo",
+            "code_knock"
+          ]
+        },
+        "bpm_range": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0 },
+            "max": { "type": "number", "minimum": 0.0 }
+          }
+        },
+        "swing": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "phase_desync": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "rtpc_bindings": {
+      "type": "object",
+      "description": "Maps invariants/metrics to RTPC keys expected by the mixer and engine.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "metric_envelopes": {
+      "type": "object",
+      "description": "Optional fine-grained envelopes per metric.",
+      "additionalProperties": false,
+      "properties": {
+        "UEC": {
+          "type": "object",
+          "properties": {
+            "max_delta_total": { "type": "number" },
+            "max_delta_per_minute": { "type": "number" }
+          }
+        },
+        "EMD": {
+          "type": "object",
+          "properties": {
+            "max_delta_total": { "type": "number" },
+            "max_delta_per_minute": { "type": "number" }
+          }
+        },
+        "STCI": {
+          "type": "object",
+          "properties": {
+            "max_delta_total": { "type": "number" },
+            "max_delta_per_minute": { "type": "number" }
+          }
+        },
+        "CDL": {
+          "type": "object",
+          "properties": {
+            "max_delta_total": { "type": "number" },
+            "max_delta_per_minute": { "type": "number" }
+          }
+        },
+        "ARR": {
+          "type": "object",
+          "properties": {
+            "max_delta_total": { "type": "number" },
+            "max_delta_per_minute": { "type": "number" }
+          }
+        }
+      }
+    },
+    "explicitviolenceforbidden": {
+      "type": "boolean",
+      "const": true,
+      "description": "Hard-coded prohibition of explicit violence for this seed."
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^(?!.*(blood|gore|organ|dismember|mutilat|entrail)).*$",
+      "description": "Optional human-readable label, filtered by Charter-safe regex."
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1024,
+      "pattern": "^(?!.*(blood|gore|organ|dismember|mutilat|entrail)).*$",
+      "description": "Optional notes field, subject to the same safety filter."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "audiotype": { "const": "negative_space" } } },
+      "then": { "required": ["negative_space"] }
+    },
+    {
+      "if": { "properties": { "audiotype": { "const": "evidence_voice" } } },
+      "then": { "required": ["evidence_voice"] }
+    },
+    {
+      "if": { "properties": { "audiotype": { "const": "spatial_misdirection" } } },
+      "then": { "required": ["spatial_misdirection"] }
+    },
+    {
+      "if": { "properties": { "audiotype": { "const": "rhythmic_structure" } } },
+      "then": { "required": ["rhythmic_structure"] }
+    }
+  ]
+}
