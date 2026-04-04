@@ -1,0 +1,119 @@
+{
+  "repo-target": "Horror.Place/core/schemas/registry",
+  "file-destination": "/schemas/registry/",
+  "filename": "registry.entry.schema.v1.json",
+  "content": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.Horror.Place/core/schemas/registry/entryv1.json",
+    "title": "Horror.Place Registry Entry v1",
+    "description": "Schema for registry entries referencing generated seeds/assets. Ensures all artifacts carry contract references for CI validation.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "type",
+      "schemaref",
+      "styleid",
+      "contractRef",
+      "deadledgerref",
+      "created",
+      "validated"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z0-9_.-]+\\.[a-z0-9_.-]+\\.v[0-9]+$",
+        "description": "Unique artifact identifier (e.g., seed.transitional_lane.watched_v1)."
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "seed",
+          "event",
+          "persona",
+          "asset_bundle",
+          "blueprint_fragment",
+          "lua_hook",
+          "audio_stem",
+          "pcg_rule_set"
+        ]
+      },
+      "schemaref": {
+        "type": "string",
+        "pattern": "^horror\\.place\\.schema\\.v1:[a-z0-9_.-]+$"
+      },
+      "styleid": {
+        "type": "string",
+        "pattern": "^STY-[A-Z0-9-]+$"
+      },
+      "contractRef": {
+        "type": "string",
+        "pattern": "^contract://[a-z0-9_./-]+$",
+        "description": "Reference to the contractCard governing this artifact."
+      },
+      "deadledgerref": {
+        "type": "string",
+        "pattern": "^deadledger://[a-z0-9_./-]+$"
+      },
+      "created": {
+        "type": "object",
+        "required": ["timestamp", "actor", "sessionid"],
+        "properties": {
+          "timestamp": {"type": "string", "format": "date-time"},
+          "actor": {"type": "string", "description": "GitHub actor or AI agent ID"},
+          "sessionid": {"type": "string"}
+        }
+      },
+      "validated": {
+        "type": "object",
+        "required": ["schema_ok", "invariants_ok", "ledger_ok"],
+        "properties": {
+          "schema_ok": {"type": "boolean"},
+          "invariants_ok": {"type": "boolean"},
+          "ledger_ok": {"type": "boolean"},
+          "validator_version": {"type": "string"},
+          "validated_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "artifact_location": {
+        "type": "object",
+        "required": ["repo", "path"],
+        "properties": {
+          "repo": {"type": "string"},
+          "path": {"type": "string"},
+          "commit_hash": {"type": "string", "pattern": "^[a-f0-9]{40}$"}
+        }
+      },
+      "telemetry_hooks": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["hook_type", "metric_target"],
+          "properties": {
+            "hook_type": {
+              "enum": ["on_spawn", "on_trigger", "on_completion", "on_drift"]
+            },
+            "metric_target": {
+              "enum": ["UEC", "EMD", "STCI", "CDL", "ARR", "DET", "SHCI"]
+            },
+            "adjustment": {
+              "type": "object",
+              "properties": {
+                "delta": {"type": "number"},
+                "condition": {"type": "string"}
+              }
+            }
+          }
+        }
+      },
+      "drift_tolerance": {
+        "type": "object",
+        "properties": {
+          "max_DET_spike": {"type": "number", "minimum": 0.0, "maximum": 2.0},
+          "allowed_metric_drift_pct": {"type": "number", "minimum": 0.0, "maximum": 0.25},
+          "auto_correction_enabled": {"type": "boolean", "default": true}
+        }
+      }
+    }
+  }
+}
