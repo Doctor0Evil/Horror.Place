@@ -1,0 +1,170 @@
+{
+  "repo-target": "Horror.Place/core/schemas",
+  "file-destination": "/schemas/core/contracts/",
+  "filename": "coreschemascontractcardv1.json",
+  "content": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.Horror.Place/core/schemas/contractcardv1.json",
+    "title": "Horror.Place Contract Card v1",
+    "description": "Machine-readable contract card encoding invariants, metrics, and style contracts for horror seed/scene generation. Validated against Horror.Place doctrine and Dead-Ledger governance.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "title",
+      "styleid",
+      "schemaref",
+      "invariants",
+      "metrics"
+    ],
+    "properties": {
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160,
+        "description": "Human-readable label for the contract card (seed/scene identifier)."
+      },
+      "styleid": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^STY-[A-Z0-9-]+$",
+        "description": "Reference to style contract governing aesthetic/behavioral tone (e.g., STY-DARKWOOD-FOREST)."
+      },
+      "schemaref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256,
+        "pattern": "^horror\\.place\\.schema\\.v1:[a-z0-9_.-]+$",
+        "description": "Schema reference for the entity type this card creates (seed, event, persona, etc.)."
+      },
+      "invariants": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["CIC", "AOS", "RRM", "LSG", "DET", "SHCI"],
+        "description": "Target values for core horror mechanics invariants.",
+        "properties": {
+          "CIC": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Clue-to-Incident Ratio: balance of evidence vs. overt events."
+          },
+          "AOS": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Ambiguity-to-Oppression Score: tension from uncertainty vs. direct threat."
+          },
+          "RRM": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Resource-Restriction Metric: scarcity of tools/safety/escape options."
+          },
+          "LSG": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Locus-Safety Gradient: perceived safety differential across space."
+          },
+          "DET": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 10.0,
+            "description": "Dread Event Threshold: intensity cap for overt scare events."
+          },
+          "SHCI": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Spectral-Harmonic Consistency Index: coherence of supernatural manifestations."
+          }
+        }
+      },
+      "metrics": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["UEC", "EMD", "STCI", "CDL", "ARR"],
+        "description": "Acceptable [min, max] bands for outcome metrics.",
+        "properties": {
+          "UEC": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Uncertainty Engagement Coefficient: player engagement via ambiguity."
+          },
+          "EMD": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Evidential Mystery Density: unresolved clues per unit time."
+          },
+          "STCI": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Safe-Threat Contrast Index: alternation between safety and danger."
+          },
+          "CDL": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Cognitive Dissonance Load: mutually plausible explanations held simultaneously."
+          },
+          "ARR": {
+            "type": "array",
+            "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Ambiguous Resolution Ratio: partial vs. full story resolution."
+          }
+        }
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 2000,
+        "description": "Designer rationale for chosen parameters; non-binding documentation."
+      },
+      "deadledgerref": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "pattern": "^deadledger://[a-z0-9_./-]+$",
+        "description": "Placeholder reference to Dead-Ledger entry for provenance/attestation."
+      },
+      "policyprofile": {
+        "type": "string",
+        "enum": ["standard", "restricted", "experimental"],
+        "default": "standard",
+        "description": "Policy tier governing allowable invariant/metric ranges."
+      },
+      "entitlementtier": {
+        "type": "string",
+        "pattern": "^tier[0-9]+(vault|public|internal)$",
+        "description": "Access tier for this contract (controls agent capabilities)."
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {"policyprofile": {"const": "restricted"}}
+        },
+        "then": {
+          "properties": {
+            "invariants": {
+              "properties": {
+                "DET": {"maximum": 5.0},
+                "SHCI": {"maximum": 0.75}
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
