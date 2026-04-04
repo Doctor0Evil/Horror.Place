@@ -1,0 +1,257 @@
+name: Daily Schema Drift Audit
+
+on:
+  schedule:
+    - cron: "0 5 * * *"  # Daily at 05:00 UTC
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Optional tier filter (tier-1, tier-2, tier-3)"
+        required: false
+        type: string
+      repo:
+        description: "Optional single-repo override (name from repos-manifest.json)"
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/daily-schema-audit.yml"
+      - "scripts/drift-audit/**"
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  prepare:
+    name: Prepare Constellation Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout Horror.Place
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Build repository matrix from manifest
+        id: build-matrix
+        run: |
+          python - << "EOF"
+          import json
+          from pathlib import Path
+
+          manifest_path = Path("scripts/drift-audit/repos-manifest.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+          tier_filter = "${{ github.event.inputs.tier || '' }}".strip()
+          repo_filter = "${{ github.event.inputs.repo || '' }}".strip()
+
+          entries = []
+          for repo in manifest.get("repos", []):
+              name = repo["name"]
+              tier = repo.get("tier", "")
+              if tier_filter and tier != tier_filter:
+                  continue
+              if repo_filter and name != repo_filter:
+                  continue
+              entries.append({
+                  "name": name,
+                  "repo": repo["repo"],
+                  "tier": tier,
+                  "ref": repo.get("ref", "main"),
+              })
+
+          matrix = {"include": entries}
+          print(f"::set-output name=matrix::{json.dumps(matrix)}")
+          EOF
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repos-manifest
+          path: scripts/drift-audit/repos-manifest.json
+
+  scan:
+    name: Scan Repositories
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Checkout audit suite
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies (if any)
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Clone constellation repo
+        env:
+          CONSTELLATION_PAT: ${{ secrets.CONSTELLATION_PAT }}
+        run: |
+          set -e
+          REPO="${{ matrix.repo }}"
+          REF="${{ matrix.ref }}"
+          TARGET_DIR="${{ matrix.name }}"
+          git clone --depth 1 --branch "$REF" "https://x-access-token:${CONSTELLATION_PAT}@github.com/${REPO}.git" "$TARGET_DIR"
+
+      - name: Run schema drift scanner
+        run: |
+          python scripts/drift-audit/schema_drift_detector.py "${{ matrix.name }}" --json > "schema-drift-${{ matrix.name }}.json" || true
+
+      - name: Run charter compliance scanner
+        run: |
+          python scripts/drift-audit/charter_compliance.py "${{ matrix.name }}" --json > "charter-${{ matrix.name }}.json" || true
+
+      - name: Run NDJSON linter
+        run: |
+          python scripts/drift-audit/ndjson_lint.py "${{ matrix.name }}" --json > "ndjson-${{ matrix.name }}.json" || true
+
+      - name: Upload scan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "scan-${{ matrix.name }}"
+          path: |
+            schema-drift-${{ matrix.name }}.json
+            charter-${{ matrix.name }}.json
+            ndjson-${{ matrix.name }}.json
+
+  report:
+    name: Aggregate Report
+    needs: scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit suite
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: repos-manifest
+          path: artifacts
+
+      - name: Download scan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Build aggregated results JSON
+        id: aggregate
+        run: |
+          python - << "EOF"
+          import json
+          from pathlib import Path
+
+          manifest_path = Path("artifacts/repos-manifest.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+          results = {}
+
+          for repo in manifest.get("repos", []):
+              name = repo["name"]
+              drift_path = Path("artifacts") / f"schema-drift-{name}.json"
+              charter_path = Path("artifacts") / f"charter-{name}.json"
+              ndjson_path = Path("artifacts") / f"ndjson-{name}.json"
+
+              def load_list(p: Path) -> list:
+                  if p.is_file():
+                      try:
+                          return json.loads(p.read_text(encoding="utf-8"))
+                      except json.JSONDecodeError:
+                          return []
+                  return []
+
+              results[name] = {
+                  "drift": load_list(drift_path),
+                  "charter": load_list(charter_path),
+                  "ndjson": load_list(ndjson_path),
+              }
+
+          out = Path("artifacts/aggregated-results.json")
+          out.write_text(json.dumps(results, indent=2), encoding="utf-8")
+          EOF
+
+      - name: Generate Markdown report
+        id: report
+        run: |
+          python scripts/drift-audit/report_generator.py --config artifacts/repos-manifest.json --output artifacts/schema-drift-report.md > artifacts/job-summary.md
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-drift-report
+          path: artifacts/schema-drift-report.md
+
+      - name: Set job summary
+        run: |
+          cat artifacts/schema-drift-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create GitHub issue for critical findings
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = "artifacts/aggregated-results.json";
+            if (!fs.existsSync(path)) {
+              core.info("No aggregated results found, skipping issue creation.");
+              return;
+            }
+            const data = JSON.parse(fs.readFileSync(path, "utf8"));
+            let hasCritical = false;
+            let summary = "";
+
+            for (const [repo, findings] of Object.entries(data)) {
+              for (const [scanner, list] of Object.entries(findings)) {
+                if (!Array.isArray(list)) continue;
+                for (const f of list) {
+                  const sev = (f.severity || "").toLowerCase();
+                  if (sev === "critical" || sev === "charter") {
+                    hasCritical = true;
+                    summary += `- [${repo}] ${scanner} ${f.file}:${f.line} ${f.rule} ${f.message}\n`;
+                  }
+                }
+              }
+            }
+
+            if (!hasCritical) {
+              core.info("No critical or charter findings; no issue will be created.");
+              return;
+            }
+
+            const title = "Schema Drift Audit: Critical Findings Detected";
+            const body = [
+              "Daily schema drift audit detected critical or charter-level findings.",
+              "",
+              "### Findings",
+              "",
+              summary || "(none listed)",
+              "",
+              "Refer to the attached workflow artifacts for full details."
+            ].join("\n");
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ["schema-drift", "audit", "critical"]
+            });
