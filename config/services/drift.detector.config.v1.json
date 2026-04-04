@@ -1,0 +1,128 @@
+{
+  "repo-target": "Horror.Place/services/drift-detector",
+  "file-destination": "/config/services/",
+  "filename": "drift.detector.config.v1.json",
+  "content": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.Horror.Place/services/drift-detector/configv1.json",
+    "title": "Horror.Place Drift Detector Configuration v1",
+    "description": "Configuration for continuous contract-drift detection service. Runs in Unreal Editor background, compares live metrics to contract bands.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["service_id", "polling_interval_ms", "metrics_sources", "alert_thresholds"],
+    "properties": {
+      "service_id": {
+        "type": "string",
+        "pattern": "^drift-detector-[a-z0-9-]+$",
+        "default": "drift-detector-unreal-editor-v1"
+      },
+      "polling_interval_ms": {
+        "type": "integer",
+        "minimum": 100,
+        "maximum": 5000,
+        "default": 500,
+        "description": "How often to sample live metrics from the scene."
+      },
+      "metrics_sources": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["source_type", "metric_name", "sampling_method"],
+          "properties": {
+            "source_type": {
+              "enum": [
+                "unreal_blueprint_hook",
+                "lua_runtime_metric",
+                "player_telemetry_stream",
+                "audio_analyzer",
+                "ai_behavior_log"
+              ]
+            },
+            "metric_name": {
+              "enum": ["UEC", "EMD", "STCI", "CDL", "ARR", "DET", "SHCI", "CIC", "AOS", "RRM", "LSG"]
+            },
+            "sampling_method": {
+              "enum": ["instant", "rolling_average_10s", "rolling_average_60s", "peak_detection"]
+            },
+            "normalization": {
+              "type": "object",
+              "properties": {
+                "min_raw": {"type": "number"},
+                "max_raw": {"type": "number"},
+                "target_min": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "target_max": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            }
+          }
+        }
+      },
+      "alert_thresholds": {
+        "type": "object",
+        "required": ["warning_pct", "critical_pct", "auto_correct_actions"],
+        "properties": {
+          "warning_pct": {
+            "type": "number",
+            "minimum": 0.05,
+            "maximum": 0.25,
+            "default": 0.10,
+            "description": "Drift percentage triggering non-modal editor warning."
+          },
+          "critical_pct": {
+            "type": "number",
+            "minimum": 0.15,
+            "maximum": 0.50,
+            "default": 0.25,
+            "description": "Drift percentage blocking save/commit until resolved."
+          },
+          "auto_correct_actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["trigger_metric", "action_type", "parameters"],
+              "properties": {
+                "trigger_metric": {"enum": ["DET", "STCI", "CDL"]},
+                "action_type": {
+                  "enum": [
+                    "convert_to_almost_event",
+                    "reduce_audio_intensity",
+                    "delay_trigger_timer",
+                    "swap_asset_variant"
+                  ]
+                },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "editor_ui_bindings": {
+        "type": "object",
+        "properties": {
+          "gutter_badge_enabled": {"type": "boolean", "default": true},
+          "timeline_marker_enabled": {"type": "boolean", "default": true},
+          "inline_suggestion_panel": {"type": "boolean", "default": true},
+          "drift_history_log": {
+            "type": "object",
+            "properties": {
+              "max_entries": {"type": "integer", "default": 100},
+              "export_format": {"enum": ["json", "csv", "telemetry_stream"]}
+            }
+          }
+        }
+      },
+      "contract_diff_output": {
+        "type": "object",
+        "required": ["format", "include_suggestions"],
+        "properties": {
+          "format": {"enum": ["json_patch", "unified_diff", "structured_object"], "default": "json_patch"},
+          "include_suggestions": {"type": "boolean", "default": true},
+          "suggestion_confidence_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0, "default": 0.75}
+        }
+      }
+    }
+  }
+}
