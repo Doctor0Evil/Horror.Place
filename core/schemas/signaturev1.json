@@ -1,118 +1,119 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://Horror.Place/core/schemas/signaturev1.json",
-  "title": "Horror.Place First-Pass Signature",
-  "description": "Canonical first-pass handoff signature for deterministic, policy-bound generation workflows across the Horror.Place VM-constellation.",
+  "$id": "schema.Horror.Place/core/schemas/signaturev1.json",
+  "title": "Horror.Place First-Pass Signature v1",
+  "description": "CI-governed signature document embedding contractCard for invariant/metric enforcement. Used by schema_spine_scanner for pre-commit validation across the Horror.Place VM-constellation.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "signature_id",
-    "issued_at",
-    "expires_at",
-    "github_actor",
-    "github_repo",
-    "github_ref",
-    "session_id",
-    "target_repo",
-    "target_path",
-    "workflow_id",
-    "operation",
-    "schema_ref",
-    "contract_type",
-    "contract_id",
-    "policy_profile",
-    "entitlement_tier",
-    "invariant_envelope",
-    "metric_envelope",
-    "shci_lock_mode",
-    "capability_token_id",
-    "entitlement_proofs",
-    "generator_version",
-    "random_seed",
-    "max_runtime_ms",
-    "max_size_bytes",
-    "constraints_hash",
-    "request_origin"
+    "signatureid",
+    "issuedat",
+    "expiresat",
+    "githubactor",
+    "githubrepo",
+    "githubref",
+    "sessionid",
+    "workflowintent",
+    "target",
+    "schemaref",
+    "contracttype",
+    "contractid",
+    "policyprofile",
+    "entitlementtier",
+    "invariantenvelope",
+    "metricenvelope",
+    "shcilockmode",
+    "capabilitytokenid",
+    "entitlementproofs",
+    "generatorversion",
+    "randomseed",
+    "maxruntimems",
+    "maxsizebytes",
+    "constraintshash",
+    "requestorigin",
+    "contractCard"
   ],
   "properties": {
-    "signature_id": {
+    "signatureid": {
       "type": "string",
-      "description": "Stable UUID for this signature instance.",
-      "format": "uuid"
+      "pattern": "^sig-[0-9]{8}-[0-9]{4}$",
+      "description": "Unique identifier for this signature instance."
     },
-    "issued_at": {
+    "issuedat": {
       "type": "string",
       "description": "Signature issuance time (ISO 8601).",
       "format": "date-time"
     },
-    "expires_at": {
+    "expiresat": {
       "type": "string",
-      "description": "Signature expiry time (ISO 8601); CI must enforce expires_at > issued_at.",
+      "description": "Signature expiry time (ISO 8601); CI must enforce expiresat > issuedat.",
       "format": "date-time"
     },
-    "github_actor": {
+    "githubactor": {
       "type": "string",
       "description": "GitHub username of the caller.",
       "minLength": 1
     },
-    "github_repo": {
+    "githubrepo": {
       "type": "string",
       "description": "Full GitHub repo slug (owner/name).",
       "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
     },
-    "github_ref": {
+    "githubref": {
       "type": "string",
       "description": "Git reference (branch or tag) that requested generation.",
       "minLength": 1
     },
-    "session_id": {
+    "sessionid": {
       "type": "string",
       "description": "UUID for the cryptographic session; must match Dead-Ledger / ALN session records.",
       "format": "uuid"
     },
-
-    "target_repo": {
+    "workflowintent": {
       "type": "string",
-      "description": "Target repository in the VM-constellation.",
       "enum": [
-        "Horror.Place",
-        "HorrorPlace-Atrocity-Seeds",
-        "HorrorPlace-Black-Archivum",
-        "HorrorPlace-Dead-Ledger-Network",
-        "HorrorPlace-Neural-Resonance-Lab",
-        "HorrorPlace-Process-Gods-Research",
-        "HorrorPlace-Liminal-Continuum",
-        "HorrorPlace-Obscura-Nexus",
-        "HorrorPlace-Redacted-Chronicles",
-        "HorrorPlace-Spectral-Foundry"
-      ]
+        "pcg-generator",
+        "asset-placement",
+        "event-scripting",
+        "npc-behavior",
+        "audio-mixing",
+        "narrative-beat"
+      ],
+      "description": "Intended use case for this signature."
     },
-    "target_path": {
+    "target": {
+      "type": "object",
+      "required": ["repo", "path"],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "description": "Target repository in the VM-constellation.",
+          "enum": [
+            "Horror.Place",
+            "HorrorPlace-Atrocity-Seeds",
+            "HorrorPlace-Black-Archivum",
+            "HorrorPlace-Dead-Ledger-Network",
+            "HorrorPlace-Neural-Resonance-Lab",
+            "HorrorPlace-Process-Gods-Research",
+            "HorrorPlace-Liminal-Continuum",
+            "HorrorPlace-Obscura-Nexus",
+            "HorrorPlace-Redacted-Chronicles",
+            "HorrorPlace-Spectral-Foundry"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "description": "Repository-relative path for the single file to be generated or updated.",
+          "pattern": "^(seeds/|events/|assets/|blueprints/).+"
+        }
+      }
+    },
+    "schemaref": {
       "type": "string",
-      "description": "Repository-relative path for the single file to be generated or updated.",
-      "minLength": 1
+      "pattern": "^horror\\.place\\.schema\\.v1:[a-z0-9_.-]+$",
+      "description": "Primary schema for generated artifact type."
     },
-    "workflow_id": {
-      "type": "string",
-      "description": "CI workflow name or ID.",
-      "minLength": 1
-    },
-    "operation": {
-      "type": "string",
-      "description": "Requested operation on the target file.",
-      "enum": [
-        "create",
-        "update",
-        "validate_only"
-      ]
-    },
-    "schema_ref": {
-      "type": "string",
-      "description": "Canonical schema URI the generated file must conform to.",
-      "minLength": 1
-    },
-
-    "contract_type": {
+    "contracttype": {
       "type": "string",
       "description": "High-level contract type being written or modified.",
       "enum": [
@@ -127,22 +128,22 @@
         "other"
       ]
     },
-    "contract_id": {
+    "contractid": {
       "type": "string",
       "description": "Stable ID of the contract or registry entry this signature applies to.",
       "minLength": 1
     },
-    "style_id": {
+    "styleid": {
       "type": "string",
       "description": "Style contract ID to be enforced (when applicable).",
       "minLength": 1
     },
-    "policy_profile": {
+    "policyprofile": {
       "type": "string",
       "description": "Policy profile identifier (e.g., STANDARD_V1, MATURE_V1, RESEARCH_V1).",
       "minLength": 1
     },
-    "entitlement_tier": {
+    "entitlementtier": {
       "type": "string",
       "description": "Entitlement tier for this operation.",
       "enum": [
@@ -151,10 +152,9 @@
         "tier3_lab"
       ]
     },
-
-    "invariant_envelope": {
+    "invariantenvelope": {
       "type": "object",
-      "description": "Required ranges for history invariants.",
+      "description": "Allowed ranges for history invariants; contractCard values must lie within.",
       "additionalProperties": false,
       "required": [
         "CIC",
@@ -177,15 +177,15 @@
         "FCF": { "$ref": "#/$defs/range01" },
         "SPR": { "$ref": "#/$defs/range01" },
         "RWF": { "$ref": "#/$defs/range01" },
-        "DET": { "$ref": "#/$defs/range01" },
+        "DET": { "$ref": "#/$defs/range010" },
         "HVF": { "$ref": "#/$defs/range01" },
         "LSG": { "$ref": "#/$defs/range01" },
         "SHCI": { "$ref": "#/$defs/range01" }
       }
     },
-    "metric_envelope": {
+    "metricenvelope": {
       "type": "object",
-      "description": "Target bands for entertainment metrics.",
+      "description": "Allowed bands for outcome metrics; must match contractCard exactly.",
       "additionalProperties": false,
       "required": [
         "UEC",
@@ -195,14 +195,14 @@
         "ARR"
       ],
       "properties": {
-        "UEC": { "$ref": "#/$defs/range01" },
-        "EMD": { "$ref": "#/$defs/range01" },
-        "STCI": { "$ref": "#/$defs/range01" },
-        "CDL": { "$ref": "#/$defs/range01" },
-        "ARR": { "$ref": "#/$defs/range01" }
+        "UEC": { "$ref": "#/$defs/band01" },
+        "EMD": { "$ref": "#/$defs/band01" },
+        "STCI": { "$ref": "#/$defs/band01" },
+        "CDL": { "$ref": "#/$defs/band01" },
+        "ARR": { "$ref": "#/$defs/band01" }
       }
     },
-    "shci_lock_mode": {
+    "shcilockmode": {
       "type": "string",
       "description": "How strictly SHCI and history invariants must constrain behavior.",
       "enum": [
@@ -210,13 +210,20 @@
         "loose"
       ]
     },
-
-    "capability_token_id": {
+    "capabilitytokenid": {
       "type": "string",
-      "description": "Identifier of the session-bound capability token used to authorize this signature.",
+      "description": "ALN capability token governing this signature's permissions.",
       "minLength": 1
     },
-    "entitlement_proofs": {
+    "alncontractids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^aln://"
+      },
+      "description": "Authorization and Ledger Network contract references."
+    },
+    "entitlementproofs": {
       "type": "array",
       "description": "Opaque references to ZKP / ALN proofs, not raw proofs.",
       "items": {
@@ -224,34 +231,32 @@
         "minLength": 1
       }
     },
-
-    "generator_version": {
+    "generatorversion": {
       "type": "string",
       "description": "Semantic version of the generator or persona profile.",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9.-]+)?$"
     },
-    "random_seed": {
+    "randomseed": {
       "type": "string",
-      "description": "256-bit hex string; generator must treat this as the only randomness source.",
+      "description": "Deterministic seed for reproducible generation (no hidden defaults); 256-bit hex string.",
       "pattern": "^[0-9a-fA-F]{64}$"
     },
-    "max_runtime_ms": {
+    "maxruntimems": {
       "type": "integer",
       "description": "Upper bound on generator runtime in milliseconds.",
       "minimum": 1
     },
-    "max_size_bytes": {
+    "maxsizebytes": {
       "type": "integer",
       "description": "Upper bound on generated file size in bytes.",
       "minimum": 1
     },
-    "constraints_hash": {
+    "constraintshash": {
       "type": "string",
-      "description": "SHA-256 over the concatenation of schema_ref, contract_id, invariant_envelope, and metric_envelope.",
+      "description": "SHA-256 over the concatenation of schemaref, contractid, invariantenvelope, and metricenvelope.",
       "pattern": "^[0-9a-fA-F]{64}$"
     },
-
-    "request_origin": {
+    "requestorigin": {
       "type": "string",
       "description": "Origin of the request.",
       "enum": [
@@ -260,15 +265,33 @@
         "api_call"
       ]
     },
-    "parent_signature_id": {
+    "parentsignatureid": {
       "type": "string",
       "description": "Optional link to a previous signature for lineage.",
       "format": "uuid"
     },
-    "dead_ledger_tx": {
+    "deadledgertx": {
       "type": "string",
       "description": "Optional hash or ID of the Dead-Ledger entry registering this signature.",
       "minLength": 1
+    },
+    "contractCard": {
+      "$ref": "coreschemascontractcardv1.json",
+      "description": "Embedded contract card; subset rule: values must satisfy envelope constraints."
+    },
+    "generatedartifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "schemaref", "styleid"],
+        "properties": {
+          "path": { "type": "string" },
+          "schemaref": { "type": "string" },
+          "styleid": { "type": "string" },
+          "deadledgerref": { "type": "string" }
+        }
+      },
+      "description": "List of artifacts generated under this signature (for audit)."
     }
   },
   "$defs": {
@@ -292,17 +315,102 @@
           "maximum": 1.0
         }
       }
+    },
+    "range010": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        }
+      }
+    },
+    "band01": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "mustBeInEnvelope": {
+      "type": "number"
+    },
+    "mustBeInEnvelopeDET": {
+      "type": "number"
+    },
+    "mustMatchBand": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "minItems": 2,
+      "maxItems": 2
     }
   },
   "allOf": [
     {
       "if": {
         "properties": {
-          "contract_type": { "const": "style" }
+          "contracttype": { "const": "style" }
         }
       },
       "then": {
-        "required": [ "style_id" ]
+        "required": ["styleid"]
+      }
+    },
+    {
+      "description": "Subset Rule: contractCard invariants must lie within envelope",
+      "if": { "required": ["contractCard", "invariantenvelope"] },
+      "then": {
+        "properties": {
+          "contractCard": {
+            "properties": {
+              "invariants": {
+                "properties": {
+                  "CIC": { "$ref": "#/$defs/mustBeInEnvelope" },
+                  "AOS": { "$ref": "#/$defs/mustBeInEnvelope" },
+                  "RRM": { "$ref": "#/$defs/mustBeInEnvelope" },
+                  "LSG": { "$ref": "#/$defs/mustBeInEnvelope" },
+                  "DET": { "$ref": "#/$defs/mustBeInEnvelopeDET" },
+                  "SHCI": { "$ref": "#/$defs/mustBeInEnvelope" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Band Match Rule: contractCard metrics must equal envelope bands",
+      "if": { "required": ["contractCard", "metricenvelope"] },
+      "then": {
+        "properties": {
+          "contractCard": {
+            "properties": {
+              "metrics": {
+                "properties": {
+                  "UEC": { "$ref": "#/$defs/mustMatchBand" },
+                  "EMD": { "$ref": "#/$defs/mustMatchBand" },
+                  "STCI": { "$ref": "#/$defs/mustMatchBand" },
+                  "CDL": { "$ref": "#/$defs/mustMatchBand" },
+                  "ARR": { "$ref": "#/$defs/mustMatchBand" }
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]
