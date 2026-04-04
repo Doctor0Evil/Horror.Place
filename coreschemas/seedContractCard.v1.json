@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemaHorror.Place/coreschemas/seedContractCard.v1",
+  "title": "Horror.Place Seed Contract Card",
+  "description": "Canonical contractCard for a single seed/scene, binding invariants, entertainment metrics, style, and ledger anchors.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "seedid",
+    "schemaref",
+    "scope",
+    "styleid",
+    "contractSource",
+    "invariants",
+    "metrics",
+    "deadledgerref",
+    "metadata"
+  ],
+  "properties": {
+    "seedid": {
+      "type": "string",
+      "description": "Unique identifier for this seed/scene."
+    },
+    "schemaref": {
+      "type": "string",
+      "const": "schemaHorror.Place/coreschemas/seedContractCard.v1",
+      "description": "Self-referencing schema URI."
+    },
+    "scope": {
+      "type": "string",
+      "const": "seed",
+      "description": "Discriminator indicating this is a seed-level contractCard."
+    },
+    "styleid": {
+      "type": "string",
+      "description": "Style contract identifier, must reference a valid style contract entry."
+    },
+    "contractSource": {
+      "type": "string",
+      "description": "Opaque reference to the parent regionContractCard or policyEnvelope this seed derives from."
+    },
+    "invariants": {
+      "type": "object",
+      "description": "Point values for all core invariants at this seed's locus.",
+      "additionalProperties": false,
+      "required": [
+        "CIC",
+        "MDI",
+        "AOS",
+        "RRM",
+        "FCF",
+        "SPR",
+        "RWF",
+        "DET",
+        "HVF",
+        "LSG",
+        "SHCI"
+      ],
+      "properties": {
+        "regionid": {
+          "type": "string",
+          "description": "Region identifier in which this seed resides."
+        },
+        "CIC": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Catastrophic Imprint Coefficient."
+        },
+        "MDI": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Mythic Density Index."
+        },
+        "AOS": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Archival Opacity Score."
+        },
+        "RRM": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Ritual Residue Map (local strength)."
+        },
+        "FCF": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Folkloric Convergence Factor."
+        },
+        "SPR": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Spectral Plausibility Rating."
+        },
+        "RWF": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Reliability Weighting Factor."
+        },
+        "DET": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0,
+          "description": "Dread Exposure Threshold (0–10 scale)."
+        },
+        "HVF": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Haunt Vector Field magnitude."
+        },
+        "LSG": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Liminal Stress Gradient."
+        },
+        "SHCI": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Spectral-History Coupling Index."
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Target entertainment metric bands for this seed.",
+      "additionalProperties": false,
+      "required": [
+        "UEC",
+        "EMD",
+        "STCI",
+        "CDL",
+        "ARR"
+      ],
+      "properties": {
+        "UEC": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "description": "Uncertainty Engagement Coefficient band."
+        },
+        "EMD": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "description": "Evidential Mystery Density band."
+        },
+        "STCI": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "description": "Safe-Threat Contrast Index band."
+        },
+        "CDL": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "description": "Cognitive Dissonance Load band."
+        },
+        "ARR": {
+          "type": "object",
+          "required": ["min", "max"],
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+            "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          },
+          "description": "Ambiguous Resolution Ratio band."
+        }
+      }
+    },
+    "deadledgerref": {
+      "type": "object",
+      "description": "Opaque reference to Dead-Ledger proof envelope governing this seed.",
+      "additionalProperties": false,
+      "required": [
+        "proofenvelopeid",
+        "verifierref",
+        "circuittype",
+        "protocolversion",
+        "requiredproofs"
+      ],
+      "properties": {
+        "proofenvelopeid": {
+          "type": "string",
+          "description": "Identifier of the proof envelope in Dead-Ledger."
+        },
+        "verifierref": {
+          "type": "string",
+          "description": "Reference to an entry in registryverifiers.json."
+        },
+        "circuittype": {
+          "type": "string",
+          "description": "ZKP circuit identifier governing this seed."
+        },
+        "protocolversion": {
+          "type": "string",
+          "description": "Dead-Ledger protocol version used."
+        },
+        "requiredproofs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "List of proof roles required (e.g., agegating, charteragreement)."
+        }
+      }
+    },
+    "pcgHints": {
+      "type": "array",
+      "description": "Optional PCG hints; engine-specific but schema-safe.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "blueprintStubs": {
+      "type": "array",
+      "description": "Optional Unreal/engine blueprint stub descriptors.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "luaHooks": {
+      "type": "array",
+      "description": "Optional Lua hook descriptors for runtime wiring.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Non-horror metadata fields for auditing and governance.",
+      "additionalProperties": false,
+      "required": [
+        "createdAt",
+        "updatedAt",
+        "author",
+        "policyTier"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp (ISO 8601)."
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or tool responsible for this card."
+        },
+        "policyTier": {
+          "type": "string",
+          "enum": ["standard", "mature", "research"],
+          "description": "Safety tier under which this card is allowed to execute."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional human-readable notes."
+        }
+      }
+    }
+  }
+}
