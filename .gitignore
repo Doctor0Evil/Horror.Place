@@ -1,0 +1,103 @@
+# Horror.Place (Tier 1 Public Core)
+# Zero-raw-content rules core for schemas, registries, APIs, and audit artifacts.
+# Do not ignore any tracked schema, registry, or public-api stub paths.
+
+############################
+# OS / Editor cruft
+############################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code / JetBrains / other IDEs
+.vscode/
+.idea/
+*.iml
+
+# macOS / Linux
+*.swp
+*.swo
+*~
+
+############################
+# Python tooling (schemas, linters, CI scripts)
+############################
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache / build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+.pytest_cache/
+.mypy_cache/
+.coverage
+*.coverage
+htmlcov/
+dist/
+build/
+.eggs/
+*.egg
+*.egg-info/
+
+############################
+# Lua / tooling
+############################
+# LuaRocks artifacts if used locally
+luarocks/
+*.rock
+*.rockspec
+
+############################
+# Node / front-end (future-proofing)
+############################
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+package-lock.json
+
+############################
+# Logs & temp
+############################
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+############################
+# OS / archive files
+############################
+*.bak
+*.orig
+*.old
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+############################
+# CI / coverage artifacts
+############################
+# Local CircleCI / coverage outputs
+.circleci-cache/
+coverage.xml
+test-results/
+junit-report.xml
+
+############################
+# Project-specific notes
+############################
+# Local experiments or scratch docs not meant for the repo
+notes-local/
+scratch/
+sandbox/
+
+# Local registry or schema experiments
+core/registry-local/
+core/schemas-local/
