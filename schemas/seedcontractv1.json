@@ -1,8 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "HorrorPlaceSeedContractV1",
+  "$id": "https://horror.place/schemas/seedcontractv1.json",
+  "title": "Horror.Place Seed Contract v1",
+  "description": "A Seed is the smallest, history-bound, engine-consumable unit linking a tile to a staged horror sequence, invariant profile, and target metric shifts.",
   "type": "object",
-  "description": "Tier-1 Seed contract: a single, history-bound, engine-consumable unit linking a region tile, trauma bundle, invariants, and entertainment metric targets.",
   "required": [
     "schema",
     "seed_id",
@@ -10,6 +11,8 @@
     "region_id",
     "tile_id",
     "stage",
+    "created_at",
+    "updated_at",
     "safety_tier",
     "intensity_band",
     "invariants",
@@ -24,70 +27,72 @@
   "properties": {
     "schema": {
       "type": "string",
-      "description": "Schema URI or identifier for this Seed contract.",
-      "pattern": "^horrorplace://schemas/seedcontractv1$"
+      "format": "uri",
+      "const": "https://horror.place/schemas/seedcontractv1.json",
+      "description": "Fixed URI for validator resolution."
     },
     "seed_id": {
       "type": "string",
-      "description": "Stable, globally unique identifier for this Seed.",
-      "pattern": "^[a-z0-9._-]+$"
+      "pattern": "^[a-z0-9._-]+$",
+      "minLength": 8,
+      "maxLength": 64,
+      "description": "Unique, stable identifier for this Seed."
     },
     "version": {
       "type": "string",
-      "description": "Semantic version for this Seed record.",
-      "pattern": "^v[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "description": "Semantic version string for this Seed record."
     },
     "region_id": {
       "type": "string",
-      "description": "Region identifier, shared with Horror.Place region registries."
+      "pattern": "^[a-z0-9._-]+$",
+      "description": "ID of the parent region, consistent with Horror.Place region registries and Black-Archivum bundles."
     },
     "tile_id": {
       "type": "string",
-      "description": "Tile / volume / node identifier within the region."
+      "pattern": "^[a-z0-9._-]+$",
+      "description": "Engine-scale identifier (grid cell / volume / ALN node) where this Seed lives."
     },
     "stage": {
       "type": "string",
-      "description": "Sequence stage for this Seed within its local horror arc.",
       "enum": [
         "stage_1_probe",
         "stage_2_evidence",
         "stage_3_confrontation",
         "stage_4_aftermath",
         "stage_5_residual"
-      ]
-    },
-    "safety_tier": {
-      "type": "string",
-      "description": "Safety / maturity tier for this Seed.",
-      "enum": [
-        "standard",
-        "mature",
-        "research"
-      ]
-    },
-    "intensity_band": {
-      "type": "integer",
-      "description": "Coarse 0–10 descriptor of horror intensity for this Seed.",
-      "minimum": 0,
-      "maximum": 10
+      ],
+      "description": "Enum mapping to the five-stage horror sequence model."
     },
     "created_at": {
       "type": "string",
-      "description": "Creation timestamp in ISO 8601 format.",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of Seed creation."
     },
     "updated_at": {
       "type": "string",
-      "description": "Last update timestamp in ISO 8601 format.",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last Seed modification."
+    },
+    "safety_tier": {
+      "type": "string",
+      "enum": ["standard", "mature", "research"],
+      "description": "Aligned with Horror.Place safety tier patterns."
+    },
+    "intensity_band": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Intensity rating 0–10; bands ≥8 require a non-null deadledger_ref."
     },
     "deadledger_ref": {
-      "type": "string",
-      "description": "Optional reference into Dead-Ledger for attested Seeds."
+      "type": ["string", "null"],
+      "pattern": "^dl_[a-z0-9]{16,32}$",
+      "description": "Optional but required (by policy) when intensity_band >= 8; points to attested Dead-Ledger entry."
     },
+
     "invariants": {
       "type": "object",
-      "description": "Invariant vector for this Seed at tile scope.",
       "required": [
         "CIC",
         "MDI",
@@ -97,111 +102,134 @@
         "SPR",
         "RWF",
         "DET",
-        "HVF",
         "LSG",
         "SHCI",
+        "HVF",
         "time_phase"
       ],
       "additionalProperties": false,
       "properties": {
         "CIC": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Catastrophic Imprint Coefficient."
         },
         "MDI": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Mythic Density Index."
         },
         "AOS": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Archival Opacity Score."
         },
         "RRM": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
-          "description": "Ritual Residue Map local strength."
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Ritual Residue Map."
         },
         "FCF": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Folkloric Convergence Factor."
         },
         "SPR": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Spectral Plausibility Rating."
         },
         "RWF": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Reliability Weighting Factor."
         },
         "DET": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
-          "description": "Dread Exposure Threshold at this tile."
-        },
-        "HVF": {
-          "type": "object",
-          "description": "Haunt Vector Field at this tile.",
-          "required": [
-            "mag"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "mag": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 10.0,
-              "description": "Magnitude of haunt pressure."
-            },
-            "dir": {
-              "type": "string",
-              "description": "Optional direction encoding (engine-specific)."
-            }
-          }
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Dread Exposure Threshold."
         },
         "LSG": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Liminal Stress Gradient."
         },
         "SHCI": {
           "type": "number",
-          "minimum": 0.0,
-          "maximum": 10.0,
+          "minimum": 0,
+          "maximum": 10,
           "description": "Spectral-History Coupling Index."
         },
+        "HVF": {
+          "type": "object",
+          "required": ["mag"],
+          "additionalProperties": false,
+          "properties": {
+            "mag": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Haunt Vector Field magnitude."
+            },
+            "dir": {
+              "type": ["string", "null"],
+              "enum": [
+                "N",
+                "NE",
+                "E",
+                "SE",
+                "S",
+                "SW",
+                "W",
+                "NW",
+                "UP",
+                "DOWN",
+                "RADIAL",
+                null
+              ],
+              "description": "Optional compass/graph direction for HVF flow."
+            }
+          }
+        },
         "time_phase": {
-          "type": "string",
-          "description": "Local diegetic time phase when this Seed is eligible.",
-          "enum": [
-            "any",
-            "day",
-            "night",
-            "dusk",
-            "dawn",
-            "storm",
-            "anniversary_window"
-          ]
+          "type": "object",
+          "required": ["phase"],
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "type": "string",
+              "enum": [
+                "day",
+                "dusk",
+                "night",
+                "dawn",
+                "storm",
+                "anniversary_window",
+                "always"
+              ]
+            },
+            "window_minutes": {
+              "type": ["integer", "null"],
+              "minimum": 1,
+              "maximum": 1440,
+              "description": "Optional diegetic time window in minutes."
+            }
+          }
         }
       }
     },
+
     "metric_targets": {
       "type": "object",
-      "description": "Intended metric deltas and ambiguity band for this Seed.",
       "required": [
         "UEC_delta",
         "EMD_delta",
@@ -216,126 +244,124 @@
           "type": "number",
           "minimum": -1.0,
           "maximum": 1.0,
-          "description": "Target change in Uncertainty Engagement Coefficient."
+          "description": "Target shift in Uncertainty Engagement Coefficient."
         },
         "EMD_delta": {
           "type": "number",
           "minimum": -1.0,
           "maximum": 1.0,
-          "description": "Target change in Evidential Mystery Density."
+          "description": "Target shift in Evidential Mystery Density."
         },
         "STCI_delta": {
           "type": "number",
           "minimum": -1.0,
           "maximum": 1.0,
-          "description": "Target change in Safe-Threat Contrast Index."
+          "description": "Target shift in Safe-Threat Contrast Index."
         },
         "CDL_delta": {
           "type": "number",
           "minimum": -1.0,
           "maximum": 1.0,
-          "description": "Target change in Cognitive Dissonance Load."
+          "description": "Target shift in Cognitive Dissonance Load."
         },
         "ARR_min": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "description": "Minimum desired Ambiguous Resolution Ratio."
+          "description": "Minimum acceptable Ambiguous Resolution Ratio post-activation."
         },
         "ARR_max": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "description": "Maximum desired Ambiguous Resolution Ratio."
+          "description": "Maximum acceptable Ambiguous Resolution Ratio post-activation."
+        },
+        "max_session_contrib": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Optional cap on cumulative metric contribution per session to prevent over-saturation."
         }
-      },
-      "allOf": [
-        {
-          "properties": {
-            "ARR_min": {
-              "type": "number"
-            },
-            "ARR_max": {
-              "type": "number"
-            }
-          }
-        }
-      ]
+      }
     },
+
     "bundle_ref": {
       "type": "object",
-      "description": "Binding to a Black-Archivum invariant bundle.",
-      "required": [
-        "id",
-        "hash"
-      ],
+      "required": ["id", "hash"],
       "additionalProperties": false,
       "properties": {
         "id": {
           "type": "string",
-          "description": "Invariant bundle ID."
+          "pattern": "^ba_[a-z0-9]{16,32}$",
+          "description": "Black-Archivum bundle ID this Seed inherits from."
         },
         "hash": {
           "type": "string",
-          "description": "Content hash of the bundle JSON."
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of the referenced bundle at time of Seed creation."
         }
       }
     },
+
     "archiverecord_ids": {
-      "type": "array",
-      "description": "Optional list of archive record IDs that this Seed conceptually echoes.",
+      "type": ["array", "null"],
+      "description": "Optional array of archive record IDs this Seed conceptually echoes.",
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^ar_[a-z0-9._-]{8,64}$"
       }
     },
+
     "biome_profile_id": {
-      "type": "string",
-      "description": "Biome / style profile identifier bound to this Seed."
+      "type": ["string", "null"],
+      "pattern": "^bp_[a-z0-9._-]+$",
+      "description": "Link into biome/atmosphere/audio style system."
     },
+
     "persona_hooks": {
       "type": "object",
-      "description": "Hints for persona and entity systems.",
-      "required": [
-        "primary_modes"
-      ],
+      "required": ["primary_modes"],
       "additionalProperties": false,
       "properties": {
         "primary_modes": {
           "type": "array",
-          "description": "Preferred persona archetypes for this Seed.",
           "minItems": 1,
+          "maxItems": 3,
+          "description": "Primary persona modes aligned with Spectral-Foundry taxonomy.",
           "items": {
             "type": "string",
             "enum": [
               "archivist",
               "witness",
               "echo",
+              "threshold",
               "process",
-              "threshold"
+              "void"
             ]
           }
         },
         "shci_band": {
-          "type": "string",
-          "description": "Qualitative SHCI band for persona behavior.",
+          "type": ["string", "null"],
           "enum": [
             "reenactment",
             "echo",
-            "glitch"
-          ]
+            "glitch",
+            null
+          ],
+          "description": "Optional override for SHCI-driven behavioral constraints."
         },
         "allowed_entities": {
-          "type": "array",
-          "description": "Optional list of allowed entity/species/loop IDs.",
+          "type": ["array", "null"],
+          "description": "Optional IDs referencing persona/species/loop schemas.",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^ent_[a-z0-9._-]{8,64}$"
           }
         }
       }
     },
+
     "narrative_affordances": {
       "type": "object",
-      "description": "Narrative actions and evidence modes exposed by this Seed.",
       "required": [
         "clue_types",
         "player_actions",
@@ -345,41 +371,46 @@
       "properties": {
         "clue_types": {
           "type": "array",
-          "description": "Evidence types that may surface from this Seed.",
           "minItems": 1,
+          "maxItems": 5,
+          "description": "Evidence categories matching style DSL.",
           "items": {
             "type": "string",
             "enum": [
-              "bloodstained_object",
-              "disturbed_earth",
               "contradictory_record",
               "missing_person_reference",
               "spectral_testimony_fragment",
-              "empty_space_implication"
+              "environmental_anomaly",
+              "ritual_artifact",
+              "archival_gap",
+              "rumor_chain"
             ]
           }
         },
         "player_actions": {
           "type": "array",
-          "description": "Player verbs this Seed can meaningfully support.",
           "minItems": 1,
+          "maxItems": 6,
+          "description": "Verbs Director/Story can bind to mechanics.",
           "items": {
             "type": "string",
             "enum": [
               "observe",
               "document",
-              "approach",
               "evade",
               "follow_sound",
               "wait",
-              "refuse"
+              "refuse",
+              "interact",
+              "flee"
             ]
           }
         },
         "resolution_modes": {
           "type": "array",
-          "description": "Resolution affordances shaping ARR and CDL.",
           "minItems": 1,
+          "maxItems": 2,
+          "description": "Controls ARR and CDL interplay post-activation.",
           "items": {
             "type": "string",
             "enum": [
@@ -391,14 +422,37 @@
           }
         },
         "loop_id": {
-          "type": "string",
-          "description": "Optional spectral loop identifier this Seed belongs to."
+          "type": ["string", "null"],
+          "pattern": "^loop_[a-z0-9._-]+$",
+          "description": "Optional ID if this Seed is a node in a Spectral Loop contract."
         }
       }
     },
+
+    "stage_graph": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Optional adjacency hints for multi-Seed arc planning.",
+      "properties": {
+        "previous": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9._-]+$"
+          }
+        },
+        "next": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9._-]+$"
+          }
+        }
+      }
+    },
+
     "engine_profile": {
       "type": "object",
-      "description": "Runtime constraints for triggering this Seed.",
       "required": [
         "trigger_cooldown_sec",
         "max_triggers_per_session"
@@ -406,62 +460,90 @@
       "additionalProperties": false,
       "properties": {
         "trigger_cooldown_sec": {
-          "type": "number",
-          "minimum": 0.0,
-          "description": "Minimum seconds between triggers in the same session."
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600,
+          "description": "Minimum seconds between activations of this Seed."
         },
         "max_triggers_per_session": {
           "type": "integer",
-          "minimum": 0,
-          "description": "Maximum activations allowed per session."
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Maximum times this Seed can fire per player session."
         },
         "required_player_state": {
-          "type": "object",
-          "description": "Optional constraints on player metrics for this Seed to fire.",
+          "type": ["object", "null"],
           "additionalProperties": false,
+          "description": "Optional constraints on player metrics for Seed eligibility.",
           "properties": {
-            "min_DET": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 10.0
+            "DET_min": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
             },
-            "max_DET": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 10.0"
+            "DET_max": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
             },
-            "min_UEC": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 1.0
+            "CDL_min": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
             },
-            "max_UEC": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 1.0
+            "CDL_max": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
+            },
+            "UEC_min": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
+            },
+            "UEC_max": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
             }
           }
         },
         "ls_thresholds": {
-          "type": "array",
-          "description": "Optional liminal thresholds (doors, borders) where Seed may manifest.",
-          "items": {
-            "type": "string"
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "description": "Liminal thresholds where HVF/LSG must exceed values for manifestation.",
+          "properties": {
+            "HVF_min": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
+            },
+            "LSG_min": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 10
+            }
           }
         }
       }
     },
+
     "explicit_violence_forbidden": {
       "type": "boolean",
-      "description": "Must be true in Tier-1 GitHub cores."
+      "const": true,
+      "description": "Must be true at Tier-1; forbids explicit violent content in Seed manifestations."
     },
+
     "charter_profile_id": {
-      "type": "string",
-      "description": "Optional ID of the Charter profile used to validate this Seed."
+      "type": ["string", "null"],
+      "pattern": "^cp_[a-z0-9._-]+$",
+      "description": "Optional link to validated Charter profile/ruleset."
     },
+
     "validator_signature": {
       "type": "string",
-      "description": "Optional signature or commit hash of the last validator."
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Git commit hash or signer ID for validation attestation."
     }
   }
 }
