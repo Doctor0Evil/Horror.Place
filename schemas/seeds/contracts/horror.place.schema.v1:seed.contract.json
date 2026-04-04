@@ -1,0 +1,166 @@
+{
+  "repo-target": "Horror.Place/schemas/seeds",
+  "file-destination": "/schemas/seeds/contracts/",
+  "filename": "horror.place.schema.v1:seed.contract.json",
+  "content": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.Horror.Place/seeds/contracts/seedcontractv1.json",
+    "title": "Horror.Place Seed Contract v1",
+    "description": "Schema for seed-level contracts used in procedural content generation. Extends contractCard with PCG-specific fields.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["contractCard", "pcgconfig"],
+    "properties": {
+      "contractCard": {
+        "$ref": "../core/contracts/coreschemascontractcardv1.json"
+      },
+      "pcgconfig": {
+        "type": "object",
+        "required": ["hotspots", "placementrules", "metricbindings"],
+        "properties": {
+          "hotspots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "type", "weight", "invariantbias"],
+              "properties": {
+                "id": {"type": "string", "pattern": "^hotspot_[a-z0-9_]+$"},
+                "type": {
+                  "enum": [
+                    "LSG_threshold",
+                    "AOS_peak",
+                    "CIC_cluster",
+                    "RRM_chokepoint",
+                    "DET_trigger",
+                    "SHCI_manifestation"
+                  ]
+                },
+                "weight": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "invariantbias": {
+                  "type": "object",
+                  "properties": {
+                    "CIC": {"type": "number", "minimum": -0.2, "maximum": 0.2},
+                    "AOS": {"type": "number", "minimum": -0.2, "maximum": 0.2},
+                    "RRM": {"type": "number", "minimum": -0.2, "maximum": 0.2},
+                    "LSG": {"type": "number", "minimum": -0.2, "maximum": 0.2},
+                    "DET": {"type": "number", "minimum": -1.0, "maximum": 1.0},
+                    "SHCI": {"type": "number", "minimum": -0.2, "maximum": 0.2}
+                  }
+                }
+              }
+            }
+          },
+          "placementrules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["assettype", "condition", "effect"],
+              "properties": {
+                "assettype": {
+                  "enum": [
+                    "ambiguous_landmark",
+                    "narrow_bend",
+                    "unreliable_audio",
+                    "almost_event_chain",
+                    "spectral_residual",
+                    "resource_scarcity_node"
+                  ]
+                },
+                "condition": {
+                  "type": "object",
+                  "properties": {
+                    "invariant_threshold": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "min": {"type": "number"},
+                          "max": {"type": "number"}
+                        }
+                      }
+                    },
+                    "proximity_to_hotspot": {"type": "string"},
+                    "player_state": {
+                      "enum": ["any", "low_resources", "high_sanity", "night_cycle"]
+                    }
+                  }
+                },
+                "effect": {
+                  "type": "object",
+                  "properties": {
+                    "metric_adjustment": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "delta": {"type": "number"},
+                          "duration_seconds": {"type": "number"}
+                        }
+                      }
+                    },
+                    "trigger_type": {
+                      "enum": ["on_enter", "on_timer", "on_player_action", "random_weighted"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metricbindings": {
+            "type": "object",
+            "description": "Maps contract metrics to PCG system parameters",
+            "properties": {
+              "UEC": {
+                "type": "object",
+                "properties": {
+                  "ambiguity_source_density": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                  "clue_distribution_pattern": {
+                    "enum": ["clustered", "scattered", "linear_progression", "hidden_layers"]
+                  }
+                }
+              },
+              "EMD": {
+                "type": "object",
+                "properties": {
+                  "unresolved_clue_count": {"type": "integer", "minimum": 0, "maximum": 20},
+                  "partial_explanation_ratio": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+                }
+              },
+              "STCI": {
+                "type": "object",
+                "properties": {
+                  "safe_zone_duration_min": {"type": "number"},
+                  "threat_emergence_variance": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+                }
+              },
+              "CDL": {
+                "type": "object",
+                "properties": {
+                  "conflicting_narrative_sources": {"type": "integer", "minimum": 0, "maximum": 5},
+                  "plausibility_spread": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+                }
+              },
+              "ARR": {
+                "type": "object",
+                "properties": {
+                  "partial_resolution_count": {"type": "integer"},
+                  "full_resolution_cap": {"type": "integer"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "deadledgerref": {
+        "type": "string",
+        "pattern": "^deadledger://region/[a-z0-9_-]+/ledger-v[0-9]+$",
+        "description": "Required anchor to regional ledger for history-aware generation."
+      },
+      "version": {
+        "type": "string",
+        "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
+        "default": "v1.0.0"
+      }
+    }
+  }
+}
