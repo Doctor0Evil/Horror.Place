@@ -1,0 +1,198 @@
+{
+  "repo-target": "Horror.Place/core/schemas/telemetry",
+  "file-destination": "/schemas/telemetry/",
+  "filename": "telemetry.schema.v1.json",
+  "content": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema.Horror.Place/core/schemas/telemetry/eventsv1.json",
+    "title": "Horror.Place Telemetry Events v1",
+    "description": "Schema for logging editor interactions and playtest telemetry. Enables research loop: prompt → contract → telemetry → model refinement.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["event_type", "timestamp", "session_context"],
+    "properties": {
+      "event_type": {
+        "type": "string",
+        "enum": [
+          "editor_prompt_submitted",
+          "contract_card_proposed",
+          "contract_card_edited",
+          "contract_card_accepted",
+          "artifact_generated",
+          "drift_warning_issued",
+          "drift_corrected",
+          "playtest_metric_sample",
+          "player_behavior_event",
+          "failure_case_flagged"
+        ]
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "session_context": {
+        "type": "object",
+        "required": ["session_id", "user_id", "project_id", "editor_version"],
+        "properties": {
+          "session_id": {"type": "string"},
+          "user_id": {"type": "string"},
+          "project_id": {"type": "string"},
+          "editor_version": {"type": "string"},
+          "ai_agent_id": {"type": "string"}
+        }
+      },
+      "contract_card_snapshot": {
+        "type": "object",
+        "description": "Full contractCard at time of event (for editor events)",
+        "properties": {
+          "title": {"type": "string"},
+          "styleid": {"type": "string"},
+          "invariants": {"$ref": "#/$defs/invariants"},
+          "metrics": {"$ref": "#/$defs/metrics"},
+          "deadledgerref": {"type": "string"}
+        }
+      },
+      "editor_event_data": {
+        "type": "object",
+        "properties": {
+          "prompt_text": {"type": "string"},
+          "ai_response_time_ms": {"type": "integer"},
+          "designer_edits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["field", "old_value", "new_value", "edit_reason"],
+              "properties": {
+                "field": {"type": "string"},
+                "old_value": true,
+                "new_value": true,
+                "edit_reason": {"type": "string"}
+              }
+            }
+          },
+          "acceptance_action": {"enum": ["accepted", "modified", "rejected"]}
+        }
+      },
+      "playtest_event_data": {
+        "type": "object",
+        "properties": {
+          "player_id_hash": {"type": "string"},
+          "seed_id": {"type": "string"},
+          "region_id": {"type": "string"},
+          "metric_samples": {
+            "type": "object",
+            "properties": {
+              "UEC": {"$ref": "#/$defs/metric_sample"},
+              "EMD": {"$ref": "#/$defs/metric_sample"},
+              "STCI": {"$ref": "#/$defs/metric_sample"},
+              "CDL": {"$ref": "#/$defs/metric_sample"},
+              "ARR": {"$ref": "#/$defs/metric_sample"}
+            }
+          },
+          "behavior_markers": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "backtracking",
+                "door_hesitation",
+                "evidence_inspection_time",
+                "resource_hoarding",
+                "panic_movement",
+                "safe_zone_loitering"
+              ]
+            }
+          },
+          "session_duration_seconds": {"type": "integer"},
+          "completion_state": {"enum": ["abandoned", "completed", "timeout"]}
+        }
+      },
+      "failure_case_data": {
+        "type": "object",
+        "properties": {
+          "failure_type": {
+            "enum": ["low_UEC", "high_CDL_burnout", "confusion", "frustration", "narrative_disconnect"]
+          },
+          "contract_card_at_failure": {"$ref": "#/properties/contract_card_snapshot"},
+          "telemetry_anomalies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["metric", "observed_value", "expected_band"],
+              "properties": {
+                "metric": {"type": "string"},
+                "observed_value": {"type": "number"},
+                "expected_band": {"$ref": "#/$defs/band01"}
+              }
+            }
+          },
+          "recommended_contract_adjustments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["field", "suggested_delta", "confidence"],
+              "properties": {
+                "field": {"type": "string"},
+                "suggested_delta": {"type": "number"},
+                "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            }
+          }
+        }
+      },
+      "research_metadata": {
+        "type": "object",
+        "properties": {
+          "study_id": {"type": "string"},
+          "hypothesis_tag": {"type": "string"},
+          "control_group": {"type": "boolean"},
+          "data_retention_policy": {"enum": ["anonymized", "aggregated_only", "full_audit"]}
+        }
+      }
+    },
+    "$defs": {
+      "invariants": {
+        "type": "object",
+        "properties": {
+          "CIC": {"type": "number"},
+          "AOS": {"type": "number"},
+          "RRM": {"type": "number"},
+          "LSG": {"type": "number"},
+          "DET": {"type": "number"},
+          "SHCI": {"type": "number"}
+        }
+      },
+      "metrics": {
+        "type": "object",
+        "properties": {
+          "UEC": {"$ref": "#/$defs/band01"},
+          "EMD": {"$ref": "#/$defs/band01"},
+          "STCI": {"$ref": "#/$defs/band01"},
+          "CDL": {"$ref": "#/$defs/band01"},
+          "ARR": {"$ref": "#/$defs/band01"}
+        }
+      },
+      "band01": {
+        "type": "array",
+        "items": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "metric_sample": {
+        "type": "object",
+        "required": ["value", "timestamp", "context"],
+        "properties": {
+          "value": {"type": "number"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "context": {
+            "type": "object",
+            "properties": {
+              "player_location": {"type": "string"},
+              "game_time_cycle": {"enum": ["day", "dusk", "night", "dawn"]},
+              "active_events": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    }
+  }
+}
