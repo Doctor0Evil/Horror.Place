@@ -5,6 +5,9 @@
     "requires_hooks": [
       "on_player_spawn",
       "on_tick"
-    ]
+    ],
+    "description": "Action-horror hybrid mood enforcing spawn/battlefront/liminal atmospheric integrity.",
+    "tier": "Tier-1",
+    "scope": ["multiplayer", "extraction_shooter", "coop_horror", "film_previz"]
   }
 }
