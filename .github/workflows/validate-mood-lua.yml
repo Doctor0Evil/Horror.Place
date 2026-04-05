@@ -1,0 +1,31 @@
+name: Validate Mood Lua Modules
+
+on:
+  push:
+    paths:
+      - "moods/**.lua"
+      - "registry/moods.json"
+      - "scripts/mood_lint.lua"
+  pull_request:
+    paths:
+      - "moods/**.lua"
+      - "registry/moods.json"
+      - "scripts/mood_lint.lua"
+
+jobs:
+  lint-mood-lua:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.4"
+
+      - name: Install LuaRocks and dkjson
+        uses: leafo/gh-actions-luarocks@v4
+      - run: luarocks install dkjson
+
+      - name: Run mood linter
+        run: lua scripts/mood_lint.lua registry/moods.json
