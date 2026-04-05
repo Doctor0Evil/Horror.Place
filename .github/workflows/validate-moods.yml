@@ -1,32 +1,202 @@
-name: Validate Mood Contracts
+# .github/workflows/validate-moods.yml
+# Horror.Place CI: Validate Mood JSON Contracts
+# Uses JSON Schema (ajv) to validate all mood.*.json files against
+# core/schemas/mood_contract_v1.json for structural integrity.
+
+name: Validate Mood JSON Contracts
 
 on:
   push:
+    branches: [ main, develop ]
     paths:
-      - "moods/mood.*.json"
-      - "schemas/mood_contract.schema.json"
+      - 'moods/mood.*.json'
+      - 'core/schemas/mood_contract_v1.json'
+      - 'registry/moods.json'
   pull_request:
+    branches: [ main ]
     paths:
-      - "moods/mood.*.json"
-      - "schemas/mood_contract.schema.json"
+      - 'moods/mood.*.json'
+      - 'core/schemas/mood_contract_v1.json'
+      - 'registry/moods.json'
+  workflow_dispatch:
+    inputs:
+      strict:
+        description: 'Enable strict mode (fail on warnings)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_VERSION: "20"
+  AJV_VERSION: "8.12.0"
 
 jobs:
-  validate-moods:
+  validate-schema:
+    name: Validate Schema Integrity
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node
+      
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
       - name: Install ajv-cli
-        run: npm install -g ajv-cli
-
-      - name: Validate mood contracts
+        run: npm install -g ajv-cli@${{ env.AJV_VERSION }}
+      
+      - name: Validate schema file itself
         run: |
+          # Ensure the schema is valid JSON Schema draft 2020-12
           ajv validate \
-            -s schemas/mood_contract.schema.json \
-            -d 'moods/mood.*.json'
+            -m https://json-schema.org/draft/2020-12/schema \
+            -s core/schemas/mood_contract_v1.json \
+            -d core/schemas/mood_contract_v1.json \
+            --verbose \
+            --errors text
+      
+      - name: Cache schema for downstream jobs
+        uses: actions/cache@v4
+        with:
+          path: ~/.ajv-cache
+          key: ${{ runner.os }}-ajv-schema-${{ hashFiles('core/schemas/mood_contract_v1.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ajv-schema-
+
+  validate-contracts:
+    name: Validate Mood Contracts
+    runs-on: ubuntu-latest
+    needs: validate-schema
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # Process contracts in parallel batches if many exist
+        batch: [1]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli@${{ env.AJV_VERSION }}
+      
+      - name: Restore schema cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ajv-cache
+          key: ${{ runner.os }}-ajv-schema-${{ hashFiles('core/schemas/mood_contract_v1.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ajv-schema-
+      
+      - name: Validate all mood contracts against schema
+        run: |
+          # Find all mood.*.json files and validate each
+          find moods/ -name 'mood.*.json' -print0 | while IFS= read -r -d '' file; do
+            echo "Validating: $file"
+            ajv validate \
+              -s core/schemas/mood_contract_v1.json \
+              -d "$file" \
+              --verbose \
+              --errors text \
+              ${{ github.event.inputs.strict == 'true' && '--strict' || '' }}
+          done
+      
+      - name: Generate validation report
+        if: always()
+        run: |
+          echo "## Mood Contract Validation Report" > validation-report.md
+          echo "" >> validation-report.md
+          echo "**Schema:** core/schemas/mood_contract_v1.json" >> validation-report.md
+          echo "**Validated:** $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> validation-report.md
+          echo "" >> validation-report.md
+          echo "### Files Checked" >> validation-report.md
+          find moods/ -name 'mood.*.json' -exec echo "- {}" \; >> validation-report.md
+      
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mood-validation-report-${{ github.run_number }}
+          path: validation-report.md
+          retention-days: 14
+      
+      - name: Comment on PR with summary
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const runId = process.env.GITHUB_RUN_ID;
+            const repo = context.repo;
+            
+            // Count validated files
+            const { execSync } = require('child_process');
+            let fileCount = 0;
+            try {
+              const output = execSync('find moods/ -name "mood.*.json" | wc -l', { encoding: 'utf8' });
+              fileCount = parseInt(output.trim()) || 0;
+            } catch (e) { /* ignore */ }
+            
+            let body = `### Mood Contract Validation\n\n`;
+            body += `**Schema:** \`core/schemas/mood_contract_v1.json\`\n`;
+            body += `**Files validated:** ${fileCount}\n\n`;
+            
+            if (status === 'success') {
+              body += '✅ All mood contracts passed schema validation.\n';
+            } else {
+              body += `❌ Schema validation failed. [View workflow run #${runId}](https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId})\n`;
+            }
+            body += `\n*Automatically generated by validate-moods.yml*`;
+            
+            await github.rest.issues.createComment({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: body
+            });
+
+  # Optional: Cross-reference check - ensure registry entries match actual files
+  registry-consistency:
+    name: Registry Consistency Check
+    runs-on: ubuntu-latest
+    needs: validate-contracts
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Check registry/file consistency
+        run: |
+          # Simple bash check: every path in registry/moods.json should exist
+          node -e '
+            const fs = require("fs");
+            const registry = JSON.parse(fs.readFileSync("registry/moods.json", "utf8"));
+            let errors = [];
+            for (const [id, entry] of Object.entries(registry)) {
+              if (entry.path && !fs.existsSync(entry.path)) {
+                errors.push(`Registry entry "${id}" references missing file: ${entry.path}`);
+              }
+            }
+            if (errors.length > 0) {
+              console.error("Registry consistency errors:");
+              errors.forEach(e => console.error("  -", e));
+              process.exit(1);
+            }
+            console.log("✓ Registry references are consistent with filesystem");
+          '
