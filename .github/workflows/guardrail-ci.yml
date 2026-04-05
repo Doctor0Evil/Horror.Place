@@ -1,0 +1,39 @@
+name: "Horror.Place Guardrail CI"
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'schemas/**/*.json'
+      - 'registry/**/*.ndjson'
+      - 'registry/**/*.json'
+      - 'core/**/*.json'
+      - 'core/**/*.ndjson'
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  # 1. Schema Validation
+  validate-schemas:
+    uses: Doctor0Evil/HorrorPlace-Constellation-Contracts/.github/workflows/schema-validate.reusable.yml@main
+    with:
+      schema_dir: '../HorrorPlace-Constellation-Contracts/schemas'
+      data_glob: '**/*.json'
+
+  # 2. Registry Lint
+  registry-lint:
+    uses: Doctor0Evil/HorrorPlace-Constellation-Contracts/.github/workflows/registry-lint.reusable.yml@main
+    with:
+      data_glob: 'registry/**/*.ndjson'
+      strict_unique_ids: true
+
+  # 3. Prism Envelope Lint
+  prism-envelope-lint:
+    uses: Doctor0Evil/HorrorPlace-Constellation-Contracts/.github/workflows/prism-envelope-lint.reusable.yml@main
+    with:
+      data_glob: '**/*.ai-envelope.json'
+
+  # 4. QPU Shard Lint
+  qpudatashard-lint:
+    uses: Doctor0Evil/HorrorPlace-Constellation-Contracts/.github/workflows/qpudatashard-lint.reusable.yml@main
+    with:
+      data_glob: '**/*.qpudatashard.ndjson'
