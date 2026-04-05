@@ -1,10 +1,13 @@
 -- engine/horrorinvariants.lua
 --
--- Lua API for the Horror$Place Invariant system.
+-- Lua API for the Horror$Place invariant system.
 -- This module provides a Lua interface to the Rust-based Spectral Library.
--- It allows other Lua scripts (e.g., surprisedirector.lua, trajectoryscare.lua)
--- to query regional invariants (CIC, MDI, AOS, etc.) and evaluate preconditions.
--- This assumes a mechanism exists to call the Rust functions (e.g., using mlua or a custom FFI).
+-- Other Lua scripts (e.g., surprisedirector.lua, trajectoryscare.lua)
+-- can use this to query regional invariants (CIC, MDI, AOS, etc.)
+-- and evaluate preconditions.
+-- Assumes a mechanism exists to call Rust functions (e.g., mlua or custom FFI).
+
+local H = {}
 
 -- Placeholder for the Rust Spectral Library instance (implementation depends on FFI setup)
 local spectral_lib_instance = nil
@@ -12,16 +15,10 @@ local spectral_lib_instance = nil
 -- Function to load the Rust library instance (implementation specific to FFI binding)
 local function init_rust_bindings()
     -- Example using mlua or similar:
-    -- local rust_module = require('horror_place_engine')
+    -- local rust_module = require("horror_place_engine")
     -- spectral_lib_instance = rust_module.get_spectral_library()
-    print("WARNING: Rust bindings for H. API not initialized.")
+    print("WARNING: Rust bindings for H API not initialized.")
 end
-
--- Initialize bindings on module load (this needs to be handled by the actual engine setup)
-init_rust_bindings()
-
--- The H. API namespace
-H = {}
 
 -- Helper function to safely call Rust functions (placeholder)
 local function call_rust_function(func_name, ...)
@@ -29,22 +26,38 @@ local function call_rust_function(func_name, ...)
         print(string.format("ERROR: Cannot call '%s', Rust bindings not ready.", func_name))
         return nil
     end
-    -- Example: return spectral_lib_instance[func_name](...)
+    -- Example:
+    -- return spectral_lib_instance[func_name](...)
     print(string.format("Simulating call to Rust: %s", func_name))
-    return 0.5 -- Placeholder return value
+    return {
+        CIC  = 0.5,
+        MDI  = 0.5,
+        AOS  = 0.5,
+        RRM  = 0.5,
+        FCF  = 0.5,
+        SPR  = 0.5,
+        RWF  = 0.5,
+        DET  = 0.5,
+        HVF  = 0.5,
+        LSG  = 0.5,
+        SHCI = 0.5,
+    }
 end
 
--- --- Core H. API Functions ---
+-- Initialize bindings on module load (actual engine can override or re-init)
+init_rust_bindings()
+
+-- --- Core H API Functions ---
 
 -- Query functions for individual invariants of a region
+
 function H.CIC(region_id)
-    -- Assumes a Rust function `get_region_invariants` exists and returns a table
     local invariants = call_rust_function("get_region_invariants", region_id)
     if invariants and type(invariants) == "table" then
         return invariants.CIC or 0.0
     else
         print("H.CIC: Failed to retrieve invariants or CIC not found for region: " .. tostring(region_id))
-        return 0.0 -- Default value if unavailable
+        return 0.0
     end
 end
 
@@ -152,22 +165,31 @@ end
 function H.get_all_invariants(region_id)
     local invariants = call_rust_function("get_region_invariants", region_id)
     if invariants and type(invariants) == "table" then
-        -- Return the table fetched from Rust, assuming it has all keys
         return invariants
     else
         print("H.get_all_invariants: Failed to retrieve invariants for region: " .. tostring(region_id))
         return {
-            CIC = 0.0, MDI = 0.0, AOS = 0.0, RRM = 0.0, FCF = 0.0,
-            SPR = 0.0, RWF = 0.0, DET = 0.0, HVF = 0.0, LSG = 0.0, SHCI = 0.0
+            CIC  = 0.0,
+            MDI  = 0.0,
+            AOS  = 0.0,
+            RRM  = 0.0,
+            FCF  = 0.0,
+            SPR  = 0.0,
+            RWF  = 0.0,
+            DET  = 0.0,
+            HVF  = 0.0,
+            LSG  = 0.0,
+            SHCI = 0.0,
         }
     end
 end
 
--- Function to evaluate a set of preconditions against a region's invariants
+-- Function to evaluate a set of preconditions against a region's invariants.
 -- precondition_table format: { CIC = {min = 0.8}, SPR = {min = 0.6, max = 0.9} }
 function H.evaluate_preconditions(region_id, precondition_table)
     if not precondition_table or type(precondition_table) ~= "table" then
-        print("H.evaluate_preconditions: Invalid precondition_table provided
+        print("H.evaluate_preconditions: Invalid precondition_table provided.")
+        return false
     end
 
     local region_invariants = H.get_all_invariants(region_id)
@@ -180,7 +202,7 @@ function H.evaluate_preconditions(region_id, precondition_table)
         local inv_value = region_invariants[inv_name]
         if inv_value == nil then
             print(string.format("H.evaluate_preconditions: Unknown invariant '%s' in precondition.", inv_name))
-            return false -- Fail if an unknown invariant is requested
+            return false
         end
 
         if thresholds.min and inv_value < thresholds.min then
@@ -190,7 +212,29 @@ function H.evaluate_preconditions(region_id, precondition_table)
             return false
         end
     end
+
     return true
 end
 
-print("H. API (Lua) loaded.")
+-- Convenience wrapper used by higher-level systems (PCG, Directors, AI)
+-- Returns invariants plus entertainment metrics if/when available.
+function H.region_metrics(region_id)
+    local inv = H.get_all_invariants(region_id)
+    -- Entertainment metrics would typically come from a separate module;
+    -- they are stubbed here for structure only.
+    return {
+        CIC  = inv.CIC,
+        RRM  = inv.RRM,
+        AOS  = inv.AOS,
+        HVF  = inv.HVF,
+        LSG  = inv.LSG,
+        DET  = inv.DET,
+        UEC  = 0.0,
+        EMD  = 0.0,
+        ARR  = 0.0,
+    }
+end
+
+print("H API (Lua) loaded.")
+
+return H
