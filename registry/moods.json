@@ -1,0 +1,10 @@
+{
+  "mood.dreadforge_resonance.v1": {
+    "path": "moods/mood.dreadforge_resonance.v1.json",
+    "lua_module": "moods.DreadForge_Resonance.Contract",
+    "requires_hooks": [
+      "on_player_spawn",
+      "on_tick"
+    ]
+  }
+}
