@@ -1,0 +1,32 @@
+name: Validate Mood Contracts
+
+on:
+  push:
+    paths:
+      - "moods/mood.*.json"
+      - "schemas/mood_contract.schema.json"
+  pull_request:
+    paths:
+      - "moods/mood.*.json"
+      - "schemas/mood_contract.schema.json"
+
+jobs:
+  validate-moods:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli
+
+      - name: Validate mood contracts
+        run: |
+          ajv validate \
+            -s schemas/mood_contract.schema.json \
+            -d 'moods/mood.*.json'
