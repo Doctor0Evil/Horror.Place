@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/core/schemas/mood_contract_v1",
+  "title": "Horror.Place Mood Contract",
+  "description": "Schema for mood.* contracts defining invariant bands and experience targets for atmospheric integrity enforcement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mood_id", "version", "tile_profiles", "experience_targets"],
+  "properties": {
+    "mood_id": {
+      "type": "string",
+      "pattern": "^mood\\.[a-z0-9_.]+\\.v[0-9]+$",
+      "description": "Canonical identifier for the mood contract (e.g., mood.dreadforge_resonance.v1)."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Semantic version of the mood contract."
+    },
+    "tile_profiles": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Array of invariant band definitions per tile class.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tile_class", "invariant_floor", "invariant_ceiling"],
+        "properties": {
+          "tile_class": {
+            "type": "string",
+            "enum": [
+              "battlefront_tile",
+              "spawn_tile",
+              "liminal_tile",
+              "sanctuary_tile",
+              "chokepoint_tile",
+              "exploration_tile"
+            ],
+            "description": "Classification of the tile for invariant targeting."
+          },
+          "invariant_floor": {
+            "type": "object",
+            "description": "Minimum acceptable values for invariants in this tile class.",
+            "additionalProperties": false,
+            "properties": {
+              "CIC": { "type": "number", "minimum": 0, "maximum": 1 },
+              "MDI": { "type": "number", "minimum": 0, "maximum": 1 },
+              "AOS": { "type": "number", "minimum": 0, "maximum": 1 },
+              "RRM": { "type": "number", "minimum": 0, "maximum": 1 },
+              "FCF": { "type": "number", "minimum": 0, "maximum": 1 },
+              "SPR": { "type": "number", "minimum": 0, "maximum": 1 },
+              "SHCI": { "type": "number", "minimum": 0, "maximum": 1 },
+              "LSG": { "type": "number", "minimum": 0, "maximum": 1 },
+              "RWF": { "type": "number", "minimum": 0, "maximum": 1 },
+              "HVF_mag": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          },
+          "invariant_ceiling": {
+            "type": "object",
+            "description": "Maximum acceptable values for invariants in this tile class.",
+            "additionalProperties": false,
+            "properties": {
+              "CIC": { "type": "number", "minimum": 0, "maximum": 1 },
+              "MDI": { "type": "number", "minimum": 0, "maximum": 1 },
+              "AOS": { "type": "number", "minimum": 0, "maximum": 1 },
+              "RRM": { "type": "number", "minimum": 0, "maximum": 1 },
+              "FCF": { "type": "number", "minimum": 0, "maximum": 1 },
+              "SPR": { "type": "number", "minimum": 0, "maximum": 1 },
+              "SHCI": { "type": "number", "minimum": 0, "maximum": 1 },
+              "LSG": { "type": "number", "minimum": 0, "maximum": 1 },
+              "RWF": { "type": "number", "minimum": 0, "maximum": 1 },
+              "HVF_mag": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "experience_targets": {
+      "type": "object",
+      "description": "Target bands for player-experience metrics under this mood.",
+      "additionalProperties": false,
+      "properties": {
+        "UEC": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "EMD": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "STCI": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "CDL": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "ARR": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    }
+  }
+}
