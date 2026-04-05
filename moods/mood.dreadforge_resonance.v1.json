@@ -1,0 +1,62 @@
+{
+  "mood_id": "mood.dreadforge_resonance.v1",
+  "version": "1.0.0",
+  "description": "DreadForge_Resonance: Enforces atmospheric integrity for action-horror hybrids by binding spawns and engagement zones to geo-historical invariants.",
+  "tile_profiles": [
+    {
+      "tile_class": "spawn_tile",
+      "description": "Team spawns, forward bases, insertion zones. Must feel haunted by past conflict.",
+      "invariant_floor": {
+        "CIC": 0.60,
+        "LSG": 0.65,
+        "HVF_mag": 0.40,
+        "RRM": 0.40,
+        "SHCI": 0.50
+      },
+      "invariant_ceiling": {
+        "CIC": 1.00,
+        "LSG": 1.00,
+        "HVF_mag": 1.00,
+        "RRM": 0.90,
+        "SHCI": 0.90
+      }
+    },
+    {
+      "tile_class": "battlefront_tile",
+      "description": "Front lines, chokepoints, dug-in positions. High trauma imprint required.",
+      "invariant_floor": {
+        "CIC": 0.70,
+        "HVF_mag": 0.50,
+        "SPR": 0.60,
+        "DET": 0.55
+      },
+      "invariant_ceiling": {
+        "CIC": 1.00,
+        "HVF_mag": 1.00,
+        "SPR": 0.95,
+        "DET": 0.95
+      }
+    },
+    {
+      "tile_class": "liminal_tile",
+      "description": "Corridors, stairwells, bridges, breach doors. High threshold stress enforced.",
+      "invariant_floor": {
+        "LSG": 0.75,
+        "AOS": 0.55,
+        "MDI": 0.50
+      },
+      "invariant_ceiling": {
+        "LSG": 1.00,
+        "AOS": 1.00,
+        "MDI": 0.95
+      }
+    }
+  ],
+  "experience_targets": {
+    "UEC":  { "min": 0.55, "max": 0.85, "description": "Maintain uncertainty; players should rarely feel fully safe." },
+    "EMD":  { "min": 0.60, "max": 0.90, "description": "Clues hint at deeper structure without full resolution." },
+    "STCI": { "min": 0.55, "max": 0.80, "description": "Threat vs safety remains readable; punish overconfidence, not comprehension." },
+    "CDL":  { "min": 0.65, "max": 0.90, "description": "Moderate cognitive load to avoid overwhelm during sustained firefights." },
+    "ARR":  { "min": 0.75, "max": 1.00, "description": "Most mysteries remain ambiguous; the battlefield is never fully solved." }
+  }
+}
