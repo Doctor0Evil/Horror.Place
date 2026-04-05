@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/nightwhispers-zone-v1.json",
+  "title": "NightWhispers Zone View-Layer Schema v1",
+  "description": "Zone projection over invariant bundles and Seed contracts. Read-only view; constructed at runtime via H.zone_view(). No raw horror content.",
+  "type": "object",
+  "required": [
+    "id",
+    "region_id",
+    "invariant_ref",
+    "mood_channels",
+    "rumor_bias_tags",
+    "bci_calibration",
+    "schemaref"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][a-zA-Z0-9]*$",
+      "description": "Stable Zone identifier; aligns with registry/zones.json"
+    },
+    "region_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "description": "Primary region key for Black-Archivum bundle resolution"
+    },
+    "tile_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{2,63}$"
+      },
+      "description": "Optional fine-grained tile anchors for sub-region invariant resolution",
+      "default": []
+    },
+    "invariant_ref": {
+      "type": "string",
+      "pattern": "^git@github\\.com:Doctor0Evil/HorrorPlace-Black-Archivum\\.git#contracts/invariant_bundles/[a-z][a-z0-9_]{2,63}\\.json$",
+      "description": "git@ URI to canonical invariant bundle in Black-Archivum"
+    },
+    "mood_channels": {
+      "type": "object",
+      "required": ["fog", "rain", "light", "rumor_intensity"],
+      "additionalProperties": false,
+      "properties": {
+        "fog": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Environmental occlusion driver; influences UEC, STCI"
+        },
+        "rain": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Sensory interference driver; influences UEC, EMD"
+        },
+        "light": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Safety contrast driver; influences STCI, CDL"
+        },
+        "rumor_intensity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Direct input to rumor weight and ARR; influences CIC, UEC"
+        }
+      }
+    },
+    "rumor_bias_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{2,31}$"
+      },
+      "description": "Tags that bias RumorPool seeding toward compatible invariant profiles",
+      "default": []
+    },
+    "bci_calibration": {
+      "type": "object",
+      "required": ["target_arousal", "target_valence", "artifact_sensitivity"],
+      "additionalProperties": false,
+      "properties": {
+        "target_arousal": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Lab prior for target arousal; validated by Neural-Resonance-Lab"
+        },
+        "target_valence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Lab prior for target valence; validated by Neural-Resonance-Lab"
+        },
+        "artifact_sensitivity": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Weight for EEG artifact rejection in BCI processing"
+        }
+      }
+    },
+    "schemaref": {
+      "type": "string",
+      "const": "schema://Horror.Place/nightwhispers-zone-v1.json",
+      "description": "Canonical schema URI for validation"
+    }
+  }
+}
