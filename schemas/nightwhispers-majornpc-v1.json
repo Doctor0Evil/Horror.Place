@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://Horror.Place/nightwhispers-majornpc-v1.json",
+  "title": "NightWhispers MajorNpc View-Layer Schema v1",
+  "description": "MajorNpc projection over persona contracts and metric influence vectors. Read-only view; constructed at runtime via H.npc_view(). No raw horror content.",
+  "type": "object",
+  "required": [
+    "id",
+    "persona_contract_ref",
+    "zone_id",
+    "role_tags",
+    "personality_base",
+    "rumor_tags",
+    "bci_calibration",
+    "schemaref"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][a-zA-Z0-9]*$",
+      "description": "Stable MajorNpc identifier; aligns with registry/personas.json"
+    },
+    "persona_contract_ref": {
+      "type": "string",
+      "pattern": "^git@github\\.com:Doctor0Evil/HorrorPlace-Constellation-Contracts\\.git#contracts/persona_contract_v1\\.json#[A-Z][a-zA-Z0-9]*$",
+      "description": "git@ URI to canonical persona contract in Constellation-Contracts"
+    },
+    "zone_id": {
+      "type": "string",
+      "pattern": "^[A-Z][a-zA-Z0-9]*$",
+      "description": "Primary zone association for routing presence and rumors"
+    },
+    "legend_id": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Z][a-zA-Z0-9]*$",
+      "description": "Optional link to UrbanLegendMetaQuest contract",
+      "default": null
+    },
+    "role_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["questgiver", "antagonist", "tragic", "predator", "witness", "archivist", "echo", "threshold"]
+      },
+      "description": "Coarse semantic roles mapped to metric influence vectors",
+      "default": []
+    },
+    "personality_base": {
+      "type": "object",
+      "required": ["trust", "fear", "intrigue", "horror"],
+      "additionalProperties": false,
+      "properties": {
+        "trust": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Trust seed; influences STCI, CDL in interactions"
+        },
+        "fear": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Fear seed; influences UEC, EMD in interactions"
+        },
+        "intrigue": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Intrigue seed; influences EMD, ARR in interactions"
+        },
+        "horror": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Horror seed; influences CIC, DET in interactions"
+        }
+      }
+    },
+    "rumor_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{2,31}$"
+      },
+      "description": "Tags the NPC can seed, respond to, or resolve in RumorPool",
+      "default": []
+    },
+    "bci_calibration": {
+      "type": "object",
+      "required": ["social_threat", "uncanny_factor", "recommended_eeg_band_focus"],
+      "additionalProperties": false,
+      "properties": {
+        "social_threat": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Lab prior for social anxiety validation; influences STCI, CDL"
+        },
+        "uncanny_factor": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Lab prior for uncanny valley effects; validated via EEG/EDA"
+        },
+        "recommended_eeg_band_focus": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["delta", "theta", "alpha", "beta", "gamma"]
+          },
+          "description": "EEG bands labs should prioritize when validating this NPC",
+          "default": ["theta", "beta"]
+        }
+      }
+    },
+    "schemaref": {
+      "type": "string",
+      "const": "schema://Horror.Place/nightwhispers-majornpc-v1.json",
+      "description": "Canonical schema URI for validation"
+    }
+  }
+}
