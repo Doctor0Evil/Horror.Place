@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/schemas/mood_contract.schema.json",
+  "title": "Horror$Place Mood Contract",
+  "description": "Schema for mood.* contracts defining invariant and experience target bands.",
+  "type": "object",
+  "required": ["mood_id"],
+  "properties": {
+    "mood_id": {
+      "type": "string",
+      "pattern": "^mood\\.[a-z0-9_\\.]+\\.v[0-9]+$"
+    },
+    "targets": {
+      "type": "object",
+      "description": "Invariant target bands keyed by tile/region role (e.g., battlefront_tile, spawn_tile, liminal_tile).",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "CIC": { "$ref": "#/$defs/range01" },
+          "MDI": { "$ref": "#/$defs/range01" },
+          "AOS": { "$ref": "#/$defs/range01" },
+          "RRM": { "$ref": "#/$defs/range01" },
+          "FCF": { "$ref": "#/$defs/range01" },
+          "SPR": { "$ref": "#/$defs/range01" },
+          "SHCI": { "$ref": "#/$defs/range01" },
+          "LSG": { "$ref": "#/$defs/range01" },
+          "DET": { "$ref": "#/$defs/range01" },
+          "RWF": { "$ref": "#/$defs/range01" },
+          "HVF": {
+            "type": "object",
+            "properties": {
+              "mag": { "$ref": "#/$defs/range01" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "experience_targets": {
+      "type": "object",
+      "description": "Recommended entertainment metric bands for this mood.",
+      "properties": {
+        "UEC": { "$ref": "#/$defs/range01" },
+        "EMD": { "$ref": "#/$defs/range01" },
+        "STCI": { "$ref": "#/$defs/range01" },
+        "CDL": { "$ref": "#/$defs/range01" },
+        "ARR": { "$ref": "#/$defs/range01" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "range01": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
