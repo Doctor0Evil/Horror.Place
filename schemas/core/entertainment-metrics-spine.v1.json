@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/schemas/core/entertainment-metrics-spine.v1.json",
+  "title": "Entertainment Metrics Spine v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "UEC": { "type": "number" },
+    "ARR": { "type": "number" }
+  }
+}
