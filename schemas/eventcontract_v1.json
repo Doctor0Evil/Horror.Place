@@ -1,98 +1,244 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Horror$Place Event Contract Schema v1",
-  "description": "Schema for defining Surprise.Events! and Vanish.Dissipation! sequences, including triggers, required evidence, and metric impacts.",
-  "type": "object",
-  "properties": {
-    "event_id": {
-      "type": "string",
-      "description": "Unique identifier for the event contract.",
-      "pattern": "^[a-z0-9_-]+$"
-    },
-    "name": {
-      "type": "string",
-      "description": "Human-readable name for the event."
-    },
-    "description": {
-      "type": "string",
-      "description": "Brief description of the event's nature and occurrence."
-    },
-    "event_type": {
-      "type": "string",
-      "enum": ["Surprise.Event!", "Vanish.Dissipation!", "Other"],
-      "description": "Type of event, categorizing its core mechanic."
-    },
-    "tier": {
-      "type": "string",
-      "enum": ["standard", "mature", "research"],
-      "description": "Safety tier as defined by the Rivers of Blood Charter."
-    },
-    "trigger_conditions": {
-      "type": "array",
-      "description": "List of conditions that must be met for the event to activate (e.g., invariant IDs, player state).",
-      "items": {
-        "type": "string"
-      }
-    },
-    "required_evidence": {
-      "type": "array",
-      "description": "List of evidence types that must be present in the region or player's inventory for the event to be valid.",
-      "items": {
-        "type": "string"
-      }
-    },
-    "metrics_impact": {
-      "type": "object",
-      "description": "Defines the immediate impact this event has on entertainment metrics.",
-      "properties": {
-        "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-        "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-        "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-        "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-        "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
-      },
-      "additionalProperties": false
-    },
-    "duration_estimate_ms": {
-      "type": "integer",
-      "description": "Estimated duration of the event in milliseconds, for pacing calculations.",
-      "minimum": 0
-    },
-    "stage_sequence": {
-      "type": "array",
-      "description": "Ordered list of stages defining the event's progression.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "stage_name": { "type": "string" },
-          "stage_description": { "type": "string" },
-          "duration_ms": { "type": "integer", "minimum": 0 },
-          "metrics_modifiers": {
-            "type": "object",
-            "properties": {
-              "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-              "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-              "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-              "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
-              "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+  "ai_authoring_envelope": {
+    "targetRepo": "Horror.Place",
+    "targetPath": ["schemas/eventcontractv1.json"],
+    "schemaref": [
+      "schema://HorrorPlace-Constellation-Contracts/schemas/ai-authoring-envelope-v1.json"
+    ],
+    "tier": "public",
+    "intent": "Normalize legacy Horror$Place event contract into canonical eventcontractv1.json with invariant preconditions and metric impact hints.",
+    "aiauthoringcontract": "schema-migration-v1",
+    "agentProfileId": "horrorplace-schema-author",
+    "changeset": [
+      {
+        "path": "schemas/eventcontractv1.json",
+        "kind": "schema",
+        "schemaref": "https://json-schema.org/draft/2020-12/schema",
+        "content": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "schema://Horror.Place/eventcontractv1.json",
+          "title": "Horror.Place Event Contract v1",
+          "description": "Canonical contract for Surprise.Events! and Vanish.Dissipation! seeds. Defines event identity, machine-checkable invariant preconditions, metric impact hints, safety tier, and pacing stages.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "eventId",
+            "schemaref",
+            "name",
+            "summary",
+            "eventType",
+            "safetyTier",
+            "preconditions",
+            "metricImpactHints",
+            "durationEstimateMs",
+            "stageSequence"
+          ],
+          "properties": {
+            "eventId": {
+              "type": "string",
+              "pattern": "^event\\.[a-z0-9_\\-]+\\.v[0-9]+$",
+              "description": "Canonical stable identifier for the event contract."
             },
-            "additionalProperties": false
+            "schemaref": {
+              "type": "string",
+              "const": "schema://Horror.Place/eventcontractv1.json",
+              "description": "Self-referential canonical schema URI."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable name for the event."
+            },
+            "summary": {
+              "type": "string",
+              "description": "Short neutral summary of the event's nature; no explicit horror prose."
+            },
+            "eventType": {
+              "type": "string",
+              "enum": ["Surprise.Event!", "Vanish.Dissipation!", "Other"],
+              "description": "Type of event, categorizing its core mechanic."
+            },
+            "safetyTier": {
+              "type": "string",
+              "enum": ["public", "mature", "research"],
+              "description": "Safety tier as defined by the Rivers of Blood Charter."
+            },
+            "triggerConditions": {
+              "type": "array",
+              "description": "List of symbolic conditions for activation (invariant IDs, player state tags, region roles).",
+              "items": {
+                "type": "string"
+              }
+            },
+            "requiredEvidence": {
+              "type": "array",
+              "description": "Evidence types that must be present in the region or player's inventory for the event to be valid.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bundleref": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "uri"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^bundle\\.[a-z0-9_\\-]+\\.v[0-9]+$",
+                  "description": "Reference to invariant bundle in HorrorPlace-Black-Archivum."
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "Canonical git or HTTPS URI to the bundle manifest."
+                }
+              }
+            },
+            "preconditions": {
+              "type": "object",
+              "description": "Machine-checkable invariant thresholds required for this event to be eligible in a region.",
+              "additionalProperties": false,
+              "properties": {
+                "minCIC": { "$ref": "#/$defs/range01" },
+                "maxAOS": { "$ref": "#/$defs/range01" },
+                "minSPR": { "$ref": "#/$defs/range01" },
+                "minSHCI": { "$ref": "#/$defs/range01" },
+                "maxDET": { "$ref": "#/$defs/range010" },
+                "minLSG": { "$ref": "#/$defs/range01" }
+              }
+            },
+            "metricImpactHints": {
+              "type": "object",
+              "description": "Expected entertainment metric deltas or target bands when this event activates. Used for pacing and drift detection.",
+              "additionalProperties": false,
+              "properties": {
+                "UEC": { "$ref": "#/$defs/deltaHint" },
+                "EMD": { "$ref": "#/$defs/deltaHint" },
+                "STCI": { "$ref": "#/$defs/deltaHint" },
+                "CDL": { "$ref": "#/$defs/deltaHint" },
+                "ARR": { "$ref": "#/$defs/deltaHint" }
+              }
+            },
+            "intensityBand": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Thematic intensity band (aligned with DET 0–10 scale)."
+            },
+            "durationEstimateMs": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Estimated duration of the full event in milliseconds, for pacing calculations."
+            },
+            "stageSequence": {
+              "type": "array",
+              "description": "Ordered list of stages defining the event's progression.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["stageName", "stageSummary", "durationMs"],
+                "properties": {
+                  "stageName": { "type": "string" },
+                  "stageSummary": {
+                    "type": "string",
+                    "description": "Neutral description of what changes in this stage (no explicit horror prose)."
+                  },
+                  "durationMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "metricModifiers": {
+                    "type": "object",
+                    "description": "Per-stage metric deltas for fine-grained pacing control.",
+                    "additionalProperties": false,
+                    "properties": {
+                      "UEC": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+                      "EMD": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+                      "STCI": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+                      "CDL": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+                      "ARR": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+                    }
+                  }
+                }
+              }
+            },
+            "deadledgerref": {
+              "$ref": "#/$defs/deadledgerRef",
+              "description": "Required when intensityBand >= 8 or safetyTier is mature or research."
+            }
+          },
+          "$defs": {
+            "range01": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["value"],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0
+                }
+              }
+            },
+            "range010": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["value"],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 10.0
+                }
+              }
+            },
+            "deltaHint": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "minDelta": {
+                  "type": "number",
+                  "minimum": -1.0,
+                  "maximum": 1.0
+                },
+                "maxDelta": {
+                  "type": "number",
+                  "minimum": -1.0,
+                  "maximum": 1.0
+                },
+                "targetBand": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "minimum": 0.0,
+                      "maximum": 1.0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0.0,
+                      "maximum": 1.0
+                    }
+                  }
+                }
+              }
+            },
+            "deadledgerRef": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["proofEnvelopeId", "verifierRef", "circuitType"],
+              "properties": {
+                "proofEnvelopeId": { "type": "string" },
+                "verifierRef": { "type": "string" },
+                "circuitType": { "type": "string" },
+                "requiredProofs": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
           }
-        },
-        "required": ["stage_name", "stage_description", "duration_ms"]
+        }
       }
-    }
-  },
-  "required": [
-    "event_id",
-    "name",
-    "description",
-    "event_type",
-    "tier",
-    "trigger_conditions",
-    "required_evidence",
-    "metrics_impact",
-    "stage_sequence"
-  ],
-  "additionalProperties": false
+    ]
+  }
 }
