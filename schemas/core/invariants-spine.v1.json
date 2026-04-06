@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/schemas/core/invariants-spine.v1.json",
+  "title": "Invariants Spine v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "CIC": { "type": "number" },
+    "AOS": { "type": "number" }
+  }
+}
