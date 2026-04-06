@@ -1,210 +1,166 @@
 -- engine/horrorinvariants.lua
 --
--- Lua API for the Horror$Place invariant system.
--- This module provides a Lua interface to the Rust-based Spectral Library.
--- Other Lua scripts (e.g., surprisedirector.lua, trajectoryscare.lua)
--- can use this to query regional invariants (CIC, MDI, AOS, etc.)
--- and evaluate preconditions.
--- Assumes a mechanism exists to call Rust functions (e.g., mlua or custom FFI).
+-- Canonical Invariant Access API (H.*) for Horror.Place
+--
+-- Role:
+-- - Narrow surface for querying invariants (CIC, MDI, AOS, etc.)
+-- - Reads from data shaped by schemas/invariantsv1.json
+-- - Enforces canonical key names and ranges (DET clamped to 0–10)
+--
+-- Integration:
+-- - Engine core (C/Rust) populates region data or wires FFI callbacks.
+-- - Higher-level Lua (directors, PCG, moods) must always go through H.*
 
 local H = {}
 
--- Placeholder for the Rust Spectral Library instance (implementation depends on FFI setup)
-local spectral_lib_instance = nil
+----------------------------------------------------------------------
+-- Backing store and wiring
+----------------------------------------------------------------------
 
--- Function to load the Rust library instance (implementation specific to FFI binding)
-local function init_rust_bindings()
-    -- Example using mlua or similar:
-    -- local rust_module = require("horror_place_engine")
-    -- spectral_lib_instance = rust_module.get_spectral_library()
-    print("WARNING: Rust bindings for H API not initialized.")
+-- Internal data store populated by engine core or FFI callbacks.
+-- Structure: H._regions[region_id] = { CIC = 0.5, DET = 4.0, ... }
+H._regions = H._regions or {}
+
+-- Optional function hook for external lookup (e.g., Rust/FFI).
+-- Signature: external_region_lookup(region_id) -> table or nil
+H.external_region_lookup = H.external_region_lookup or nil
+
+----------------------------------------------------------------------
+-- Canonical invariant keys (must match invariants schema)
+----------------------------------------------------------------------
+
+H.Keys = {
+    CIC  = "CIC",
+    MDI  = "MDI",
+    AOS  = "AOS",
+    RRM  = "RRM",
+    FCF  = "FCF",
+    SPR  = "SPR",
+    RWF  = "RWF",
+    DET  = "DET",
+    HVF  = "HVF",
+    LSG  = "LSG",
+    SHCI = "SHCI"
+}
+
+----------------------------------------------------------------------
+-- Internal helpers
+----------------------------------------------------------------------
+
+local function resolve_region(region_id)
+    local region_data = H._regions[region_id]
+    if region_data then
+        return region_data
+    end
+
+    if H.external_region_lookup then
+        local from_external = H.external_region_lookup(region_id)
+        if type(from_external) == "table" then
+            H._regions[region_id] = from_external
+            return from_external
+        end
+    end
+
+    return nil
 end
 
--- Helper function to safely call Rust functions (placeholder)
-local function call_rust_function(func_name, ...)
-    if not spectral_lib_instance then
-        print(string.format("ERROR: Cannot call '%s', Rust bindings not ready.", func_name))
+local function clamp_det(value)
+    if value == nil then
         return nil
     end
-    -- Example:
-    -- return spectral_lib_instance[func_name](...)
-    print(string.format("Simulating call to Rust: %s", func_name))
-    return {
-        CIC  = 0.5,
-        MDI  = 0.5,
-        AOS  = 0.5,
-        RRM  = 0.5,
-        FCF  = 0.5,
-        SPR  = 0.5,
-        RWF  = 0.5,
-        DET  = 0.5,
-        HVF  = 0.5,
-        LSG  = 0.5,
-        SHCI = 0.5,
-    }
-end
-
--- Initialize bindings on module load (actual engine can override or re-init)
-init_rust_bindings()
-
--- --- Core H API Functions ---
-
--- Query functions for individual invariants of a region
-
-function H.CIC(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.CIC or 0.0
-    else
-        print("H.CIC: Failed to retrieve invariants or CIC not found for region: " .. tostring(region_id))
+    if value < 0.0 then
         return 0.0
     end
-end
-
-function H.MDI(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.MDI or 0.0
-    else
-        print("H.MDI: Failed to retrieve invariants or MDI not found for region: " .. tostring(region_id))
-        return 0.0
+    if value > 10.0 then
+        return 10.0
     end
+    return value
 end
 
-function H.AOS(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.AOS or 0.0
-    else
-        print("H.AOS: Failed to retrieve invariants or AOS not found for region: " .. tostring(region_id))
-        return 0.0
+----------------------------------------------------------------------
+-- Generic low-level getter
+----------------------------------------------------------------------
+
+function H.get_invariant(region_id, invariant_key)
+    if not H.Keys[invariant_key] then
+        error("H.get_invariant: unknown invariant key: " .. tostring(invariant_key))
     end
-end
 
-function H.RRM(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.RRM or 0.0
-    else
-        print("H.RRM: Failed to retrieve invariants or RRM not found for region: " .. tostring(region_id))
-        return 0.0
+    local region_data = resolve_region(region_id)
+    if not region_data then
+        return nil
     end
+
+    return region_data[H.Keys[invariant_key]]
 end
 
-function H.FCF(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.FCF or 0.0
-    else
-        print("H.FCF: Failed to retrieve invariants or FCF not found for region: " .. tostring(region_id))
-        return 0.0
-    end
-end
+----------------------------------------------------------------------
+-- Canonical API surface (per-invariant functions)
+----------------------------------------------------------------------
 
-function H.SPR(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.SPR or 0.0
-    else
-        print("H.SPR: Failed to retrieve invariants or SPR not found for region: " .. tostring(region_id))
-        return 0.0
-    end
-end
+function H.CIC(region_id)  return H.get_invariant(region_id, "CIC") end
+function H.MDI(region_id)  return H.get_invariant(region_id, "MDI") end
+function H.AOS(region_id)  return H.get_invariant(region_id, "AOS") end
+function H.RRM(region_id)  return H.get_invariant(region_id, "RRM") end
+function H.FCF(region_id)  return H.get_invariant(region_id, "FCF") end
+function H.SPR(region_id)  return H.get_invariant(region_id, "SPR") end
+function H.RWF(region_id)  return H.get_invariant(region_id, "RWF") end
+function H.HVF(region_id)  return H.get_invariant(region_id, "HVF") end
+function H.LSG(region_id)  return H.get_invariant(region_id, "LSG") end
+function H.SHCI(region_id) return H.get_invariant(region_id, "SHCI") end
 
-function H.RWF(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.RWF or 0.0
-    else
-        print("H.RWF: Failed to retrieve invariants or RWF not found for region: " .. tostring(region_id))
-        return 0.0
-    end
-end
-
+-- DET has a special 0–10 range; clamp here.
 function H.DET(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.DET or 0.0
-    else
-        print("H.DET: Failed to retrieve invariants or DET not found for region: " .. tostring(region_id))
-        return 0.0
-    end
+    local val = H.get_invariant(region_id, "DET")
+    return clamp_det(val)
 end
 
-function H.HVF(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.HVF or 0.0
-    else
-        print("H.HVF: Failed to retrieve invariants or HVF not found for region: " .. tostring(region_id))
-        return 0.0
+----------------------------------------------------------------------
+-- Bulk access and mutation hooks
+----------------------------------------------------------------------
+
+-- Return a shallow copy of all invariants for a region.
+function H.get_all(region_id)
+    local data = resolve_region(region_id)
+    if not data then
+        return {}
     end
+    local copy = {}
+    for k, v in pairs(data) do
+        copy[k] = v
+    end
+    return copy
 end
 
-function H.LSG(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.LSG or 0.0
-    else
-        print("H.LSG: Failed to retrieve invariants or LSG not found for region: " .. tostring(region_id))
-        return 0.0
+-- Engine core hook: replace all invariants for a region.
+function H._update_region(region_id, data_table)
+    if type(data_table) ~= "table" then
+        error("H._update_region: data_table must be a table")
     end
+    H._regions[region_id] = data_table
 end
 
-function H.SHCI(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants.SHCI or 0.0
-    else
-        print("H.SHCI: Failed to retrieve invariants or SHCI not found for region: " .. tostring(region_id))
-        return 0.0
-    end
-end
+----------------------------------------------------------------------
+-- Preconditions and derived helpers
+----------------------------------------------------------------------
 
--- Convenience function to get all invariants for a region as a table
-function H.get_all_invariants(region_id)
-    local invariants = call_rust_function("get_region_invariants", region_id)
-    if invariants and type(invariants) == "table" then
-        return invariants
-    else
-        print("H.get_all_invariants: Failed to retrieve invariants for region: " .. tostring(region_id))
-        return {
-            CIC  = 0.0,
-            MDI  = 0.0,
-            AOS  = 0.0,
-            RRM  = 0.0,
-            FCF  = 0.0,
-            SPR  = 0.0,
-            RWF  = 0.0,
-            DET  = 0.0,
-            HVF  = 0.0,
-            LSG  = 0.0,
-            SHCI = 0.0,
-        }
-    end
-end
-
--- Function to evaluate a set of preconditions against a region's invariants.
--- precondition_table format: { CIC = {min = 0.8}, SPR = {min = 0.6, max = 0.9} }
+-- precondition_table format:
+--   { CIC = { min = 0.8 }, SPR = { min = 0.6, max = 0.9 } }
 function H.evaluate_preconditions(region_id, precondition_table)
-    if not precondition_table or type(precondition_table) ~= "table" then
-        print("H.evaluate_preconditions: Invalid precondition_table provided.")
+    if type(precondition_table) ~= "table" then
         return false
     end
 
-    local region_invariants = H.get_all_invariants(region_id)
+    local region_invariants = H.get_all(region_id)
     if not region_invariants then
-        print("H.evaluate_preconditions: Could not get invariants for region: " .. tostring(region_id))
         return false
     end
 
     for inv_name, thresholds in pairs(precondition_table) do
         local inv_value = region_invariants[inv_name]
         if inv_value == nil then
-            print(string.format("H.evaluate_preconditions: Unknown invariant '%s' in precondition.", inv_name))
             return false
         end
-
         if thresholds.min and inv_value < thresholds.min then
             return false
         end
@@ -216,25 +172,27 @@ function H.evaluate_preconditions(region_id, precondition_table)
     return true
 end
 
--- Convenience wrapper used by higher-level systems (PCG, Directors, AI)
--- Returns invariants plus entertainment metrics if/when available.
+-- Convenience wrapper for systems that want a single record with
+-- key invariants plus placeholders for entertainment metrics.
 function H.region_metrics(region_id)
-    local inv = H.get_all_invariants(region_id)
-    -- Entertainment metrics would typically come from a separate module;
-    -- they are stubbed here for structure only.
+    local inv = H.get_all(region_id)
     return {
-        CIC  = inv.CIC,
-        RRM  = inv.RRM,
-        AOS  = inv.AOS,
-        HVF  = inv.HVF,
-        LSG  = inv.LSG,
-        DET  = inv.DET,
-        UEC  = 0.0,
-        EMD  = 0.0,
-        ARR  = 0.0,
+        CIC = inv.CIC,
+        RRM = inv.RRM,
+        AOS = inv.AOS,
+        HVF = inv.HVF,
+        LSG = inv.LSG,
+        DET = inv.DET,
+        UEC = 0.0,
+        EMD = 0.0,
+        ARR = 0.0
     }
 end
 
-print("H API (Lua) loaded.")
+----------------------------------------------------------------------
+-- Export
+----------------------------------------------------------------------
+
+_G.H = H
 
 return H
