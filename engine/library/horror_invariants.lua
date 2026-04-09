@@ -1,38 +1,32 @@
 -- engine/library/horror_invariants.lua
--- Horror.Place invariant query API.
--- All invariant getters should read from the master registry or cached bundles.
--- Never hardcode values; always delegate to the history layer.
+-- Canonical H. invariants + metrics runtime surface (Tier 1)
+-- All invariant getters should read from promoted bundles or the engine bridge.
+-- Never hardcode values; always delegate to the history layer or telemetry.
 
 local H = {}
 
--- Placeholder for engine bridge (implemented in C++ adapter or engine host).
+-- Optional engine bridge (implemented in C++ adapter or engine host).
 -- The host is responsible for providing:
 --   request_invariants(region_id, tile_id) -> table
 --   get_player_metric(player_id, metric_name) -> number
 --   log_violation(entry) -> ()
 H.EngineBridge = H.EngineBridge or {}
 
--- Internal cache for invariant bundles (populated by H.load_bundle or engine bridge).
+-- Internal cache for invariant bundles (region/tile keyed).
 local _bundle_cache = {}
 
--- Compose a stable cache key for a region/tile pair.
+-- Internal state for per-player metrics snapshots (optional).
+local _players = {}
+
+----------------------------------------------------------------
+-- Cache key helpers
+----------------------------------------------------------------
+
 local function _key(region_id, tile_id)
-    return string.format("%d:%d", region_id, tile_id)
+    -- region_id and tile_id are typically numeric; stringify defensively.
+    return tostring(region_id) .. ":" .. tostring(tile_id)
 end
 
--- Load invariant bundle for a region/tile into cache.
--- @param region_id number
--- @param tile_id number
--- @param bundle table { CIC, MDI, AOS, RRM, FCF, SPR, SHCI, HVF, LSG, DET, RWF, EMD, STCI, ARR, ... }
-function H.load_bundle(region_id, tile_id, bundle)
-    local key = _key(region_id, tile_id)
-    _bundle_cache[key] = bundle or {}
-end
-
--- Get invariant bundle from cache or request from engine/host layer.
--- @param region_id number
--- @param tile_id number
--- @return table invariant_bundle
 local function _get_bundle(region_id, tile_id)
     local key = _key(region_id, tile_id)
     local bundle = _bundle_cache[key]
@@ -45,9 +39,40 @@ local function _get_bundle(region_id, tile_id)
     return bundle or {}
 end
 
--------------------------------------------------------------------------------
+----------------------------------------------------------------
+-- Registration / hydration
+----------------------------------------------------------------
+
+--- Install or update a region/tile invariant bundle in the cache.
+--- bundle is expected to carry:
+---   CIC, MDI, AOS, RRM, FCF, SPR, SHCI, HVF, LSG, DET, RWF,
+---   EMD, STCI, ARR, and optional DET_player map.
+function H.load_bundle(region_id, tile_id, bundle)
+    local key = _key(region_id, tile_id)
+    _bundle_cache[key] = bundle or {}
+end
+
+--- Install or update a player experience metrics snapshot.
+--- data: table with fields uec, emd, stci, cdl, arr
+function H.register_player(player_id, data)
+    assert(type(player_id) == "string" or type(player_id) == "number", "player_id must be id-like")
+    assert(type(data) == "table", "data must be table")
+    _players[player_id] = {
+        uec  = data.uec  or 0.0,
+        emd  = data.emd  or 0.0,
+        stci = data.stci or 0.0,
+        cdl  = data.cdl  or 0.0,
+        arr  = data.arr  or 0.0,
+    }
+end
+
+local function _player(player_id)
+    return _players[player_id]
+end
+
+----------------------------------------------------------------
 -- Canonical geo-historical invariant getters
--------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 function H.CIC(region_id, tile_id)
     return _get_bundle(region_id, tile_id).CIC or 0.0
@@ -92,9 +117,9 @@ function H.RWF(region_id, tile_id)
     return _get_bundle(region_id, tile_id).RWF or 1.0
 end
 
--------------------------------------------------------------------------------
+----------------------------------------------------------------
 -- Experience metrics (per-player / per-tile)
--------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 -- Dread Exposure Threshold may be player-specific; fall back to tile default.
 function H.DET(region_id, tile_id, player_id)
@@ -110,41 +135,60 @@ end
 
 -- Uncertainty Engagement Coefficient is typically telemetry-derived.
 function H.UEC(player_id)
+    local p = _player(player_id)
+    if p and p.uec ~= nil then
+        return p.uec
+    end
     if H.EngineBridge and H.EngineBridge.get_player_metric then
         return H.EngineBridge.get_player_metric(player_id, "UEC") or 0.5
     end
     return 0.5
 end
 
--- Evidential Mystery Density is usually bound to region/tile history.
-function H.EMD(region_id, tile_id)
+-- Evidential Mystery Density; prefer per-player snapshot, fall back to bundle.
+function H.EMD(region_id, tile_id, player_id)
+    local p = player_id and _player(player_id) or nil
+    if p and p.emd ~= nil then
+        return p.emd
+    end
     return _get_bundle(region_id, tile_id).EMD or 0.5
 end
 
--- Safe-Threat Contrast Index, region/tile-level by default.
-function H.STCI(region_id, tile_id)
+-- Safe-Threat Contrast Index.
+function H.STCI(region_id, tile_id, player_id)
+    local p = player_id and _player(player_id) or nil
+    if p and p.stci ~= nil then
+        return p.stci
+    end
     return _get_bundle(region_id, tile_id).STCI or 0.5
 end
 
 -- Cognitive Dissonance Load, per-player metric.
 function H.CDL(player_id)
+    local p = _player(player_id)
+    if p and p.cdl ~= nil then
+        return p.cdl
+    end
     if H.EngineBridge and H.EngineBridge.get_player_metric then
         return H.EngineBridge.get_player_metric(player_id, "CDL") or 0.5
     end
     return 0.5
 end
 
--- Ambiguous Resolution Ratio, region/tile-level by default.
-function H.ARR(region_id, tile_id)
+-- Ambiguous Resolution Ratio; player snapshot beats bundle.
+function H.ARR(region_id, tile_id, player_id)
+    local p = player_id and _player(player_id) or nil
+    if p and p.arr ~= nil then
+        return p.arr
+    end
     return _get_bundle(region_id, tile_id).ARR or 0.7
 end
 
--------------------------------------------------------------------------------
--- History sampling helpers
--------------------------------------------------------------------------------
+----------------------------------------------------------------
+-- Sampling helpers (for AI-chat, PCG, and diagnostics)
+----------------------------------------------------------------
 
 -- Returns a shallow snapshot of the geo-historical invariants only.
--- @return table { CIC, MDI, AOS, RRM, FCF, SPR, SHCI, HVF, LSG, RWF }
 function H.sample_history(region_id, tile_id)
     local bundle = _get_bundle(region_id, tile_id)
     return {
@@ -162,13 +206,9 @@ function H.sample_history(region_id, tile_id)
 end
 
 -- Sample all invariants + metrics for a region/tile/player in one call.
--- @param player_id number|nil
--- @return table {
---   CIC, MDI, AOS, RRM, FCF, SPR, SHCI, LSG, DET, RWF, HVF,
---   UEC, EMD, STCI, CDL, ARR
--- }
 function H.sample_all(region_id, tile_id, player_id)
     local bundle = _get_bundle(region_id, tile_id)
+    local p = player_id and _player(player_id) or nil
 
     return {
         CIC  = bundle.CIC or 0.0,
@@ -182,26 +222,25 @@ function H.sample_all(region_id, tile_id, player_id)
         DET  = H.DET(region_id, tile_id, player_id),
         RWF  = bundle.RWF or 1.0,
         HVF  = bundle.HVF or { mag = 0.0, dir = { x = 0, y = 0, z = 0 } },
+
         UEC  = player_id and H.UEC(player_id) or 0.5,
-        EMD  = bundle.EMD or 0.5,
-        STCI = bundle.STCI or 0.5,
+        EMD  = H.EMD(region_id, tile_id, player_id),
+        STCI = H.STCI(region_id, tile_id, player_id),
         CDL  = player_id and H.CDL(player_id) or 0.5,
-        ARR  = bundle.ARR or 0.7,
+        ARR  = H.ARR(region_id, tile_id, player_id),
     }
 end
 
--------------------------------------------------------------------------------
+----------------------------------------------------------------
 -- Telemetry / CI audit helpers
--------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 -- Log a violation for telemetry/CI audit.
--- @param entry table
---   { mood_id, violation, region_id, tile_id, player_id?, reason?, invariant_snapshot? }
+-- entry: { mood_id, violation, region_id, tile_id, player_id?, reason?, invariant_snapshot? }
 function H.log_violation(entry)
     if H.EngineBridge and H.EngineBridge.log_violation then
         H.EngineBridge.log_violation(entry)
     else
-        -- Fallback: print to console for dev builds.
         local mood_id = entry.mood_id or "unknown_mood"
         local reason  = entry.reason or "unknown"
         print(string.format("[Horror.Place VIOLATION] %s: %s", mood_id, reason))
