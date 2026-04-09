@@ -1,132 +1,205 @@
--- engine/library/horrorresurrection.lua
--- Resurrection helpers: compute novelty, gate reuse, and surface diffs.
+-- horrorresurrection.lua
+-- Canonical resurrection helper surface under H.Resurrection.
 
-local H       = require("engine.library.horrorinvariants")
-local Metrics = require("engine.library.horrormetrics")   -- thin wrapper over UEC/EMD/STCI/CDL/ARR
-local json    = require("dkjson")                         -- or your preferred JSON lib
+local H = require("engine.library.horrorinvariants")
 
 local Resurrection = {}
 
--- Internal: compute a simple invariant+metric distance between ancestor and candidate.
-local function compute_distance(a, b)
-    if not a or not b then
+-- Compute a normalized drift score in [0,1] between ancestor and candidate
+-- using invariant and metric vectors. This is the core "freshness" distance.
+-- In a full implementation, ancestorSummary should be loaded from registry/
+-- and telemetry aggregates; here we assume callers pass both tables in.
+function Resurrection.computeDrift(ancestor, candidate)
+    if not ancestor or not candidate then
         return 1.0
     end
+
+    local function clamp01(x)
+        if x < 0.0 then
+            return 0.0
+        elseif x > 1.0 then
+            return 1.0
+        else
+            return x
+        end
+    end
+
+    local function sq(x)
+        return x * x
+    end
+
+    -- Sample a small, stable subset of invariants and metrics.
     local keys = {
-        "CIC","MDI","AOS","RRM","FCF","SPR","RWF","DET","LSG","SHCI",
-        "UEC","EMD","STCI","CDL","ARR"
+        "CIC",
+        "MDI",
+        "AOS",
+        "DET",
+        "UEC",
+        "EMD",
+        "STCI",
+        "CDL",
+        "ARR"
     }
-    local acc, count = 0.0, 0
+
+    local accum = 0.0
+    local count = 0
+
     for _, k in ipairs(keys) do
-        local av = a[k]
-        local bv = b[k]
-        if type(av) == "number" and type(bv) == "number" then
-            local d = math.abs(av - bv)
-            acc   = acc + d * d
+        local a = ancestor[k]
+        local b = candidate[k]
+        if type(a) == "number" and type(b) == "number" then
+            accum = accum + sq(b - a)
             count = count + 1
         end
     end
+
     if count == 0 then
         return 1.0
     end
-    return math.sqrt(acc / count)
+
+    local meanSq = accum / count
+    -- Normalize: assume max meaningful distance ~1.0.
+    return clamp01(math.sqrt(meanSq))
 end
 
--- Query ancestor profile from history layer + telemetry.
--- Contract: returns a flat table of invariants + metrics.
-function Resurrection.sample_ancestor_profile(region_id, tile_id, player_id, ancestor_id)
-    -- You can later route ancestor_id into Atrocity-Seeds / Dead-Ledger.
-    local inv = H.sampleAll(region_id, tile_id, player_id)
-    local met = Metrics.samplePlayer(player_id)
-    local out = {}
-    out.CIC  = inv.CIC
-    out.MDI  = inv.MDI
-    out.AOS  = inv.AOS
-    out.RRM  = inv.RRM
-    out.FCF  = inv.FCF
-    out.SPR  = inv.SPR
-    out.RWF  = inv.RWF
-    out.DET  = inv.DET
-    out.HVF  = inv.HVF and inv.HVF.mag or nil
-    out.LSG  = inv.LSG
-    out.SHCI = inv.SHCI
-
-    out.UEC  = met.UEC
-    out.EMD  = met.EMD
-    out.STCI = met.STCI
-    out.CDL  = met.CDL
-    out.ARR  = met.ARR
-
-    return out
-end
-
--- Decide whether a resurrection is allowed given ancestor + candidate bands.
--- novelty_threshold is a scalar in [0,1]; higher = demand bigger change.
-function Resurrection.allow(ancestor_profile, candidate_profile, novelty_threshold)
-    local dist = compute_distance(ancestor_profile, candidate_profile)
-    local allowed = dist >= (novelty_threshold or 0.15)
-    return {
-        allowed = allowed,
-        distance = dist,
-        noveltyThreshold = novelty_threshold or 0.15,
+-- Pre-flight check: determine if a resurrection candidate is allowed
+-- under the given resurrectionProfile and ancestor summary.
+--
+-- Inputs:
+--   resurrectionProfile: table conforming to resurrection-profile-v1 schema.
+--   ancestorSummary:     table of invariants/metrics for originId.
+--   candidateSummary:    table of invariants/metrics for proposed contract.
+--
+-- Returns:
+--   result: table {
+--     allowed = boolean,
+--     reason  = string|nil,
+--     drift   = number,
+--     thresholds = { minDrift = ..., maxDrift = ..., cloneBand = ... }
+--   }
+function Resurrection.preflight(resurrectionProfile, ancestorSummary, candidateSummary)
+    local result = {
+        allowed = true,
+        reason = nil,
+        drift = 1.0,
+        thresholds = {}
     }
-end
 
--- Convenience: compute and log a resurrection diff summary for CI / telemetry.
-function Resurrection.diff_summary(ancestor_profile, candidate_profile)
-    local keys = {
-        "CIC","AOS","HVF","LSG","DET","UEC","EMD","STCI","CDL","ARR","SHCI"
-    }
-    local rows = {}
-    for _, k in ipairs(keys) do
-        local a = ancestor_profile[k]
-        local c = candidate_profile[k]
-        if type(a) == "number" and type(c) == "number" then
-            table.insert(rows, {
-                key      = k,
-                ancestor = a,
-                current  = c,
-                delta    = c - a,
-            })
-        end
-    end
-    return rows
-end
-
--- Runtime gate used by mood/event/seed logic.
--- Returns { allowed=bool, reason=string, summary=table }.
-function Resurrection.gate_resurrection(args)
-    local ancestor   = args.ancestorProfile
-    local candidate  = args.candidateProfile
-    local threshold  = args.noveltyThreshold or 0.15
-    local res        = Resurrection.allow(ancestor, candidate, threshold)
-    local summary    = Resurrection.diff_summary(ancestor, candidate)
-
-    local reason
-    if not res.allowed then
-        reason = "RESURRECTION_TOO_SIMILAR"
-    else
-        reason = "OK"
+    if not resurrectionProfile or not ancestorSummary or not candidateSummary then
+        result.allowed = false
+        result.reason = "MISSING_PROFILE_OR_SUMMARY"
+        return result
     end
 
-    return {
-        allowed  = res.allowed,
-        reason   = reason,
-        distance = res.distance,
-        summary  = summary,
-    }
+    local novelty = resurrectionProfile.novelty or {}
+    local minDrift = novelty.minDrift or 0.0
+    local maxDrift = novelty.maxDrift or 1.0
+    local cloneBand = novelty.cloneBandThreshold or 0.05
+
+    result.thresholds.minDrift = minDrift
+    result.thresholds.maxDrift = maxDrift
+    result.thresholds.cloneBand = cloneBand
+
+    local drift = Resurrection.computeDrift(ancestorSummary, candidateSummary)
+    result.drift = drift
+
+    -- Reject near-clones.
+    if drift <= cloneBand then
+        result.allowed = false
+        result.reason = "DRIFT_BELOW_CLONE_BAND"
+        return result
+    end
+
+    -- Enforce minimum novelty.
+    if drift < minDrift then
+        result.allowed = false
+        result.reason = "DRIFT_BELOW_MIN"
+        return result
+    end
+
+    -- Enforce maximum acceptable change.
+    if drift > maxDrift then
+        result.allowed = false
+        result.reason = "DRIFT_ABOVE_MAX"
+        return result
+    end
+
+    -- Optional invariant-specific checks (HVF/LSG rotation) can be layered here
+    -- by inspecting resurrectionProfile.invariantDeltas.
+
+    return result
 end
 
--- Helper to pretty-print diffs in a dev console or CI log.
-function Resurrection.pretty_print_summary(summary, out_fn)
-    local write = out_fn or print
-    write("=== Resurrection diff summary ===")
-    for _, row in ipairs(summary) do
-        write(string.format(
-            "%-4s: ancestor=%.3f current=%.3f delta=%+.3f",
-            row.key, row.ancestor, row.current, row.delta
-        ))
+-- Runtime scheduling helper: decide whether to schedule a resurrection
+-- given current budgetState and player/session metrics.
+--
+-- Inputs:
+--   resurrectionProfile: table as above.
+--   budgetState:         table { usedThisSession = int, lastSeenAt = number|nil, now = number, regionId = ..., tileClass = ... }
+--   playerMetrics:       table { DET = number, UEC = number, ARR = number }
+--
+-- Returns:
+--   allowed: boolean
+--   reason:  string|nil
+function Resurrection.schedule(resurrectionProfile, budgetState, playerMetrics)
+    if not resurrectionProfile or not budgetState or not playerMetrics then
+        return false, "MISSING_INPUT"
     end
+
+    local pacing = resurrectionProfile.pacing or {}
+    local maxPerSession = pacing.maxPerSession or math.huge
+    local cooldown = pacing.cooldownSeconds or 0.0
+
+    if budgetState.usedThisSession and budgetState.usedThisSession >= maxPerSession then
+        return false, "SESSION_LIMIT_REACHED"
+    end
+
+    if budgetState.lastSeenAt and budgetState.now and (budgetState.now - budgetState.lastSeenAt) < cooldown then
+        return false, "COOLDOWN_ACTIVE"
+    end
+
+    -- Use player metrics to decide whether resurrection should restore mystery.
+    local metrics = resurrectionProfile.metricTargets or {}
+    local arrBand = metrics.ARR or {}
+
+    local arrMin = arrBand.min or 0.0
+    local currentARR = playerMetrics.ARR or 0.0
+
+    if currentARR >= arrMin then
+        -- ARR already high enough; avoid cheap repetition.
+        return false, "ARR_ALREADY_HIGH"
+    end
+
+    -- Respect DET safety caps when present.
+    local safety = metrics.safetyCaps or {}
+    local detCap = safety.DET
+    if detCap and playerMetrics.DET and playerMetrics.DET >= detCap then
+        return false, "DET_CAP_REACHED"
+    end
+
+    return true, nil
+end
+
+-- Runtime helper to block overly perfect recall.
+-- SPR/SHCI are read via H.sampleAll.
+function Resurrection.blockIfRecallTooPerfect(regionId, tileId, playerId, thresholds)
+    thresholds = thresholds or {}
+    local sprCap = thresholds.SPR or 0.95
+    local shciCap = thresholds.SHCI or 0.95
+
+    local inv = H.sampleall(regionId, tileId, playerId)
+    if not inv then
+        return false
+    end
+
+    local spr = inv.SPR or 0.0
+    local shci = inv.SHCI or 0.0
+
+    if spr >= sprCap and shci >= shciCap then
+        return true
+    end
+
+    return false
 end
 
 return Resurrection
