@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "schema/Horror.Place/core/schemas/audio-landscape-style.v1",
+  "title": "Horror.Place Audio Landscape Style (Hellscape Mixer)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["styleId", "version", "bands", "rtpcMappings"],
+  "properties": {
+    "styleId": {
+      "type": "string",
+      "pattern": "audio\\.hellscape\\.[a-z0-9_.]+\\.v[0-9]+"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "[0-9]+\\.[0-9]+\\.[0-9]+"
+    },
+    "bands": {
+      "description": "Invariant and metric band presets keyed by role or tileClass.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "invariants", "metrics"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "battlefronttile",
+              "spawntile",
+              "liminaltile",
+              "sanctuarytile",
+              "chokepointtile"
+            ]
+          },
+          "invariants": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "CIC":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "LSG":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "HVFmag": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "AOS":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "RRM":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "SPR":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "DET":  { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "UEC":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "EMD":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "STCI": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "CDL":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "ARR":  { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+            }
+          }
+        }
+      }
+    },
+    "rtpcMappings": {
+      "description": "Derived audio parameters driven by invariants/metrics.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parameters"],
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "inputs", "curveType", "params", "safety"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z0-9_.]+$"
+              },
+              "inputs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "CIC",
+                    "LSG",
+                    "HVFmag",
+                    "HVFdir",
+                    "AOS",
+                    "DET",
+                    "UEC",
+                    "ARR",
+                    "EMD",
+                    "STCI",
+                    "CDL"
+                  ]
+                }
+              },
+              "curveType": {
+                "type": "string",
+                "enum": [
+                  "linear",
+                  "sigmoid",
+                  "piecewise",
+                  "hysteresis",
+                  "oscillatory",
+                  "noiseAugmented"
+                ]
+              },
+              "params": {
+                "type": "object",
+                "description": "Curve parameters; interpreted by Rust mapping engine."
+              },
+              "safety": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["min", "max", "maxSlopePerSecond"],
+                "properties": {
+                  "min": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+                  "max": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+                  "maxSlopePerSecond": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
