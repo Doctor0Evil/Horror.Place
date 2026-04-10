@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema.Horror.Place/core/schemas/signaturev1.json",
+  "$id": "schema:Horror.Place/core/schemassignaturev1.json",
   "title": "Horror.Place First-Pass Signature v1",
-  "description": "CI-governed signature document embedding contractCard for invariant/metric enforcement. Used by schema_spine_scanner for pre-commit validation across the Horror.Place VM-constellation.",
+  "description": "Canonical first-pass handoff signature for deterministic, policy-bound generation workflows across the Horror.Place VM-constellation. Embeds a contractCard for invariant/metric enforcement and is validated by schema_spine_scanner in CI.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -83,7 +83,10 @@
     },
     "target": {
       "type": "object",
-      "required": ["repo", "path"],
+      "required": [
+        "repo",
+        "path"
+      ],
       "properties": {
         "repo": {
           "type": "string",
@@ -104,9 +107,10 @@
         "path": {
           "type": "string",
           "description": "Repository-relative path for the single file to be generated or updated.",
-          "pattern": "^(seeds/|events/|assets/|blueprints/).+"
+          "pattern": "^(schemas/|events/|seeds/|docs/|src/).+"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "schemaref": {
       "type": "string",
@@ -281,17 +285,30 @@
     },
     "generatedartifacts": {
       "type": "array",
+      "description": "List of artifacts generated under this signature (for audit).",
       "items": {
         "type": "object",
-        "required": ["path", "schemaref", "styleid"],
+        "required": [
+          "path",
+          "schemaref",
+          "styleid"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "schemaref": { "type": "string" },
-          "styleid": { "type": "string" },
-          "deadledgerref": { "type": "string" }
-        }
-      },
-      "description": "List of artifacts generated under this signature (for audit)."
+          "path": {
+            "type": "string"
+          },
+          "schemaref": {
+            "type": "string"
+          },
+          "styleid": {
+            "type": "string"
+          },
+          "deadledgerref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "$defs": {
@@ -318,7 +335,12 @@
     },
     "range010": {
       "type": "object",
-      "required": ["min", "max"],
+      "description": "Inclusive [min,max] range within [0.0,10.0].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
       "properties": {
         "min": {
           "type": "number",
@@ -334,6 +356,7 @@
     },
     "band01": {
       "type": "array",
+      "description": "Two-element [min,max] band within [0.0,1.0].",
       "items": {
         "type": "number",
         "minimum": 0.0,
@@ -363,28 +386,51 @@
     {
       "if": {
         "properties": {
-          "contracttype": { "const": "style" }
+          "contracttype": {
+            "const": "style"
+          }
         }
       },
       "then": {
-        "required": ["styleid"]
+        "required": [
+          "styleid"
+        ]
       }
     },
     {
-      "description": "Subset Rule: contractCard invariants must lie within envelope",
-      "if": { "required": ["contractCard", "invariantenvelope"] },
+      "description": "Subset Rule: contractCard invariants must lie within envelope.",
+      "if": {
+        "required": [
+          "contractCard",
+          "invariantenvelope"
+        ]
+      },
       "then": {
         "properties": {
           "contractCard": {
+            "type": "object",
             "properties": {
               "invariants": {
+                "type": "object",
                 "properties": {
-                  "CIC": { "$ref": "#/$defs/mustBeInEnvelope" },
-                  "AOS": { "$ref": "#/$defs/mustBeInEnvelope" },
-                  "RRM": { "$ref": "#/$defs/mustBeInEnvelope" },
-                  "LSG": { "$ref": "#/$defs/mustBeInEnvelope" },
-                  "DET": { "$ref": "#/$defs/mustBeInEnvelopeDET" },
-                  "SHCI": { "$ref": "#/$defs/mustBeInEnvelope" }
+                  "CIC": {
+                    "$ref": "#/$defs/mustBeInEnvelope"
+                  },
+                  "AOS": {
+                    "$ref": "#/$defs/mustBeInEnvelope"
+                  },
+                  "RRM": {
+                    "$ref": "#/$defs/mustBeInEnvelope"
+                  },
+                  "LSG": {
+                    "$ref": "#/$defs/mustBeInEnvelope"
+                  },
+                  "DET": {
+                    "$ref": "#/$defs/mustBeInEnvelopeDET"
+                  },
+                  "SHCI": {
+                    "$ref": "#/$defs/mustBeInEnvelope"
+                  }
                 }
               }
             }
@@ -393,19 +439,36 @@
       }
     },
     {
-      "description": "Band Match Rule: contractCard metrics must equal envelope bands",
-      "if": { "required": ["contractCard", "metricenvelope"] },
+      "description": "Band Match Rule: contractCard metrics must equal envelope bands.",
+      "if": {
+        "required": [
+          "contractCard",
+          "metricenvelope"
+        ]
+      },
       "then": {
         "properties": {
           "contractCard": {
+            "type": "object",
             "properties": {
               "metrics": {
+                "type": "object",
                 "properties": {
-                  "UEC": { "$ref": "#/$defs/mustMatchBand" },
-                  "EMD": { "$ref": "#/$defs/mustMatchBand" },
-                  "STCI": { "$ref": "#/$defs/mustMatchBand" },
-                  "CDL": { "$ref": "#/$defs/mustMatchBand" },
-                  "ARR": { "$ref": "#/$defs/mustMatchBand" }
+                  "UEC": {
+                    "$ref": "#/$defs/mustMatchBand"
+                  },
+                  "EMD": {
+                    "$ref": "#/$defs/mustMatchBand"
+                  },
+                  "STCI": {
+                    "$ref": "#/$defs/mustMatchBand"
+                  },
+                  "CDL": {
+                    "$ref": "#/$defs/mustMatchBand"
+                  },
+                  "ARR": {
+                    "$ref": "#/$defs/mustMatchBand"
+                  }
                 }
               }
             }
