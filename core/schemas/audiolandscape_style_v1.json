@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema.Horror.Place.core.audio.audiolandscape_style_v1.json",
+  "title": "Horror.Place Audio Landscape Style v1",
+  "description": "Contract for invariant- and metric-bound audio landscape styles used by Hellscape Mixer and Lua audio policy. No raw assets; styles only describe behavior envelopes and RTPC bindings.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "id",
+    "version",
+    "safetyTier",
+    "intensityBand",
+    "detCap",
+    "invariantBindings",
+    "metricIntent",
+    "rtpcBindings",
+    "spatializationModes",
+    "channels",
+    "explicitViolenceForbidden"
+  ],
+
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique style id, e.g. audio.landscape.hellscape_mixer.v1"
+    },
+
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this style contract, e.g. v1.0.0",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for designers.",
+      "maxLength": 256
+    },
+
+    "notes": {
+      "type": "string",
+      "description": "Short implementation notes; implication-only.",
+      "maxLength": 1024
+    },
+
+    "safetyTier": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "Safety tier 1–3 aligned with build/entitlement tiers."
+    },
+
+    "intensityBand": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Nominal intensity band for this style."
+    },
+
+    "detCap": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Maximum DET the style is allowed to push toward."
+    },
+
+    "invariantBindings": {
+      "type": "object",
+      "description": "Baseline bindings to the invariant stack; typical operating point of this style.",
+      "additionalProperties": false,
+      "required": [ "CIC", "MDI", "AOS", "RRM", "SPR", "SHCI", "DET", "HVF", "LSG" ],
+      "properties": {
+        "CIC":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "MDI":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "AOS":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "RRM":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "SPR":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "SHCI": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "DET":  { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "HVF":  { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "LSG":  { "type": "number", "minimum": 0.0, "maximum": 10.0 }
+      }
+    },
+
+    "metricIntent": {
+      "type": "object",
+      "description": "Expected metric shifts when this style is active; used for policy and mixer selection.",
+      "additionalProperties": false,
+      "required": [ "deltaUEC", "deltaEMD", "deltaSTCI", "deltaCDL", "deltaARR" ],
+      "properties": {
+        "deltaUEC": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0,
+          "description": "Nominal change to Uncertainty Engagement Coefficient."
+        },
+        "deltaEMD": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaSTCI": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaCDL": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        },
+        "deltaARR": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0
+        }
+      }
+    },
+
+    "rtpcBindings": {
+      "type": "object",
+      "description": "Mapping from logical RTPC keys to middleware or engine RTPC names.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+
+    "spatializationModes": {
+      "type": "array",
+      "description": "Allowed spatialization patterns for this style.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "stereo_width_only",
+          "nearfield_rumble",
+          "binaural_orbit",
+          "threshold_crawl"
+        ]
+      },
+      "minItems": 1
+    },
+
+    "channels": {
+      "type": "array",
+      "description": "Logical channel families used by this style (no assets).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "ambience",
+          "diegetic_loop",
+          "whisper_bed",
+          "oneshot_spatial",
+          "impact_accent"
+        ]
+      },
+      "minItems": 1
+    },
+
+    "metricEnvelopes": {
+      "type": "object",
+      "description": "Optional per-metric caps over time for this style.",
+      "additionalProperties": false,
+      "properties": {
+        "UEC": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDeltaTotal": { "type": "number" },
+            "maxDeltaPerMinute": { "type": "number" }
+          }
+        },
+        "EMD": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDeltaTotal": { "type": "number" },
+            "maxDeltaPerMinute": { "type": "number" }
+          }
+        },
+        "STCI": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDeltaTotal": { "type": "number" },
+            "maxDeltaPerMinute": { "type": "number" }
+          }
+        },
+        "CDL": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDeltaTotal": { "type": "number" },
+            "maxDeltaPerMinute": { "type": "number" }
+          }
+        },
+        "ARR": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDeltaTotal": { "type": "number" },
+            "maxDeltaPerMinute": { "type": "number" }
+          }
+        }
+      }
+    },
+
+    "explicitViolenceForbidden": {
+      "type": "boolean",
+      "const": true,
+      "description": "Hard-coded prohibition of explicit violence in this style contract."
+    }
+  }
+}
