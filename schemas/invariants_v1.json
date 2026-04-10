@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Horror$Place Invariant Bundle Schema v1",
-  "description": "Schema for defining region-specific horror invariants that govern content generation and safety constraints.",
+  "description": "Schema for defining region-specific horror invariants that govern content generation, timing, and safety constraints.",
   "type": "object",
   "properties": {
     "region_id": {
@@ -75,6 +75,24 @@
       "minimum": 0.0,
       "maximum": 1.0
     },
+    "TMI": {
+      "type": "number",
+      "description": "Timing Mercy Index: Weight for granting Coyote Time grace windows.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "RPI": {
+      "type": "number",
+      "description": "Repetition Punishment Index: Sensitivity to repeated failures.",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "ADI": {
+      "type": "number",
+      "description": "Adaptive Damage Index: Baseline punishment multiplier.",
+      "minimum": 0.5,
+      "maximum": 2.0
+    },
     "preconditions": {
       "type": "array",
       "description": "List of invariant IDs that must be satisfied before this region can be activated or accessed.",
@@ -95,7 +113,18 @@
     "DET",
     "HVF",
     "LSG",
-    "SHCI"
+    "SHCI",
+    "TMI",
+    "RPI",
+    "ADI"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "ai_file_envelope": {
+    "target_repo": "Horror.Place",
+    "target_path": "schemas/invariants_v1.json",
+    "schemaref": "schema://HorrorPlace-Constellation-Contracts/ai_file_envelope_v1.json",
+    "tier": "T1_public",
+    "description": "Adds TMI, RPI, ADI invariants for systemic timing mechanics.",
+    "content_language": "json"
+  }
 }
