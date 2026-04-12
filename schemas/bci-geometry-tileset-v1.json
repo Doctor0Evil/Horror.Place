@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horror.place/constellation/schemas/bci-geometry-tileset-v1.json",
+  "title": "BCIGeometryTilesetV1",
+  "description": "Tier-1 contract for BCI-aware 5D tileset geometry profiles, binding region history invariants, BCI bands, and entitlement tiers to runtime geometry, camera, lighting, and spawn states.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "tilesetId",
+    "schemaref",
+    "baseRegionRefs",
+    "bciBands",
+    "geometryProfiles"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Semantic version of the tileset schema implementation, e.g., 1.0.0."
+    },
+    "tilesetId": {
+      "type": "string",
+      "description": "Stable ID for this BCI geometry tileset contract."
+    },
+    "schemaref": {
+      "type": "string",
+      "description": "Reference to this schema ID for validation and tooling."
+    },
+    "deadledgerref": {
+      "type": "string",
+      "description": "Optional reference into Dead-Ledger attestation bundle governing this tileset's DET/BCI exposure caps."
+    },
+    "baseRegionRefs": {
+      "type": "array",
+      "description": "RegionContractCard IDs or patterns this tileset can wrap.",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "bciBands": {
+      "type": "object",
+      "description": "Discrete bands over canonical BCI state used by geometry selection.",
+      "additionalProperties": false,
+      "required": [
+        "modes"
+      ],
+      "properties": {
+        "modes": {
+          "type": "array",
+          "description": "Allowed normalized BCI intensity modes.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "UNDERSTIMULATED",
+              "OPTIMALSTRESS",
+              "OVERWHELMED"
+            ]
+          }
+        },
+        "fearBands": {
+          "type": "array",
+          "description": "Optional discrete bands derived from fearIndex or similar metric.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MID",
+              "HIGH"
+            ]
+          }
+        }
+      }
+    },
+    "geometryProfiles": {
+      "type": "array",
+      "description": "Contracted geometry/camera/lighting/spawn profiles keyed by region, BCI band, and entitlement tier.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profileId",
+          "appliesTo",
+          "invariants",
+          "metrics",
+          "cameraGrammarRef",
+          "lightingStyleRef"
+        ],
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "description": "Stable ID for this geometry profile."
+          },
+          "deadledgerref": {
+            "type": "string",
+            "description": "Optional Dead-Ledger attestation reference at profile granularity."
+          },
+          "appliesTo": {
+            "type": "object",
+            "description": "Selection keys for this profile.",
+            "additionalProperties": false,
+            "required": [
+              "regionIdPattern",
+              "mode",
+              "tier"
+            ],
+            "properties": {
+              "regionIdPattern": {
+                "type": "string",
+                "description": "Glob or regex-like pattern for region IDs this profile applies to."
+              },
+              "timePhase": {
+                "type": "string",
+                "description": "Optional time/phase label, e.g., Shock/Echo/Recovery or similar pacing tags."
+              },
+              "mode": {
+                "type": "string",
+                "description": "BCI intensity mode for which this profile is valid.",
+                "enum": [
+                  "UNDERSTIMULATED",
+                  "OPTIMALSTRESS",
+                  "OVERWHELMED"
+                ]
+              },
+              "fearBand": {
+                "type": "string",
+                "description": "Optional fear band derived from BCI metrics.",
+                "enum": [
+                  "LOW",
+                  "MID",
+                  "HIGH"
+                ]
+              },
+              "tier": {
+                "type": "string",
+                "description": "Entitlement tier from Policy.DeadLedger.",
+                "enum": [
+                  "STANDARD",
+                  "MATURE",
+                  "RESEARCH"
+                ]
+              },
+              "intensityBand": {
+                "type": "string",
+                "description": "Optional named intensity band within the tier, from Dead-Ledger policy."
+              }
+            }
+          },
+          "invariants": {
+            "type": "object",
+            "description": "Target bands for regional invariants that this profile assumes or attempts to realize.",
+            "additionalProperties": false,
+            "properties": {
+              "CIC": { "$ref": "#/$defs/invariantBand01" },
+              "MDI": { "$ref": "#/$defs/invariantBand01" },
+              "AOS": { "$ref": "#/$defs/invariantBand01" },
+              "RRM": { "$ref": "#/$defs/invariantBand01" },
+              "FCF": { "$ref": "#/$defs/invariantBand01" },
+              "SPR": { "$ref": "#/$defs/invariantBand01" },
+              "RWF": { "$ref": "#/$defs/invariantBand01" },
+              "DET": { "$ref": "#/$defs/invariantBand010" },
+              "HVF": { "$ref": "#/$defs/invariantBand01" },
+              "LSG": { "$ref": "#/$defs/invariantBand01" },
+              "SHCI": { "$ref": "#/$defs/invariantBand01" }
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "description": "Target bands for player-experience metrics that geometry is meant to support.",
+            "additionalProperties": false,
+            "properties": {
+              "UEC": { "$ref": "#/$defs/metricBand01" },
+              "EMD": { "$ref": "#/$defs/metricBand01" },
+              "STCI": { "$ref": "#/$defs/metricBand01" },
+              "CDL": { "$ref": "#/$defs/metricBand01" },
+              "ARR": { "$ref": "#/$defs/metricBand01" }
+            }
+          },
+          "cameraGrammarRef": {
+            "type": "string",
+            "description": "ID of a fixed-camera or camera-grammar contract in the camera grammar library, e.g., corridor-fixed-03."
+          },
+          "lightingStyleRef": {
+            "type": "string",
+            "description": "ID of a lighting style contract, e.g., deadlantern-industrial-indifference."
+          },
+          "spawnHints": {
+            "type": "object",
+            "description": "Hints for spawn density, avoid regions, and pacing under this geometry.",
+            "additionalProperties": false,
+            "properties": {
+              "densityBand": {
+                "type": "string",
+                "description": "Qualitative density hint for spawns/events.",
+                "enum": [
+                  "VERY_LOW",
+                  "LOW",
+                  "MEDIUM",
+                  "HIGH",
+                  "EXTREME"
+                ]
+              },
+              "avoidCorridorsAround": {
+                "type": "array",
+                "description": "Corridor/room IDs or patterns where spawns should be suppressed.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cooldownSecondsMin": {
+                "type": "number",
+                "minimum": 0.0,
+                "description": "Minimum cooldown after high-impact events for this profile."
+              },
+              "cooldownSecondsMax": {
+                "type": "number",
+                "minimum": 0.0,
+                "description": "Maximum cooldown after high-impact events for this profile."
+              }
+            }
+          },
+          "detCaps": {
+            "type": "object",
+            "description": "Optional hard caps for DET and related exposure metrics under this profile, aligned with Dead-Ledger attestation.",
+            "additionalProperties": false,
+            "properties": {
+              "DETMax": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 10.0,
+                "description": "Maximum allowed DET for this profile."
+              },
+              "overwhelmedDwellSecondsMax": {
+                "type": "number",
+                "minimum": 0.0,
+                "description": "Maximum continuous time allowed in OVERWHELMED mode when this profile is active."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "metricBand01": {
+      "type": "object",
+      "description": "Absolute band for a single entertainment metric in [0,1].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "invariantBand01": {
+      "type": "object",
+      "description": "Absolute band for a normalized invariant in [0,1].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "invariantBand010": {
+      "type": "object",
+      "description": "Absolute band for DET or other capped invariant in [0,10].",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 10.0
+        }
+      }
+    }
+  }
+}
