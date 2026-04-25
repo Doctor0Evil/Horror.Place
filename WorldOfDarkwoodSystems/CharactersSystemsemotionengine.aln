@@ -1,0 +1,48 @@
+aln
+MODULE emotionengine.v1
+META purpose Map personality + generic stimuli → emotion tensor & tone.
+END
+
+ACTION computeemotion
+  INPUT basepersonality map, stimuli map
+  EXEC
+    EMOTION fear 0.0, anger 0.0, curiosity 0.0, sadness 0.0, mania 0.0, trust 0.0
+
+    if basepersonality.Cunning 0.7
+      EMOTION.curiosity 0.2
+    end
+    if basepersonality.Cruel 0.5
+      EMOTION.anger 0.15
+    end
+    if stimuli.PlayerAction Threaten
+      EMOTION.anger 0.3
+      EMOTION.trust -0.2
+    end
+    if stimuli.WorldMood ChaosRising
+      EMOTION.mania 0.25
+      EMOTION.fear 0.1
+    end
+
+    ; clamp 0–1
+    for k in EMOTION.keys
+      if EMOTION[k] 0.0 then EMOTION[k] 0.0 end
+      if EMOTION[k] 1.0 then EMOTION[k] 1.0 end
+    end
+
+    RETURN EMOTION
+  END
+END
+
+ACTION selectdialoguetone
+  INPUT emotion map
+  EXEC
+    tone neutral
+    if emotion.anger 0.6       tone hostile
+    elif emotion.curiosity 0.5 tone probing
+    elif emotion.fear 0.5      tone anxious
+    elif emotion.mania 0.5     tone unhinged
+    end
+    RETURN tone
+  END
+END
+END
